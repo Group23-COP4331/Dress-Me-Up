@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { exec } = require('child_process');
 
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
 
 // Update this to the absolute path of your repository working copy.
 const repoPath = '/root/Dress-Me-Up';
@@ -20,6 +20,7 @@ app.post('/git-webhook', (req, res) => {
       git pull origin main &&
       npm install &&
       npm run build &&
+      rm -rf /var/www/html/*
       cp -r ${repoPath}/frontend/dist/* ${deployPath}
     `;
     
