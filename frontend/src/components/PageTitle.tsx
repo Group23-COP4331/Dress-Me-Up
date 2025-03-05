@@ -3,9 +3,9 @@
 
 function PageTitle()
 {
-   return(
-     <h1 id="title">Dress Me Up Website</h1>
-   );
+  return(
+    <h1 className = "text-2xl">Dress Me Up Website</h1>
+  );
 };
 
 export default PageTitle;

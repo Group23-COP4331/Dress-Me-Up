@@ -10,7 +10,7 @@ const LoginPage: React.FC = () => {
       <Login />
       <p>
         Don't have an account?{' '}
-        <Link to="/register" style={{ color: 'blue', textDecoration: 'underline' }}>
+        <Link to="/register">
           Register here
         </Link>
       </p>

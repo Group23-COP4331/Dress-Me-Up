@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildPath } from '../Path'; // Adjust the import path as needed
+import { buildPath } from '../components/Path'; // Adjust the import path as needed
 
 const RegisterPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
