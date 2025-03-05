@@ -37,6 +37,9 @@ connectToDatabase();
 const apiRoutes = require('./api'); // Import api.js
 apiRoutes(app, client); // Pass app and database client
 
+
+console.log('Working directory:', process.cwd());
+
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, "0.0.0.0", () => {
