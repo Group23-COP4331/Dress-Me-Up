@@ -3,7 +3,7 @@ export default function LandingPage(){
   console.log("hello");
   return (
 
-    <div className = "bg-themeGray">
+    <div >
 
       <h1>hello</h1>
 
