@@ -20,8 +20,8 @@ app.use(cors({
 app.use(express.json());
 
 // Database Connection
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const url = process.env.MONGODB_URI;
+const client = new MongoClient(url);
 
 async function connectToDatabase() {
   try {
