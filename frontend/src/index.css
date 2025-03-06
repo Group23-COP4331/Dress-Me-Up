@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Piazzolla:wght@300;400;700&display=swap'); /*Importing piazolla font*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;  /*CSS is always applied to a page globally. If we import tailwindcss in indexcss which is refernced in main.tsx entry point for app then all components will be able to use tailwind*/
 
 body{ 
   @apply bg-themeLightBeige; /*applying the background color of our website using tailwind utility. This css file gets served in main.tsx which is wrapped in a body inside the index.html that iss why this bg will persist across pages */
+  font-family: 'Piazzolla', serif; 
 }
