@@ -1,6 +1,6 @@
 // Updated Login.tsx
 import { useState } from 'react';
-import { buildPath as bp } from './Path.tsx';
+import { buildPath as bp } from './Path.js';
 
 function Login() {
     const [message, setMessage] = useState('');
