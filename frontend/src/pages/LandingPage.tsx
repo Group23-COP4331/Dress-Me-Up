@@ -24,8 +24,17 @@ export default function LandingPage(){
 
           </div>  
 
-          <div className="flex flex-col flex-shrink-0"> {/*Div for dressmeup logo ***FLEX COL CAUSE TEXT WILL GO UNDER IT IN THIS DIV */}
+          <div className="flex flex-col flex-shrink-0 gap-16 relative"> {/*Div for dressmeup logo and slogan that will go under the logo*/}
+
             <img src = {logo} alt = "DressMeUp Logo" className = "w-44 h-44 rounded-lg" />
+
+            <div className = "absolute top-[118%] w-[600px]"> {/*So I had to wrap the text in a div that was absolute to remove the text from page flow so they wouldnt push flex box with buttons next to it away. This div is relative to the flex col parent */}
+              <p className  = "text-left text-7xl leading-normal"> {/*Align text left and since its div's width is fixed p tags wrap on their own so */}
+                Revamp your fashion.
+                Restyle your favorites. 
+                Rewear, reimagined. 
+              </p>
+            </div>
           </div>
 
           <div className = "flex flex-col items-center justify-center gap-10 flex-grow-0"> {/*Flex col so that login and about us are stacked on top of each other */}
