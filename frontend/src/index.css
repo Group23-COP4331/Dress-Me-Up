@@ -6,4 +6,5 @@
 body{ 
   @apply bg-themeLightBeige; /*applying the background color of our website using tailwind utility. This css file gets served in main.tsx which is wrapped in a body inside the index.html that iss why this bg will persist across pages */
   font-family: 'Piazzolla', serif; 
+  overflow: hidden; /*Temporary solution so that pages dont scroll since some were scrolling even tho they had no extra content*/
 }
