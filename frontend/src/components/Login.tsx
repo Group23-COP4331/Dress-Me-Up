@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { buildPath as bp } from './Path.js';
 
 function Login() {
-    const [message, setMessage] = useState('');
+    //using the useState hook so that react can keepp track of these variables as  their state changes eg user types.
+    const [message, setMessage] = useState(''); 
     const [loginName, setLoginName] = useState('');
     const [loginPassword, setPassword] = useState('');
+    //creating another useState variable that will keep track of what form to show user the login or register. Remeber state is dynamic in react if it changes react automatically re-renders page
+    const [isLoginForm, setIsLoginForm] = useState(true); 
 
     async function doLogin(event: any): Promise<void> {
         event.preventDefault();
@@ -35,7 +38,7 @@ function Login() {
                 };
                 localStorage.setItem('user_data', JSON.stringify(user));
                 setMessage('');
-                window.location.href = '/cards';
+                window.location.href = '/cards'; //*****this line needs to change to /dahsboard once dashboard is implemented****
             }
         } catch (error: any) {
             alert(error.toString());
@@ -43,29 +46,11 @@ function Login() {
     }
 
     return (
-        <div id="loginDiv">
-            <span id="inner-title">PLEASE LOG IN</span>
-            <br />
-            <input
-                type="text"
-                id="loginName"
-                placeholder="Username"
-                onChange={(e) => setLoginName(e.target.value)}
-            />
-            <input
-                type="password"
-                id="loginPassword"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-            />
-            <input
-                type="submit"
-                id="loginButton"
-                className="buttons"
-                value="Login"
-                onClick={doLogin}
-            />
-            <span id="loginResult">{message}</span>
+        <div className = "flex flex-col bg-themeGray w-[600px] h-[600px] rounded-lg ">
+            
+            {/*In here we will have component for the login slider, the login form that will display when isLoginForm state is true, the register form that will
+            display when false*/}
+
         </div>
     );
 }
