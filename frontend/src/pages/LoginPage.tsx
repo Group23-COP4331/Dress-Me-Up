@@ -3,19 +3,15 @@ import { Link } from 'react-router-dom';
 import PageTitle from '../components/PageTitle';
 import Login from '../components/Login';
 
-const LoginPage: React.FC = () => {
+export default function LoginPage(){
   return (
     <div>
       <PageTitle />
       <Login />
       <p>
-        Don't have an account?{' '}
-        <Link to="/register" >
-          Register here
-        </Link>
+        login page hehehe
       </p>
     </div>
   );
 };
 
-export default LoginPage;
