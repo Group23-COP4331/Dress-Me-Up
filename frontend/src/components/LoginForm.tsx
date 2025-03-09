@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { buildPath } from './Path.js';
+import { buildPath } from './BuildApiPath.js';
 
 interface LoginFormProps {
   setMessage: (message: string) => void; // Function that takes a string and returns nothing
@@ -55,7 +55,7 @@ export default function LoginForm({setMessage} : LoginFormProps){
   return(
 
     <form onSubmit = {doLogin}> {/*On form submit execute the login function*/}
-      <div className ="flex flex-col justify-center items-center gap-10"> {/*Keep al form items in a flex col so that they are above one another */}
+      <div className ="flex flex-col justify-center items-center gap-6"> {/*Keep al form items in a flex col so that they are above one another */}
 
         <div className = "flex flex-col items-start gap-2"> {/*Wrap labels and inputs in another flex col so lable lines up left with input box */}
           <label htmlFor="email"> Email </label>
@@ -63,14 +63,14 @@ export default function LoginForm({setMessage} : LoginFormProps){
           <input onChange = {(e) => {setEmail(e.target.value)}} className = "w-[500px] h-12 rounded-lg pl-4" type="email" required id="email" name="email" placeholder='Youraddress@example.com' />
         </div>
 
-        <div className = "flex flex-col items-start">
+        <div className = "flex flex-col items-start gap-2">
           <label htmlFor="password"> Password </label>
           {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
           <input onChange = {(e) => {setPassword(e.target.value)}} className = "w-[500px] h-12 rounded-lg pl-4" type="text" required id="password" name="password" placeholder='Password'/>
         </div>
 
         <button className = "text-2xl text-white w-[500px] h-12 bg-themeGreen rounded-lg mt-10 hover:scale-105"type="submit">Submit</button>
-        
+
       </div>
     </form>
 
