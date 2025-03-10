@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 //below imports are the components that we call and show up on our login box
 import SliderButton from './SliderButton.js';
-import RegisterForm from './registerForm.js';
-import LoginForm from './loginForm.js';
+import RegisterForm from './RegisterForm.js';
+import LoginForm from './LoginForm.js';
 
 function Login() {
     const [message, setMessage] = useState('What error message would look like!'); 
