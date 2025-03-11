@@ -84,7 +84,7 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
         <input onChange = {(e) => {setPassword(e.target.value)}} className = "w-[500px] h-12 rounded-lg pl-4" required pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
   title="Password must be at least 8 characters long, contain one letter, one number, and one symbol." type = {showPassword? 'text': 'password'} id="password" name="password" placeholder='Password'/>
 
-        <button className = {`absolute bottom-2 right-4 ${password ? '': 'opacity-50 cursor-not-allowed'}`} disabled={!password} onClick = {() => setVisibility((prev)=> !prev)}> {/*On click of this button we toggle the bool of our showPassword so that state changes and everything using show password re-renders. Also have disabled so that when password is not empty so !password it returns true which enables button to have onclick functionality */}
+        <button type = "button" className = {`absolute bottom-2 right-4 ${password ? '': 'opacity-50 cursor-not-allowed'}`} disabled={!password} onClick = {() => setVisibility((prev)=> !prev)}> {/*On click of this button we toggle the bool of our showPassword so that state changes and everything using show password re-renders. Also have disabled so that when password is not empty so !password it returns true which enables button to have onclick functionality */}
           <img src = {showPassword? hide: show} alt = "toggle password icon" className = "w-8 h-8 pointer-events-none" />
         </button>
       </div>
