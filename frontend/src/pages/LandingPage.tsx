@@ -57,7 +57,7 @@ export default function LandingPage(){
           <div className = "flex flex-col items-center justify-center gap-10 flex-grow-0"> {/*Flex col so that login and about us are stacked on top of each other */}
 
             <button onClick = {() => navigate("/login")} className = {buttonClass}> Login  </button>
-            <button onClick = {() => navigate("/aboutus")} className = {buttonClass}> About Us </button>
+            <button onClick = {() => navigate("/about")} className = {buttonClass}> About Us </button>
 
             {/*ABOVE ON CLICK NAVIGATES TO ABOUT US DOESNT EXIST CHANGE THAT ROUTE ONCE ETHAN MAKES ABOUT PAGE*/}
           </div>

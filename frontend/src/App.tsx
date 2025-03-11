@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import './App.css';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
-import AboutUs from './pages/AboutUs';
+import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
 
 function App() {
@@ -11,7 +11,7 @@ function App() {
       <Routes> {/*This wraps all the routes and each <Route> component inside <Routes> defiines a path and a component that should be rendered when user visits that path*/}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/aboutus" element={<AboutUs />} />
+        <Route path="/about" element={<AboutPage  />} />
         <Route path="*" element={<Navigate to="/" />} /> {/*  *path is a wildcard any unknown / undefined route will match that star and route user back to homepage */}
       </Routes>
     </Router>
