@@ -43,7 +43,7 @@ export default function LoginForm({setMessage} : LoginFormProps){
       
         localStorage.setItem('user_data', JSON.stringify(user)); //store objet in local storage so we can use later
         setMessage(''); //leave message empty
-        window.location.href = '/cards'; //*****this line needs to change to /dahsboard once dashboard is implemented****
+        window.location.href = '/dashboard'; //*****have this line as /dashboard so that it redirects us to log in test which is working fine****
 
       }
 
