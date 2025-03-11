@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
@@ -13,29 +14,44 @@ app.use(cors({
   credentials: true
 }));
 
-
-
-
 // Parse JSON bodies
 app.use(express.json());
 
-// Database Connection
+// Native MongoDB Client Connection (if needed elsewhere)
 const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 
-async function connectToDatabase() {
+async function connectToNativeDB() {
   try {
     await client.connect();
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB (Native Client)');
   } catch (error) {
-    console.error('MongoDB Connection Error:', error);
+    console.error('MongoDB Native Client Connection Error:', error);
   }
 }
-connectToDatabase();
+connectToNativeDB();
 
-// Import API Routes
-const apiRoutes = require('./api'); // Import api.js
-apiRoutes(app, client); // Pass app and database client
+// Establish Mongoose Connection for your models
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("Mongoose connected"))
+.catch(err => console.error("Mongoose connection error:", err));
+
+// Optional: Listen to connection events for more debugging info
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connection established');
+});
+mongoose.connection.on('error', (err) => {
+  console.error('Mongoose connection error:', err);
+});
+
+// Import API Routes (Mongoose will now be available to your models)
+const apiRoutes = require('./api');
+apiRoutes(app, client); // Pass app and native client if needed
+
+console.log('Working directory:', process.cwd());
 
 // Start the server
 const PORT = process.env.PORT || 5001;
