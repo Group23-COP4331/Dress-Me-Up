@@ -12,22 +12,20 @@ const deployPath = '/var/www/html';
 
 app.post('/git-webhook', (req, res) => {
   console.log('Webhook received:', req.body);
-console.log(`Payload size: ${JSON.stringify(req.body).length} bytes`);
+  console.log(`Payload size: ${JSON.stringify(req.body).length} bytes`);
+
   if (req.headers['x-github-event'] === 'push') {
-    // Chain commands: git pull, npm install, npm run build, and then copy the build output.
-    // Adjust "build" below if your build folder is named differently (e.g., "dist")
+    // Chain commands: git pull, npm install, npm run build (from frontend directory), and then copy the build output.
     const cmd = `
+      cd ${repoPath} &&
       git pull origin main &&
-      npm install &&
-      cd ${repoPath}/backend &&
-      npm install &&
       cd ${repoPath}/frontend &&
       npm install &&
       npm run build &&
-      rm -rf /var/www/html/*
-      cp -r /dist/* ${deployPath}
+      rm -rf ${deployPath}/* &&
+      cp -r ${repoPath}/frontend/dist/* ${deployPath}
     `;
-    
+
     exec(cmd, { cwd: repoPath }, (error, stdout, stderr) => {
       if (error) {
         console.error(`Error during automation: ${error}`);
