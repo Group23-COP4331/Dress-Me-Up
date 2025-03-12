@@ -19,7 +19,7 @@ console.log(`Payload size: ${JSON.stringify(req.body).length} bytes`);
     const cmd = `
       git pull origin main &&
       npm install &&
-      cd $(repoPath)/backend &&
+      cd ${repoPath}/backend &&
       npm install &&
       cd ${repoPath}/frontend &&
       npm install &&
