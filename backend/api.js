@@ -30,8 +30,14 @@ app.post('/api/register', async (req, res) => {
 
     await newUser.save();
 
+    // create custom json web token
     const token = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // the verification link
+    // TO BE CHANGED AFTER DEVELOPMENT
     const verificationLink = `http://localhost:5173/auth/verify-email?token=${token}`;
+
+    // wait for the email to send
     await sendEmailVerification(newUser.Login.trim(), verificationLink);
 
     // 3. (Optional) Auto-login the user by returning a JWT
@@ -53,20 +59,29 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.get('/auth/verify-email', async (req, res) => {
+  // get token
   const { token } = req.query;
 
+  // wrap in try/catch for any erros
   try {
+    // decode the json web token
     const decoded = jsonWebToken.verify(token, process.env.JWT_SECRET);
 
+    // find the user associated w/ token
     const user = await User.findById(decoded.id);
+
+    // if user does't exist, error
     if (!user) {
       return res.status(400).json({ error: 'Invalid user' });
     }
 
+    // if user does, assign true to verified
     user.verified = true;
     await user.save();
     
     res.status(200).json({ message: 'You have been successfully verified!' });
+
+    // else, error
     } catch (error) { 
         console.error('Error during email verification:', error);
     }
