@@ -3,8 +3,11 @@ const User = require('./models/user');
 const Card = require('./models/card');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
 
-module.exports = function (app) {
+const express = require('express');
+const jsonWebToken = require('jsonwebtoken');
+const sendEmailVerification = require('./models/sendEmailVerification')
 
+module.exports = function (app) {
 
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password } = req.body;
@@ -27,6 +30,10 @@ app.post('/api/register', async (req, res) => {
 
     await newUser.save();
 
+    const token = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const verificationLink = `http://localhost:5173/auth/verify-email?token=${token}`;
+    await sendEmailVerification(newUser.Login.trim(), verificationLink);
+
     // 3. (Optional) Auto-login the user by returning a JWT
     // const jwtToken = token.createToken(newUser.FirstName, newUser.LastName, newUser.UserId);
 
@@ -36,7 +43,8 @@ app.post('/api/register', async (req, res) => {
       // jwtToken, // if you're returning a token
       firstName: newUser.FirstName,
       lastName: newUser.LastName,
-      userId: newUser.UserId
+      userId: newUser.UserId,
+      message: 'You have successfully registered! Please check your email to verify your account and finish registration.'
     });
   } catch (e) {
     console.error('Error in /api/register:', e);
@@ -44,6 +52,25 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+app.get('/auth/verify-email', async (req, res) => {
+  const { token } = req.query;
+
+  try {
+    const decoded = jsonWebToken.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid user' });
+    }
+
+    user.verified = true;
+    await user.save();
+    
+    res.status(200).json({ message: 'You have been successfully verified!' });
+    } catch (error) { 
+        console.error('Error during email verification:', error);
+    }
+});
 
   app.post('/api/addcard', async (req, res, next) => {
     const { userId, card, jwtToken } = req.body;
