@@ -19,6 +19,8 @@ app.post('/git-webhook', (req, res) => {
     const cmd = `
       cd ${repoPath} &&
       git pull origin main &&
+      cd ${repoPath}/backend &&
+      npm install &&
       cd ${repoPath}/frontend &&
       npm install &&
       npm run build &&
