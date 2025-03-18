@@ -5,7 +5,7 @@ const token = require('./createJWT'); // Assuming you have your JWT helper in cr
 
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
-const sendEmailVerification = require('./models/sendEmailVerification')
+const sendEmailVerification = require('./sendEmailVerification')
 
 module.exports = function (app) {
 
@@ -25,7 +25,8 @@ app.post('/api/register', async (req, res) => {
       FirstName: FirstName.trim(),
       LastName: LastName.trim(),
       Login: Login.trim(),
-      Password: Password.trim() // In production, hash this!
+      Password: Password.trim(), // In production, hash this!
+      verified: false,
     });
 
     await newUser.save();
@@ -34,8 +35,15 @@ app.post('/api/register', async (req, res) => {
     const token = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // the verification link
-    // TO BE CHANGED AFTER DEVELOPMENT
-    const verificationLink = `http://localhost:5173/auth/verify-email?token=${token}`;
+    // Going to use process.env.ENV_NODE variable to check if we are on production or local host
+    let verificationLink;
+
+    if (process.env.NODE_ENV === 'production') { //if we are on production make verification link hit the api endpoint on the actual domain name
+      verificationLink = `http://dressmeupproject.com/auth/verify-email?token=${token}`;
+    } else { //otherwise jsut do local host
+      verificationLink = `http://localhost:5001/auth/verify-email?token=${token}`;
+    }
+
 
     // wait for the email to send
     await sendEmailVerification(newUser.Login.trim(), verificationLink);
@@ -50,7 +58,7 @@ app.post('/api/register', async (req, res) => {
       firstName: newUser.FirstName,
       lastName: newUser.LastName,
       userId: newUser.UserId,
-      message: 'You have successfully registered! Please check your email to verify your account and finish registration.'
+      message: 'You have successfully registered! Please check email to verify account and finish registration.'
     });
   } catch (e) {
     console.error('Error in /api/register:', e);
@@ -59,6 +67,9 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.get('/auth/verify-email', async (req, res) => {
+
+  console.log("Hitting verify-email");
+
   // get token
   const { token } = req.query;
 
@@ -68,7 +79,7 @@ app.get('/auth/verify-email', async (req, res) => {
     const decoded = jsonWebToken.verify(token, process.env.JWT_SECRET);
 
     // find the user associated w/ token
-    const user = await User.findById(decoded.id);
+    const user = await User.findOne({ UserId: decoded.id }); //had to change this to find one becasuse findById trys to find by users default _id field that mongo assigns and decoded.id is our customer Userid field
 
     // if user does't exist, error
     if (!user) {
@@ -84,6 +95,7 @@ app.get('/auth/verify-email', async (req, res) => {
     // else, error
     } catch (error) { 
         console.error('Error during email verification:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -136,18 +148,29 @@ app.get('/auth/verify-email', async (req, res) => {
     const { Login, Password } = req.body;
 
     try {
-      const results = await User.find({
+      const user = await User.findOne({ //changed this from find to findOne so we target one user at a time there wont be dups anyways we check this in register
         Login: Login.trim(),
         Password: Password.trim()
       });
 
-      console.log("Database query result:", JSON.stringify(results, null, 2));
+      console.log("Database query result:", JSON.stringify(user, null, 2));
 
-      if (results.length > 0) {
-        res.status(200).json({ id: results[0].UserId, firstName: results[0].FirstName, lastName: results[0].LastName, error: '' });
-      } else {
-        res.status(401).json({ error: "Login/Password incorrect" });
+      if(!user){ //if there is no user object then its cause we didnt find correct login and password on the database
+        return res.status(401).json({error: "Incorrect email and password!"}); //return 401 error status with appropriate error message
       }
+      if(!user.verified){  //if we are here it means user exists so check if they are verified if they arent then
+        return res.status(403).json({error: "Please verify your email before signing in!", verified: false}); //exit with an erro code as well
+      }
+      
+      //if we didnt exit in above checks then it means the user is verified and logged in so return success code along with all user information
+      return res.status(200).json({
+        id: user.UserId,
+        firstName: user.FirstName,
+        lastName: user.LastName,
+        verified: true,
+        error: ''
+      });
+
     } catch (e) {
       console.error("Error in /api/login:", e);
       res.status(500).json({ error: e.message });
