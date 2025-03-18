@@ -4,6 +4,8 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
+import LoggedInTest from './pages/LoggedInTest';
+import MyClosetPage from './pages/MyClosetPage';
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/about" element={<AboutPage  />} />
+        <Route path="/dashboard" element ={<LoggedInTest />}/> 
+        <Route path ="/mycloset" element={<MyClosetPage/>}/>
         <Route path="*" element={<Navigate to="/" />} /> {/*  *path is a wildcard any unknown / undefined route will match that star and route user back to homepage */}
       </Routes>
     </Router>

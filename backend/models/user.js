@@ -6,7 +6,8 @@ const UserSchema = new Schema({
   FirstName: { type: String, required: true },
   LastName: { type: String, required: true },
   Login: { type: String, required: true, unique: true },
-  Password: { type: String, required: true }
+  Password: { type: String, required: true },
+  verified: { type: Boolean, default:false }
 });
 
 module.exports = mongoose.model('User', UserSchema, 'Users');

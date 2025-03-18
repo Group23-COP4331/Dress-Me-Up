@@ -7,10 +7,15 @@ import RegisterForm from './RegisterForm.js';
 import LoginForm from './LoginForm.js';
 
 function Login() {
-    const [message, setMessage] = useState('What error message would look like!'); 
+    const [message, setMessage] = useState(''); 
     //creating another useState variable that will keep track of what form to show user the login or register. Remeber state is dynamic in react if it changes react automatically re-renders page
     const [isLoginForm, setIsLoginForm] = useState(true); 
-    const toggleForm = () => setIsLoginForm((prev) => !prev); //declaring a callback function toggleForm that calls the setIsLoginForm which has a callback function inside thaat uses Functional Updating to flip the treu to false and vice versa. "prev" is what the state was before aand we flip it
+
+    const toggleForm = () => {
+        setIsLoginForm((prev) => !prev); //declaring a callback function toggleForm that calls the setIsLoginForm which has a callback function inside thaat uses Functional Updating to flip the treu to false and vice versa. "prev" is what the state was before aand we flip it
+        setMessage(''); // Reset message state when switching forms so when looking at register form we arent displaying state we set in login form
+    }
+
 
 
     return (
