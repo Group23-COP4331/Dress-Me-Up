@@ -48,7 +48,7 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
         // storeToken(res.jwtToken);
 
         // Display success or navigate to a different page
-        setMessage('Registration successful!');
+        setMessage(res.message ||'Registration successful!');
       }
     } catch (err) {
       console.error(err);
