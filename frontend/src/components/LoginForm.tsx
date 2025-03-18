@@ -52,9 +52,9 @@ export default function LoginForm({setMessage} : LoginFormProps){
           id: res.id,
         };
       
-        localStorage.setItem('user_data', JSON.stringify(user)); //store objet in local storage so we can use later
+        localStorage.setItem('user_data', JSON.stringify(user)); //store object in local storage so we can use later
         setMessage(''); //leave message empty
-        window.location.href = '/dashboard'; //*****have this line as /dashboard so that it redirects us to log in test which is working fine****
+        window.location.href = '/dashboard'; //redirect user to their dashboard page
       }
 
     } catch (error: any) {

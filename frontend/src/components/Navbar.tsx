@@ -1,0 +1,36 @@
+import { Link } from 'react-router-dom';
+import Logo from '../assets/GreenLogo.png';
+
+export default function Navbar() {
+  return (
+    <nav className="flex items-center justify-between px-6 py-4 h-16 bg-themeGray shadow-md rounded-md">
+      <div className="flex items-center">
+        <Link to="/dashboard"> 
+          <img
+            src={Logo}
+            alt="Logo"
+            className="h-9 w-9 mr-2 rounded-md"
+          />
+        </Link>
+      </div>
+      {/* Navigation Links (medium screens and up) */}
+      {/* Add Page ROUTING once pages are created in the future */}
+      <div className="hidden md:flex items-center space-x-6">
+        <Link to="/my-closet" className="text-lg text-white hover:text-blue-500">
+          My Closet
+        </Link>
+        <Link to="/ootd" className="text-lg text-white hover:text-blue-500">
+          Outfit of the Day
+        </Link>
+        <Link to="/explore" className="text-lg text-white hover:text-blue-500">
+          Explore
+        </Link>
+      </div>
+      <div className="flex items-center">
+        <button className="text-lg text-white hover:text-blue-500">
+          Logout
+        </button>
+      </div>
+    </nav>
+  );
+}
