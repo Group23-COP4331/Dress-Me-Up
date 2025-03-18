@@ -3,7 +3,6 @@ import './App.css';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import AboutPage from './pages/AboutPage';
-import RegisterPage from './pages/RegisterPage';
 import LoggedInTest from './pages/LoggedInTest';
 import MyClosetPage from './pages/MyClosetPage';
 
