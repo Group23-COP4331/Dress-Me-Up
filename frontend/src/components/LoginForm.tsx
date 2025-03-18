@@ -36,9 +36,15 @@ export default function LoginForm({setMessage} : LoginFormProps){
 
       const res = await response.json(); //convert response to json and store it in a variable
 
-      if (!res.id) {
-        setMessage('User/Password combination incorrect'); //if password combo is incorrect meaning the id isnt a number greater than 0 display error message
-      } else { //otherwise combo was correct
+      if (!res.id) { //if no id was returned we know its cause user doesnt even exist
+        setMessage(res.error || 'User/Password combination incorrect'); //if password combo is incorrect meaning the id isnt a number greater than 0 display error message
+      } 
+      
+      else if(res.verified == false) {
+        setMessage(res.error || 'Please verify email before signing in'); //if user isnt verified they need ot verify before they can sign in 
+      }
+
+      else{ //otherwise combo was correct and user is verified
 
         const user = { //make an object from response
           firstName: res.firstName,
@@ -49,7 +55,6 @@ export default function LoginForm({setMessage} : LoginFormProps){
         localStorage.setItem('user_data', JSON.stringify(user)); //store objet in local storage so we can use later
         setMessage(''); //leave message empty
         window.location.href = '/dashboard'; //*****have this line as /dashboard so that it redirects us to log in test which is working fine****
-
       }
 
     } catch (error: any) {
