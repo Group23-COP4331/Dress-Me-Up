@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
-
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
+import AboutPage from './pages/AboutPage';
 import DashboardPage from './pages/DashboardPage';
+import MyCloset from './pages/MyClosetPage';
 
 function App() {
   return (
@@ -12,6 +13,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element ={<DashboardPage />}/> 
+        <Route path="/about" element={<AboutPage  />} />
+        <Route path ="/mycloset" element={<MyCloset />}/>
         <Route path="*" element={<Navigate to="/" />} /> {/*  *path is a wildcard any unknown / undefined route will match that star and route user back to homepage */}
       </Routes>
     </Router>
