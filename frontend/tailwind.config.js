@@ -9,7 +9,6 @@ export default {
         themeDarkBeige: '#E7D4B5',
         themeLightBeige: '#F6E6CB'
       }
-
     },
   },
   plugins: [],
