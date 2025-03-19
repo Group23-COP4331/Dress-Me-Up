@@ -18,7 +18,10 @@
   "homepage": "https://github.com/Group23-COP4331/Dress-Me-Up#readme",
   "description": "",
   "dependencies": {
+    "axios": "^1.8.3",
     "body-parser": "^1.20.3",
-    "express": "^4.21.2"
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.12.1"
   }
 }

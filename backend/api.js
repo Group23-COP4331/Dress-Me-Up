@@ -1,11 +1,12 @@
 // api.js
 const User = require('./models/user');
 const Card = require('./models/card');
+const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
 
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
-const sendEmailVerification = require('./sendEmailVerification')
+const sendEmailVerification = require('./sendEmailVerification');
 
 module.exports = function (app) {
 
@@ -176,4 +177,25 @@ app.get('/auth/verify-email', async (req, res) => {
       res.status(500).json({ error: e.message });
     }
   });
+
+  app.post('/api/weather', async (req, res) => {
+    try {
+      const { city, country, temperature, description, icon } = req.body;
+
+      const weatherData = new Weather({
+        city,
+        country,
+        temperature,
+        description,
+        icon
+      });
+
+      await weatherData.save();
+      res.json({ message: 'Weather data successfully saved' });
+    } catch (error) {
+      console.error('Error in /api/weather: ', error);
+      res.status(500).json({ error: error.message });
+    }
+  })
+
 };
