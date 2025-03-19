@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import ProfileCard from '../components/ProfileCard';
 import Logo from '../assets/GreenLogo.png';
 import Tree from '../assets/tree.png';
+import Kevin from '../assets/About-Images/kevinpfp.JPG'; 
+import Daniel from '../assets/About-Images/Daniel.JPG'; 
+
 
 export default function AboutPage(){
 
@@ -10,32 +13,32 @@ export default function AboutPage(){
         { 
             name: "Kevin Pereda",
             role: "Project Manager",
-            // IMPORT PROFILE PHOTO
+            pic: Kevin
         },
         { 
+            // IMPORT PROFILE PHOTO
+            name: "Daniel Pereda",
+            role: "Database, API",
+            pic: Daniel
+        },
+        { 
+            // IMPORT PROFILE PHOTO
             name: "Jesiel Reyes",
             role: "Front End",
+        },
+        { 
+            
+            name: "Sadie Burns",
+            role: "Front End, Mobile",
             // IMPORT PROFILE PHOTO
         },
         { 
             name: "Ethan McKissic",
             role: "Front End",
-            // IMPORT PROFILE PHOTO
-        },
-        { 
-            
-            name: "Sade",
-            role: "Front End, Mobile",
-            // IMPORT PROFILE PHOTO
         },
         { 
             name: "Ernesto Perez",
             role: "Front End, API",
-            // IMPORT PROFILE PHOTO
-        },
-        { 
-            name: "Daniel",
-            role: "Database, API",
             // IMPORT PROFILE PHOTO
         },
         { 
@@ -47,24 +50,23 @@ export default function AboutPage(){
 
     return (
         <div className = "min-h-screen flex flex-col justify-center items-center relative">
-            <Link to="/" className="-left-72 top-0 hover:scale-105 absolute">
+            <Link to="/" className="left-8 top-4 hover:scale-105 fixed">
                 <img src={Logo} alt="DressMeUp Logo" className = "w-24 h-24 rounded-lg" />
             </Link>
             <h1 className='text-6xl absolute top-0'>Meet the developers</h1>
-            <div className="flex flex-col justify-center items-center h-[30rem] w-[75rem]"> 
-                <div className="flex flex-row justify-center gap-12 h-full ">
-                    <ProfileCard />
-                    <ProfileCard />
-                    <ProfileCard />
+            <div className="flex flex-col justify-center items-center h-[30rem] w-[75rem] relative top-5 right-4"> 
+                <div className="flex flex-row justify-center gap-12 h-full">
+                    {devs.slice(0, 3).map((dev, index) => (
+                        <ProfileCard key={index} {...dev} />
+                    ))}
                 </div>
                 <div className="flex flex-row justify-center gap-12 h-full w-full">
-                    <ProfileCard />
-                    <ProfileCard />
-                    <ProfileCard />
-                    <ProfileCard />
+                {devs.slice(3, 7).map((dev, index) => (
+                        <ProfileCard key={index} {...dev} />
+                    ))}
                 </div>
             </div>
-            <img src={Tree} alt="Tree" className="fixed top-10 scale-[1.25] z-[-1]  h-auto"/> 
+            <img src={Tree} alt="Tree" className="fixed top-10 scale-[1.25] z-[-1] h-auto"/> 
         </div>
     ); 
 }

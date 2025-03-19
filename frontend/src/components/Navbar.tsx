@@ -16,7 +16,7 @@ export default function Navbar() {
       {/* Navigation Links (medium screens and up) */}
       {/* Add Page ROUTING once pages are created in the future */}
       <div className="hidden md:flex items-center space-x-6">
-        <Link to="/my-closet" className="text-lg text-white hover:text-blue-500">
+        <Link to="/mycloset" className="text-lg text-white hover:text-blue-500">
           My Closet
         </Link>
         <Link to="/ootd" className="text-lg text-white hover:text-blue-500">

@@ -3,6 +3,7 @@ import redheart from "../assets/MyClosetImages/redheart.png";
 // Example placeholder imports – adjust these paths to match your actual files:
 import plant from "../assets/MyClosetImages/plant.png";
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
+import { Link } from "react-router-dom";
 // ^ If you have a different image name/path for the shoe, change this import
 
 export default function MyCloset() {
@@ -19,12 +20,13 @@ export default function MyCloset() {
     <div className="relative flex h-screen bg-themeLightBeige p-2">
       {/* Sidebar (Left) */}
       <div className="fixed left-0 top-0 h-full w-64 flex flex-col items-center p-4 bg-themeLightBeige">
-        <img
-          src={logo}
-          alt="DressMeUp Logo"
-          className="w-32 h-32 rounded-lg mb-4"
-        />
-
+        <Link to="/dashboard">
+          <img
+            src={logo}
+            alt="DressMeUp Logo"
+            className="w-32 h-32 rounded-lg mb-4"
+          />
+        </Link>
         {/* Menu Buttons */}
         <div className="flex flex-col w-5/6 h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-2">
           <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg">
