@@ -122,6 +122,44 @@ app.get('/auth/verify-email', async (req, res) => {
     }
   });
 
+  app.post('/api/addClothingItem', upload.single('image'), async (req, res, next) => {
+
+    const {name, color, category, size, jwtToken} = req.body;
+
+    try{
+
+      if(token.isExpired(jwtToken))
+      {
+        res.stats(401).json({error: 'The JWT is no longer valid', jwtToken: ''});
+        return;
+      }
+
+      const userId = token.decode(jwtToken).userId;
+
+      if(!req.file)
+      {
+        return res.status(400).json({error: 'Image is required!', jwtToken: ''});
+      }
+
+      const newItem = new ClothingItem({
+        userId,
+        name,
+        color,
+        category,
+        size: parseInt(size, 10),
+        imageURL: `` //we need to figure out where we are going to store the images people upload
+
+      });
+
+      await newItem.save();
+
+      const refreshedToken = token.refresh(jwtToken);
+      res.status(201).json({error: '', jwtToken: refreshedToken, newItem});
+    } catch(e){
+      res.status(500).json({error: e.message, jwtToken: ''});
+    }
+  });
+
   app.post('/api/searchcards', async (req, res, next) => {
     const { userId, search, jwtToken } = req.body;
 
