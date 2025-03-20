@@ -1,11 +1,13 @@
 // api.js
 const User = require('./models/user');
 const Card = require('./models/card');
+const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
 
+const axios = require('axios');
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
-const sendEmailVerification = require('./sendEmailVerification')
+const sendEmailVerification = require('./sendEmailVerification');
 
 module.exports = function (app) {
 
@@ -176,4 +178,29 @@ app.get('/auth/verify-email', async (req, res) => {
       res.status(500).json({ error: e.message });
     }
   });
+
+  app.get('/api/weather', async (req, res) => {
+    try {
+      const { city, country } = req.query;
+      const API_KEY = '2e18e1b041698949b18ec7270162d99a';
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`;
+
+      const response = await axios.get(url);
+      const { name, sys, main, weather } = response.data;
+
+      const weatherData = new Weather({
+       city: city,
+       country: sys.country,
+       temperature: main.temp,
+       description: weather[0].description,
+       icon: `https://openweathermap.org/img/wn/${weather[0].icon}.png`
+      });
+
+      res.json(weatherData);
+    } catch (error) {
+      console.error('Error in /api/weather: ', error);
+      res.status(500).json({ error: error.message });
+    }
+  })
+
 };
