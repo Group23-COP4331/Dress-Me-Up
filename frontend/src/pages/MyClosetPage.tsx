@@ -1,9 +1,8 @@
 import logo from "../assets/GreenLogo.png";
 import redheart from "../assets/MyClosetImages/redheart.png";
-// Example placeholder imports – adjust these paths to match your actual files:
+// Example placeholder imports – adjust these paths to match actual files:
 import plant from "../assets/MyClosetImages/plant.png";
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
-// ^ If you have a different image name/path for the shoe, change this import
 
 export default function MyCloset() {
   // Example “items” array.  Adjust to match your data.
@@ -66,61 +65,67 @@ export default function MyCloset() {
         <div className="mt-20 w-full flex justify-center">
           <div className="grid grid-cols-3 gap-8">
             {items.map((item) => (
-              <div
-                key={item.id}
-                className="relative w-64 h-80 bg-themeDarkBeige rounded-lg shadow-md flex flex-col items-center"
-              >
+              <div className = "relative bg-themeLightBeige">
+
                 {/* Top “plant” decoration */}
                 <img
                   src={plant}
                   alt="plant"
-                  className="w-full h-20 object-cover rounded-t-lg"
+                  className="w-full h-10 object-cover rounded-t-lg"
                 />
+                
+              <div
+                key={item.id}
+                className="relative w-66 h-60 bg-themeGray rounded-lg shadow-md flex flex-col items-center justify-center border border-black gap-2"
+              >
+
 
                 {/* Shoe image, slightly overlapping the plant */}
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-32 h-32 -mt-8 rounded shadow-lg"
+                  className="rounded shadow-lg"
                 />
 
                 {/* Name & color info */}
-                <div className="mt-2 text-center">
-                  <p className="font-semibold">{item.name}</p>
-                  <p>Color: {item.color}</p>
-                </div>
-
-                {/* Heart & edit icons in bottom-right corner */}
-                <div className="absolute bottom-2 right-2 flex gap-3">
-                  <button>
-                    <img
-                      src={redheart}
-                      alt="Favorite"
-                      className="w-6 h-6"
-                      style={{
-                        filter: item.isFavorite ? "none" : "grayscale(100%)",
-                      }}
-                    />
-                  </button>
-                  <button>
-                    {/* Simple pencil icon*/}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15.232 5.232l3.536 3.536M7.5 16.5l7.606-7.606a2 2 0 012.828 0l.464.464a2 2 0 010 2.828L10.5 19.5H7.5v-3z"
+                <div className="flex flex-col rounded-lg bg-themeLightBeige py-2">
+                  <div className="flex flex-row justify-between items-center">
+                    <p className="text-lg">{item.name}</p>
+                    <button>
+                      <img
+                        src={redheart}
+                        alt="Favorite"
+                        className="w-6 h-6"
+                        style={{
+                          filter: item.isFavorite ? "none" : "grayscale(100%)",
+                        }}
                       />
-                    </svg>
-                  </button>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-row justify-between items-center gap-20">
+                    <p className="text-lg">Color: {item.color}</p>
+                    <button>
+                      {/* Edit (pencil) icon */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-gray-700"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.232 5.232l3.536 3.536M7.5 16.5l7.606-7.606a2 2 0 012.828 0l.464.464a2 2 0 010 2.828L10.5 19.5H7.5v-3z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
+            </div>
             ))}
           </div>
         </div>
