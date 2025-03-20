@@ -3,6 +3,8 @@ const User = require('./models/user');
 const Card = require('./models/card');
 const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
+const multer = require('multer');
+const ClothingItem = require('./models/clothingItem');
 
 const axios = require('axios');
 const express = require('express');
