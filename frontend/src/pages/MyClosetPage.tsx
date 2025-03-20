@@ -1,11 +1,12 @@
 import logo from "../assets/GreenLogo.png";
 import redheart from "../assets/MyClosetImages/redheart.png";
-// Example placeholder imports – adjust these paths to match actual files:
 import plant from "../assets/MyClosetImages/plant.png";
+
+//shoe is a placeholder import we will change this with the images users upload
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
 
 export default function MyCloset() {
-  // Example “items” array.  Adjust to match your data.
+  //grid to hold placeholder items
   const items = [
     { id: 1, name: "AirForce1", color: "Red", image: shoe, isFavorite: false },
     { id: 2, name: "AirForce1", color: "Red", image: shoe, isFavorite: true },
@@ -15,8 +16,9 @@ export default function MyCloset() {
   ];
 
   return (
+    //div on whole screen
     <div className="relative flex h-screen bg-themeLightBeige p-2">
-      {/* Sidebar (Left) */}
+      {/* Sidebar surrounding buttons on the left */}
       <div className="fixed left-0 top-0 h-full w-64 flex flex-col items-center p-4 bg-themeLightBeige">
         <img
           src={logo}
@@ -24,7 +26,7 @@ export default function MyCloset() {
           className="w-32 h-32 rounded-lg mb-4"
         />
 
-        {/* Menu Buttons */}
+        {/* Menu Buttons on the left side of the screen*/}
         <div className="flex flex-col w-5/6 h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-2">
           <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg">
             Saved Fits
@@ -52,6 +54,7 @@ export default function MyCloset() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center">
+
         {/* Search Bar*/}
         <div className="fixed flex flex-col w-full max-w-2xl mt-2">
           <input
@@ -67,7 +70,7 @@ export default function MyCloset() {
             {items.map((item) => (
               <div className = "relative bg-themeLightBeige">
 
-                {/* Top “plant” decoration */}
+                {/* Top “plant” decoration not aligned properly will fix later*/}
                 <img
                   src={plant}
                   alt="plant"
@@ -80,14 +83,14 @@ export default function MyCloset() {
               >
 
 
-                {/* Shoe image, slightly overlapping the plant */}
+                {/* Shoe image this is a placeholder*/}
                 <img
                   src={item.image}
                   alt={item.name}
                   className="rounded shadow-lg"
                 />
 
-                {/* Name & color info */}
+                {/* Name & color info for each item*/}
                 <div className="flex flex-col rounded-lg bg-themeLightBeige py-2">
                   <div className="flex flex-row justify-between items-center">
                     <p className="text-lg">{item.name}</p>
@@ -131,7 +134,7 @@ export default function MyCloset() {
         </div>
       </div>
 
-      {/* Right Sidebar Buttons */}
+      {/* Create outfit and add item buttons */}
       <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
         <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg">
           Add Item
