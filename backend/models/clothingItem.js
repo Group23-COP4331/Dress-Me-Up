@@ -6,8 +6,9 @@ const ClothingItemSchema = new Schema({
     Name: {type: String, required: true},
     Color: {type: String, required: true},
     Category: {type: String, enum: ['Shirts', 'LongSleeves', 'Pants', 'Shorts', 'Shoes'],required: true},
-    Size: {type: Number, required: true},
-    ImageURL: {type: String, required: true},
+    Size: {type: String, required: true},
+    file: {type: Buffer, required: true},
+    fileType: {type: String, required: true}
 }, {timestamps: true});
 
-mondule.exports = mongoose.model('ClothingItem', ClothingItemSchema);
+module.exports = mongoose.model('ClothingItem', ClothingItemSchema);

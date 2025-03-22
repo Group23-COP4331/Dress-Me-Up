@@ -3,9 +3,9 @@ const User = require('./models/user');
 const Card = require('./models/card');
 const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
-const multer = require('multer');
 const ClothingItem = require('./models/clothingItem');
-
+const multer = require('multer');
+const upload = multer({storage: multer.memoryStorage()});
 const axios = require('axios');
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
@@ -122,43 +122,68 @@ app.get('/auth/verify-email', async (req, res) => {
     }
   });
 
-  app.post('/api/addClothingItem', upload.single('image'), async (req, res, next) => {
 
-    const {name, color, category, size, jwtToken} = req.body;
 
-    try{
 
-      if(token.isExpired(jwtToken))
+
+  app.post('/api/addClothingItem', upload.single('file'), async (req, res, next) => {
+
+    const {userId, name, color, category, size, jwtToken} = req.body;
+    try {
+
+      // if(token.isExpired(jwtToken))
+      // {
+      //   res.status(401).json({error: 'The JWT is no longer valid', jwtToken: ''});
+      //   return;
+      // }
+
+      // const userId = token.decode(jwtToken).userId;
+
+      if(!name || !color || !category || !size)
       {
-        res.stats(401).json({error: 'The JWT is no longer valid', jwtToken: ''});
-        return;
+        return res.status(400).json({error: 'Complete all fields', jwtToken: ''});
       }
-
-      const userId = token.decode(jwtToken).userId;
 
       if(!req.file)
       {
-        return res.status(400).json({error: 'Image is required!', jwtToken: ''});
+        return res.status(400).json({error: 'Image is required', jwtToken: ''});
+      }
+
+      if(req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/png' && 
+        req.file.mimetype != 'image/heic' && req.file.mimetype != 'image/heif' && 
+        req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/webp') 
+      {
+        return res.status(400).json({error: 'Invalid image format', jwtToken: ''});
+      }
+
+      if(req.file.size > 10 * 1024 * 1024)
+      {
+        return res.status(400).json({error: 'Image exceeds 10MB', jwtToken: ''});
       }
 
       const newItem = new ClothingItem({
-        userId,
-        name,
-        color,
-        category,
-        size: parseInt(size, 10),
-        imageURL: `` //we need to figure out where we are going to store the images people upload
-
+        UserId: userId, 
+        Name: name,
+        Color: color, 
+        Category: category, 
+        Size: size, 
+        file: req.file.buffer, 
+        fileType: req.file.mimetype
       });
 
       await newItem.save();
 
       const refreshedToken = token.refresh(jwtToken);
-      res.status(201).json({error: '', jwtToken: refreshedToken, newItem});
-    } catch(e){
+      res.status(201).json({error: 'It Worked', jwtToken: refreshedToken, newItem});
+    } catch(e) {
       res.status(500).json({error: e.message, jwtToken: ''});
     }
   });
+
+
+
+
+
 
   app.post('/api/searchcards', async (req, res, next) => {
     const { userId, search, jwtToken } = req.body;
