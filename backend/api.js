@@ -183,7 +183,7 @@ app.get('/auth/verify-email', async (req, res) => {
 
   //Need to add jwtToken to this
   app.post('/api/getClothingItems', async (req, res, next) => {
-
+    
     const {userId, search, jwtToken} = req.body;
     if (!search) {
       return res.status(400).json ({error: 'Search field is required'});
@@ -204,6 +204,64 @@ app.get('/auth/verify-email', async (req, res) => {
       res.status(500).json({error: e.message});
     }
   })
+
+  //need to add jwtToken to this
+  app.post('/api/updateClothingItem', upload.single('file'), async (req, res, next) => {
+    const {_id, name, color, category, size, jwtToken} = req.body;
+    try{
+      item = await ClothingItem.findById(_id)
+      if (!item) {
+        return res.status(404).json({error: 'Item not found'});
+      }
+      if (name) {
+        item.Name = name;
+      }
+      if (color) {
+        item.Color = color;
+      }
+      if (category) {
+        item.Category = category;
+      }
+      if (size) {
+        item.Size = size;
+      }
+      if (req.file) {
+        if(req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/png' && 
+        req.file.mimetype != 'image/heic' && req.file.mimetype != 'image/heif' && 
+        req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/webp') 
+        {
+          return res.status(400).json({error: 'Invalid image format', jwtToken: ''});
+        }
+        if(req.file.size > 10 * 1024 * 1024)
+        {
+          return res.status(400).json({error: 'Image exceeds 10MB', jwtToken: ''});
+        }
+        item.file = req.file.buffer;
+        item.fileType = req.file.mimetype;
+      }
+      await item.save();
+      res.status(200).json({item, message: 'Item Updated', error: ''});
+    } catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  })
+
+  //need to add jwtToken to this
+  app.post('/api/deleteClothingItem', async (req, res, next) =>{
+    const {_id, jwtToken} = req.body; 
+    id = _id;
+    try {
+      const deleted = await ClothingItem.findByIdAndDelete(id);
+      if (!deleted) {
+        return res.status(404).json({error: 'Item id not found'});
+      }
+      res.status(200).json({id, message: 'Item Deleted', error: ''});
+      }
+    catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  })
+
 
 
 
