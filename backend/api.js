@@ -125,7 +125,7 @@ app.get('/auth/verify-email', async (req, res) => {
 
 
 
-
+  //Need to add jwtToken to this
   app.post('/api/addClothingItem', upload.single('file'), async (req, res, next) => {
 
     const {userId, name, color, category, size, jwtToken} = req.body;
@@ -181,7 +181,29 @@ app.get('/auth/verify-email', async (req, res) => {
   });
 
 
+  //Need to add jwtToken to this
+  app.post('/api/getClothingItems', async (req, res, next) => {
 
+    const {userId, search, jwtToken} = req.body;
+    if (!search) {
+      return res.status(400).json ({error: 'Search field is required'});
+    }
+
+    try {
+      const _search = search.trim();
+      let regex = new RegExp(_search, 'i'); //creates regex to search by
+      const results = await ClothingItem.find({
+        UserId: userId,
+        $or: [{Name: regex },{Color: regex}] //searches for name or color
+      })
+      if (results.length === 0) {
+        return res.status(404).json({error: 'No items found'});
+      }
+      res.status(200).json({results, error: '', count: results.length});
+    } catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  })
 
 
 
