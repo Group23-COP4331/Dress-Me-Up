@@ -1,16 +1,13 @@
 import { useEffect } from "react";
 import Navbar from "../components/Navbar";
+import DashboardCard from "../components/DashboardCard";
 
 export default function DashboardPage(){
-
-    const previewClass = `
-        bg-themeGray
-        w-full 
-        h-[700px] 
-        rounded-lg
-    `;
-
-
+    const previews = [
+        {title: 'My Closet'},
+        {title: 'Outfit of the Day'},
+        {title: 'Explore'}
+    ];
     // Removes default padding and width opon rendering
     useEffect(() => {
         document.getElementById("root")?.classList.add("dashboard");
@@ -28,9 +25,9 @@ export default function DashboardPage(){
                 flex flex-row items-center 
                 justify-center gap-12 
                 h-[100svh] w-full px-12 pb-16">
-                <div className={previewClass}></div>
-                <div className={previewClass}></div>
-                <div className={previewClass}></div>
+                {previews.map((item, index) => (
+                    <DashboardCard key={index} {...item} />
+                ))} 
             </section>
         </main>
     );
