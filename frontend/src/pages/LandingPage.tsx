@@ -27,11 +27,11 @@ export default function LandingPage(){
 
   return (
 
-    <div className = "relative flex flex-col justify-start items-center h-screen gap-4 lg:pt-24 lg:gap-20 lg:flex-row lg:-translate-x-36 lg:items-start"> {/* Outer div takes up whole screen so the inner div can be centered on screen */}
+    <div className = "relative flex flex-col justify-start items-center h-screen gap-4 md:flex-row md:items-start lg:pt-24 lg:gap-20 lg:flex-row lg:-translate-x-36 lg:items-start"> {/* Outer div takes up whole screen so the inner div can be centered on screen */}
 
-          <div className = "order-2 relative flex flex-col items-center justify-center bg-themeGray rounded-lg flex-shrink-0 w-80 h-80 gap-4 pt- lg:gap-10 lg:w-4/6 lg:h-5/6 lg:pt-0 lg:order-1 "> {/*This div is the gray card containing the closet picture and buttons under it */}
-
-            <img src = {closetImage} alt = "Minimalist closet pic" className = "select-none pointer-events-none w-64 h-56 rounded-lg lg:w-5/6 lg:h-4/6"></img> 
+          <div className = "order-2 relative flex flex-col items-center justify-center bg-themeGray rounded-lg flex-shrink-0 w-80 h-80 gap-4 md:order-1 md:w-3/6 md:h-3/6 lg:gap-10 lg:w-4/6 lg:h-5/6 lg:pt-0 lg:order-1"> {/*This div is the gray card containing the closet picture and buttons under it */}
+    
+            <img src = {closetImage} alt = "Minimalist closet pic" className = "select-none pointer-events-none w-64 h-56 rounded-lg md:-translate-y-10 md:w-5/6 md:h-3/6 lg:w-5/6 lg:h-4/6"></img> 
 
             <div className = "flex flex-row justify-center items-center self-start ml-8 w-fit gap-2 lg:ml-16"> {/*This div keeps all buttons in a flex row within the flex col that stacks the image and button above each other */}
               <img src = {blackheart} alt = "heart symbol" className = "select-none pointer-events-none w-9 h-9 lg:w-14 lg:h-14"></img>
@@ -42,12 +42,20 @@ export default function LandingPage(){
 
           </div>  
 
-          <div className="flex flex-col flex-shrink-0 gap-16 relative lg:order-2"> {/*Div for dressmeup logo and slogan that will go under the logo*/}
+          <div className="flex flex-col flex-shrink-0 gap-9 relative md:order-2 lg:order-2 lg:gap-16"> {/*Div for dressmeup logo and slogan that will go under the logo*/}
 
             <img src = {logo} alt = "DressMeUp Logo" className = "select-none pointer-events-none w-36 h-36 lg:w-44 lg:h-44 rounded-lg" />
 
-            <div className = "hidden lg:block lg:absolute lg:top-[118%] lg:w-[600px]"> {/*So I had to wrap the text in a div that was absolute to remove the text from page flow so they wouldnt push flex box with buttons next to it away. This div is relative to the flex col parent */}
-              <p className  = "text-left text-7xl leading-normal"> {/*Align text left and since its div's width is fixed p tags wrap on their own so */}
+            <div className = "hidden items-start justify-center gap-4 md:flex md:flex-col lg:hidden"> {/*Flex col so that login and about us are stacked on top of each other */}
+
+              <button onClick = {() => navigate("/login")} className = {buttonClass}> Login  </button>
+              <button onClick = {() => navigate("/about")} className = {buttonClass}> About Us </button>
+
+              {/*ABOVE ON CLICK NAVIGATES TO ABOUT US DOESNT EXIST CHANGE THAT ROUTE ONCE ETHAN MAKES ABOUT PAGE*/}
+            </div> 
+
+            <div className = "hidden md:block md:top-[110%] md:w-[300px] lg:block lg:absolute lg:top-[118%] lg:w-[600px]"> {/*So I had to wrap the text in a div that was absolute to remove the text from page flow so they wouldnt push flex box with buttons next to it away. This div is relative to the flex col parent */}
+              <p className  = "text-left leading-normal md:text-4xl lg:text-7xl"> {/*Align text left and since its div's width is fixed p tags wrap on their own so */}
                 Revamp your fashion.
                 Restyle your favorites. 
                 Rewear, reimagined. 
@@ -56,7 +64,7 @@ export default function LandingPage(){
           </div>
 
 
-          <div className = "flex items-center justify-center flex-grow-0 gap-8 lg:gap-10 lg:flex-col lg:order-2"> {/*Flex col so that login and about us are stacked on top of each other */}
+          <div className = "flex items-center justify-center flex-grow-0 gap-8 md:hidden lg:flex lg:gap-10 lg:flex-col lg:order-2"> {/*Flex col so that login and about us are stacked on top of each other */}
 
             <button onClick = {() => navigate("/login")} className = {buttonClass}> Login  </button>
             <button onClick = {() => navigate("/about")} className = {buttonClass}> About Us </button>
@@ -64,7 +72,7 @@ export default function LandingPage(){
             {/*ABOVE ON CLICK NAVIGATES TO ABOUT US DOESNT EXIST CHANGE THAT ROUTE ONCE ETHAN MAKES ABOUT PAGE*/}
           </div>
 
-          <div className = "order-3 lg:hidden"> {/*So I had to wrap the text in a div that was absolute to remove the text from page flow so they wouldnt push flex box with buttons next to it away. This div is relative to the flex col parent */}
+          <div className = "order-3 md:hidden lg:hidden"> {/*So I had to wrap the text in a div that was absolute to remove the text from page flow so they wouldnt push flex box with buttons next to it away. This div is relative to the flex col parent */}
               <p className  = "text-left text-3xl leading-normal whitespace-pre-line"> {/*Align text left and since its div's width is fixed p tags wrap on their own so */}
                 Revamp your fashion. <br />
                 Restyle your favorites. <br />
