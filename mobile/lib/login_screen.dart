@@ -22,11 +22,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = '';
     });
 
-    String username = _usernameController.text;
-    String password = _passwordController.text;
+    final username = _usernameController.text;
+    final password = _passwordController.text;
 
     // Adjust keys to match your backend's expected JSON fields
-    Map<String, dynamic> loginData = {
+    final loginData = {
       'Login': username,
       'Password': password,
     };
@@ -41,17 +41,24 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // If the server returns an error message in the JSON
+        // Check for any error in the response
         if (data['error'] != null && data['error'].isNotEmpty) {
           setState(() {
             _errorMessage = data['error'];
           });
         } else {
-          // Login succeeded, navigate to CardsScreen (no token passed)
+          // Extract JWT token and user ID from the response
+          final jwtToken = data['jwtToken'] ?? '';
+          final userId = data['id']?.toString() ?? '';
+
+          // Navigate to CardsScreen, passing the token and user ID
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const CardsScreen(),
+              builder: (context) => CardsScreen(
+                jwtToken: jwtToken,
+                userId: userId,
+              ),
             ),
           );
         }

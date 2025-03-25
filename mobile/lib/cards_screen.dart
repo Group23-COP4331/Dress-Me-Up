@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CardsScreen extends StatefulWidget {
-  const CardsScreen({Key? key}) : super(key: key);
+  final String jwtToken;
+  final String userId;
+
+  const CardsScreen({
+    Key? key,
+    required this.jwtToken,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   _CardsScreenState createState() => _CardsScreenState();
@@ -13,18 +20,30 @@ class _CardsScreenState extends State<CardsScreen> {
   final TextEditingController _addCardController = TextEditingController();
   final TextEditingController _searchCardController = TextEditingController();
 
+  // We'll store the current token in a state variable so we can update it
+  // whenever the server returns a refreshed token.
+  late String _currentJwtToken;
+
   List<String> _cards = [];
   String _message = '';
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize _currentJwtToken with the token passed from LoginScreen
+    _currentJwtToken = widget.jwtToken;
+  }
+
   // Function to add a card
   Future<void> _addCard() async {
-    String cardText = _addCardController.text;
+    final cardText = _addCardController.text;
     if (cardText.isEmpty) return;
 
-    // Adjust 'userId' as needed (you might store this in local storage or pass it to this screen)
-    Map<String, dynamic> cardData = {
-      'userId': 'yourUserId',
+    // The server code expects userId, card, and jwtToken
+    final cardData = {
+      'userId': widget.userId,
       'card': cardText,
+      'jwtToken': _currentJwtToken,
     };
 
     try {
@@ -34,15 +53,22 @@ class _CardsScreenState extends State<CardsScreen> {
         body: jsonEncode(cardData),
       );
 
-      var data = jsonDecode(response.body);
-      if (data['error'] != null && data['error'] != '') {
+      final data = jsonDecode(response.body);
+
+      // Check if there's an error
+      if (data['error'] != null && data['error'].isNotEmpty) {
         setState(() {
           _message = 'Error: ${data['error']}';
         });
       } else {
         setState(() {
           _message = 'Card added successfully';
-          // Optionally, update your _cards list or refresh the list from the server.
+
+          // >>> If the server returns a refreshed token, store it <<<
+          final newToken = data['jwtToken'];
+          if (newToken != null && newToken.isNotEmpty) {
+            _currentJwtToken = newToken;
+          }
         });
       }
     } catch (e) {
@@ -54,12 +80,13 @@ class _CardsScreenState extends State<CardsScreen> {
 
   // Function to search for cards
   Future<void> _searchCards() async {
-    String searchQuery = _searchCardController.text;
+    final searchQuery = _searchCardController.text;
     if (searchQuery.isEmpty) return;
 
-    Map<String, dynamic> searchData = {
-      'userId': 'yourUserId',
+    final searchData = {
+      'userId': widget.userId,
       'search': searchQuery,
+      'jwtToken': _currentJwtToken,
     };
 
     try {
@@ -69,16 +96,23 @@ class _CardsScreenState extends State<CardsScreen> {
         body: jsonEncode(searchData),
       );
 
-      var data = jsonDecode(response.body);
-      if (data['error'] != null && data['error'] != '') {
+      final data = jsonDecode(response.body);
+
+      if (data['error'] != null && data['error'].isNotEmpty) {
         setState(() {
           _message = 'Error: ${data['error']}';
         });
       } else {
-        // Assume the backend returns a list of cards in data['results']
+        // The server returns a list of cards in data['results']
         setState(() {
           _cards = List<String>.from(data['results']);
           _message = 'Cards retrieved successfully';
+
+          // >>> Also store the refreshed token if present <<<
+          final newToken = data['jwtToken'];
+          if (newToken != null && newToken.isNotEmpty) {
+            _currentJwtToken = newToken;
+          }
         });
       }
     } catch (e) {

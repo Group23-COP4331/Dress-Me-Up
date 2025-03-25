@@ -146,38 +146,44 @@ app.get('/auth/verify-email', async (req, res) => {
 
   app.post('/api/login', async (req, res) => {
     console.log("Received login request:", JSON.stringify(req.body, null, 2));
-
+  
     const { Login, Password } = req.body;
-
+  
     try {
-      const user = await User.findOne({ //changed this from find to findOne so we target one user at a time there wont be dups anyways we check this in register
+      const user = await User.findOne({
         Login: Login.trim(),
         Password: Password.trim()
       });
-
+  
       console.log("Database query result:", JSON.stringify(user, null, 2));
-
-      if(!user){ //if there is no user object then its cause we didnt find correct login and password on the database
-        return res.status(401).json({error: "Incorrect email and password!"}); //return 401 error status with appropriate error message
+  
+      if(!user){
+        return res.status(401).json({ error: "Incorrect email and password!" });
       }
-      if(!user.verified){  //if we are here it means user exists so check if they are verified if they arent then
-        return res.status(403).json({error: "Please verify your email before signing in!", verified: false}); //exit with an erro code as well
+      if(!user.verified){
+        return res.status(403).json({ error: "Please verify your email before signing in!", verified: false });
       }
-      
-      //if we didnt exit in above checks then it means the user is verified and logged in so return success code along with all user information
+  
+      // >>> Create the JWT token here <<<
+      const jwtToken = token.createToken(user.FirstName, user.LastName, user.UserId);
+  
+      // Return user info + the token
       return res.status(200).json({
         id: user.UserId,
         firstName: user.FirstName,
         lastName: user.LastName,
         verified: true,
-        error: ''
+        error: '',
+        // The 'accessToken' property depends on your createJWT.js structure
+        jwtToken: jwtToken.accessToken  
       });
-
+  
     } catch (e) {
       console.error("Error in /api/login:", e);
       res.status(500).json({ error: e.message });
     }
   });
+  
 
   app.get('/api/weather', async (req, res) => {
     try {
