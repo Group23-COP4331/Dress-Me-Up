@@ -22,9 +22,6 @@ export default function Navbar() {
         <Link to="/ootd" className="text-lg text-white hover:text-blue-500">
           Outfit of the Day
         </Link>
-        <Link to="/explore" className="text-lg text-white hover:text-blue-500">
-          Explore
-        </Link>
       </div>
       <div className="flex items-center">
         <button className="text-lg text-white hover:text-blue-500">
