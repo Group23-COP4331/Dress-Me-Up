@@ -7,10 +7,10 @@ class CardsScreen extends StatefulWidget {
   final String userId;
 
   const CardsScreen({
-    Key? key,
+    super.key,
     required this.jwtToken,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   _CardsScreenState createState() => _CardsScreenState();
