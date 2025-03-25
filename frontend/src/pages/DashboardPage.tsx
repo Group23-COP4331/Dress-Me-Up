@@ -23,9 +23,9 @@ export default function DashboardPage(){
             <Navbar />
             <section 
             className="
-                flex flex-row items-center 
-                justify-center gap-32
-                h-[100svh] w-full pb-16">
+                flex flex-col items-center 
+                justify-center gap-16 md:flex-row lg:gap-32
+                h-auto lg:h-[100svh] w-full px-16 pb-16">
                 {previews.map((item, index) => (
                     <DashboardCard key={index} {...item} />
                 ))} 

@@ -2,11 +2,13 @@ import { Link } from 'react-router-dom';
 
 export default function DashboardCard(props){
     return (
-        <Link to="." className="bg-themeGray w-[650px] h-[700px] rounded-3xl flex flex-col items-center justify-center shadow-lg px-10 ">
+        <Link to="." className="bg-no-repeat bg-cover w-[650px] h-[700px] rounded-3xl z-[0] shadow-lg"
+        style={{ backgroundImage: `url(${props.pic})` }}>
             {/* Rembmer to adjust margins when I refactor this code*/}
-            <h1 className="text-5xl z-[2] text-white font-bold mb-8 drop-shadow-lg">{props.title}</h1>
-            <p className=" mb-10 z-[2] text-xl text-white text-wrap font-semibold sdrop-shadow-lg">{props.desc}</p>
-            <img src={props.pic} className='z-[1] object-cover rounded-3xl shadow-lg'></img>
+            <div className="w-full h-full flex flex-col items-center justify-center px-16 bg-black/50 rounded-3xl">
+                <h1 className="text-6xl z-[2] text-white font-extrabold mb-8 drop-shadow-lg">{props.title}</h1>
+                <h6 className=" mb-10 z-[2] text-xl text-white text-wrap font-semibold sdrop-shadow-lg">{props.desc}</h6>
+            </div>
         </Link>
     );
 }
