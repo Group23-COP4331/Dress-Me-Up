@@ -36,8 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
         Uri.parse('http://dressmeupproject.com:5001/api/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(loginData),
+
+        
       );
 
+      print('Login response: ${response.body}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 

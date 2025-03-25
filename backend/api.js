@@ -34,16 +34,16 @@ app.post('/api/register', async (req, res) => {
     await newUser.save();
 
     // create custom json web token
-    const token = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const verifyToken = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // the verification link
     // Going to use process.env.ENV_NODE variable to check if we are on production or local host
     let verificationLink;
 
     if (process.env.NODE_ENV === 'production') { //if we are on production make verification link hit the api endpoint on the actual domain name
-      verificationLink = `http://dressmeupproject.com/auth/verify-email?token=${token}`;
+      verificationLink = `http://dressmeupproject.com/auth/verify-email?token=${verifyToken}`;
     } else { //otherwise jsut do local host
-      verificationLink = `http://localhost:5001/auth/verify-email?token=${token}`;
+      verificationLink = `http://localhost:5001/auth/verify-email?token=${verifyToken}`;
     }
 
 
@@ -167,6 +167,7 @@ app.get('/auth/verify-email', async (req, res) => {
       // >>> Create the JWT token here <<<
       const jwtToken = token.createToken(user.FirstName, user.LastName, user.UserId);
   
+      console.log("Login route token:", jwtToken)
       // Return user info + the token
       return res.status(200).json({
         id: user.UserId,
@@ -175,7 +176,7 @@ app.get('/auth/verify-email', async (req, res) => {
         verified: true,
         error: '',
         // The 'accessToken' property depends on your createJWT.js structure
-        jwtToken: jwtToken.accessToken  
+        jwtToken: jwtToken
       });
   
     } catch (e) {
