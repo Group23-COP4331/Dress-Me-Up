@@ -3,7 +3,9 @@ const User = require('./models/user');
 const Card = require('./models/card');
 const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
-
+const ClothingItem = require('./models/clothingItem');
+const multer = require('multer');
+const upload = multer({storage: multer.memoryStorage()});
 const axios = require('axios');
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
@@ -119,6 +121,149 @@ app.get('/auth/verify-email', async (req, res) => {
       res.status(500).json({ error: e.message, jwtToken: '' });
     }
   });
+
+
+
+
+  //Need to add jwtToken to this
+  app.post('/api/addClothingItem', upload.single('file'), async (req, res, next) => {
+
+    const {userId, name, color, category, size, jwtToken} = req.body;
+    try {
+
+      // if(token.isExpired(jwtToken))
+      // {
+      //   res.status(401).json({error: 'The JWT is no longer valid', jwtToken: ''});
+      //   return;
+      // }
+
+      // const userId = token.decode(jwtToken).userId;
+
+      if(!name || !color || !category || !size)
+      {
+        return res.status(400).json({error: 'Complete all fields', jwtToken: ''});
+      }
+
+      if(!req.file)
+      {
+        return res.status(400).json({error: 'Image is required', jwtToken: ''});
+      }
+
+      if(req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/png' && 
+        req.file.mimetype != 'image/heic' && req.file.mimetype != 'image/heif' && 
+        req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/webp') 
+      {
+        return res.status(400).json({error: 'Invalid image format', jwtToken: ''});
+      }
+
+      if(req.file.size > 10 * 1024 * 1024)
+      {
+        return res.status(400).json({error: 'Image exceeds 10MB', jwtToken: ''});
+      }
+
+      const newItem = new ClothingItem({
+        UserId: userId, 
+        Name: name,
+        Color: color, 
+        Category: category, 
+        Size: size, 
+        file: req.file.buffer, 
+        fileType: req.file.mimetype
+      });
+
+      await newItem.save();
+
+      const refreshedToken = token.refresh(jwtToken);
+      res.status(201).json({error: 'It Worked', jwtToken: refreshedToken, newItem});
+    } catch(e) {
+      res.status(500).json({error: e.message, jwtToken: ''});
+    }
+  });
+
+
+  //Need to add jwtToken to this
+  app.post('/api/getClothingItems', async (req, res, next) => {
+    
+    const {userId, search, jwtToken} = req.body;
+    if (!search) {
+      return res.status(400).json ({error: 'Search field is required'});
+    }
+
+    try {
+      const _search = search.trim();
+      let regex = new RegExp(_search, 'i'); //creates regex to search by
+      const results = await ClothingItem.find({
+        UserId: userId,
+        $or: [{Name: regex },{Color: regex}] //searches for name or color
+      })
+      if (results.length === 0) {
+        return res.status(404).json({error: 'No items found'});
+      }
+      res.status(200).json({results, error: '', count: results.length});
+    } catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  })
+
+  //need to add jwtToken to this
+  app.post('/api/updateClothingItem', upload.single('file'), async (req, res, next) => {
+    const {_id, name, color, category, size, jwtToken} = req.body;
+    try{
+      item = await ClothingItem.findById(_id)
+      if (!item) {
+        return res.status(404).json({error: 'Item not found'});
+      }
+      if (name) {
+        item.Name = name;
+      }
+      if (color) {
+        item.Color = color;
+      }
+      if (category) {
+        item.Category = category;
+      }
+      if (size) {
+        item.Size = size;
+      }
+      if (req.file) {
+        if(req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/png' && 
+        req.file.mimetype != 'image/heic' && req.file.mimetype != 'image/heif' && 
+        req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/webp') 
+        {
+          return res.status(400).json({error: 'Invalid image format', jwtToken: ''});
+        }
+        if(req.file.size > 10 * 1024 * 1024)
+        {
+          return res.status(400).json({error: 'Image exceeds 10MB', jwtToken: ''});
+        }
+        item.file = req.file.buffer;
+        item.fileType = req.file.mimetype;
+      }
+      await item.save();
+      res.status(200).json({item, message: 'Item Updated', error: ''});
+    } catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  })
+
+  //need to add jwtToken to this
+  app.post('/api/deleteClothingItem', async (req, res, next) =>{
+    const {_id, jwtToken} = req.body; 
+    id = _id;
+    try {
+      const deleted = await ClothingItem.findByIdAndDelete(id);
+      if (!deleted) {
+        return res.status(404).json({error: 'Item id not found'});
+      }
+      res.status(200).json({id, message: 'Item Deleted', error: ''});
+      }
+    catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  })
+
+
+
 
   app.post('/api/searchcards', async (req, res, next) => {
     const { userId, search, jwtToken } = req.body;
