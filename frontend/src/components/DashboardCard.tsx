@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function DashboardCard(props){
     return (
-        <Link to="." className="bg-no-repeat bg-cover w-[650px] h-[700px] rounded-3xl z-[0] shadow-lg"
+        <Link to={props.route} className="bg-no-repeat bg-cover w-[650px] h-[700px] rounded-3xl z-[0] shadow-lg"
         style={{ backgroundImage: `url(${props.pic})` }}>
             {/* Rembmer to adjust margins when I refactor this code*/}
             <div className="w-full h-full flex flex-col items-center justify-center px-16 bg-black/50 rounded-3xl">
