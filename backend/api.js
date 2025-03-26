@@ -126,7 +126,7 @@ app.get('/auth/verify-email', async (req, res) => {
 
 
   //Need to add jwtToken to this
-  app.post('/api/addClothingItem', upload.single('file'), async (req, res, next) => {
+  app.post('/api/addClothingItem', upload.single('image'), async (req, res, next) => {
 
     const {userId, name, color, category, size, jwtToken} = req.body;
     try {
@@ -206,7 +206,7 @@ app.get('/auth/verify-email', async (req, res) => {
   })
 
   //need to add jwtToken to this
-  app.post('/api/updateClothingItem', upload.single('file'), async (req, res, next) => {
+  app.post('/api/updateClothingItem', upload.single('image'), async (req, res, next) => {
     const {_id, name, color, category, size, jwtToken} = req.body;
     try{
       item = await ClothingItem.findById(_id)
