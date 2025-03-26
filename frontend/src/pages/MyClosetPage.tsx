@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import logo from "../assets/GreenLogo.png";
 import redheart from "../assets/MyClosetImages/redheart.png";
 import plant from "../assets/MyClosetImages/plant.png";
@@ -6,6 +7,14 @@ import plant from "../assets/MyClosetImages/plant.png";
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
 
 export default function MyCloset() {
+
+  const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [itemName, setItemName] = useState('');
+  const [itemColor, setItemColor] = useState('');
+  const [itemImage, setItemImage] = useState<File | null>(null);
+  const [itemCategory, setItemCategory] = useState('');
+  const [itemSize, setItemSize] = useState('');
+
   //grid to hold placeholder items
   const items = [
     { id: 1, name: "AirForce1", color: "Red", image: shoe, isFavorite: false },
@@ -136,13 +145,96 @@ export default function MyCloset() {
 
       {/* Create outfit and add item buttons */}
       <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg">
+        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg"
+        onClick={() => setShowAddItemForm(true)}
+        >
           Add Item
         </button>
         <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg">
           Create Outfit
         </button>
       </div>
+      
+        {showAddItemForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
+            <button
+              className="absolute top-2 right-2 text-xl font-bold"
+              onClick={() => setShowAddItemForm(false)}
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Add New Item</h2>
+              <form
+                className="flex flex-col gap-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+
+                  const formData = new FormData();
+                  formData.append("name", itemName);
+                  formData.append("color", itemColor);
+                  if(itemImage)
+                  {
+                    formData.append("image", itemImage);
+                  }
+
+                  try {
+                    const response = await fetch('/api/addClothingItem', {
+                      method: 'POST',
+                      body: formData,
+                    });
+
+                    if (response.ok) {
+                      console.log("Item added successfully");
+                      setShowAddItemForm(false);
+                      setItemName('');
+                      setItemColor('');
+                      setItemImage(null);
+                    } else {
+                      console.error("Error adding item");
+                    }
+                  } catch (error) {
+                    console.error("API call failed:", error);
+                  }
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Item Name"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                />
+                <input
+                  type="text"
+                  placeholder="Color"
+                  value={itemColor}
+                  onChange={(e) => setItemColor(e.target.value)}
+                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setItemImage(e.target.files?.[0] || null)}
+                  className="file:bg-themeGreen file:text-white file:font-medium file:border-none file:px-4 file:py-2 file:rounded file:cursor-pointer bg-themeGray border border-black p-2 rounded"
+                />
+                <button type="submit" className="bg-themeGreen text-white p-2 rounded">
+                  Save
+                </button>
+              </form>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+/*
+colors:{
+        themeGreen: '#B6C7AA',
+        themeGray: '#A0937D',
+        themeDarkBeige: '#E7D4B5',
+        themeLightBeige: '#F6E6CB'
+      }
+*/
