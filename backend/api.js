@@ -12,7 +12,7 @@ const sendEmailVerification = require('./sendEmailVerification');
 module.exports = function (app) {
 
 app.post('/api/register', async (req, res) => {
-  const { FirstName, LastName, Login, Password } = req.body;
+  const { FirstName, LastName, Login, Password, Country, City } = req.body;
 
   try {
     // 1. Check if user already exists
@@ -28,6 +28,8 @@ app.post('/api/register', async (req, res) => {
       LastName: LastName.trim(),
       Login: Login.trim(),
       Password: Password.trim(), // In production, hash this!
+      Country: Country.trim(),
+      City: City.trim(),
       verified: false,
     });
 
@@ -60,6 +62,8 @@ app.post('/api/register', async (req, res) => {
       firstName: newUser.FirstName,
       lastName: newUser.LastName,
       userId: newUser.UserId,
+      Country: newUser.Country,
+      City: newUser.City,
       message: 'You have successfully registered! Please check email to verify account and finish registration.'
     });
   } catch (e) {
@@ -169,6 +173,8 @@ app.get('/auth/verify-email', async (req, res) => {
         id: user.UserId,
         firstName: user.FirstName,
         lastName: user.LastName,
+        country: user.Country,
+        city: user.City,
         verified: true,
         error: ''
       });
