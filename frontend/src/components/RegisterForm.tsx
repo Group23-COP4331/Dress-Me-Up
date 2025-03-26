@@ -16,6 +16,8 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
   const [lastName, setLastName]   = useState('');
   const [email, setEmail]         = useState('');
   const [password, setPassword]   = useState('');
+  const [country, setCountry]   = useState('');
+  const [city, setCity]   = useState('');
   const [showPassword, setVisibility] = useState(false); //state so we can toggle password visbility. If show password is true we want to well show it. If its false then hide it
 
 
@@ -28,7 +30,9 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
         FirstName: firstName,
         LastName: lastName,
         Login: email,
-        Password: password
+        Password: password,
+        Country: country,
+        City: city,
       };
 
       console.log(body); //just to check if values were set properly
@@ -70,6 +74,20 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
         <label htmlFor="lastname"> Last Name </label>
         {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
         <input onChange = {(e) => {setLastName(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4" type="text" required id="lastname" name="lastname" placeholder='Last Name'/>
+      </div>
+
+      <div className = "flex flex-col gap-4 w-full md:flex-row md:w[500px]"> {/*Flex row div so i can put countryy and city input boxes side by side */}
+        <div className = "flex flex-col items-start gap-2 md:w-1/2"> {/*Make it so that the input for country is half the size of the 500px parent container so country and city are side by side */}
+          <label htmlFor="country">Country</label>
+          <input onChange={(e) => setCountry(e.target.value)} className="w-full h-12 rounded-lg pl-4" type="text" required id="country" name="country" placeholder="Country"/>
+
+        </div>
+
+        <div className = "flex flex-col items-start gap-2 md:w-1/2">
+          <label htmlFor="city">City</label>
+          <input onChange={(e) => setCity(e.target.value)} className="w-full h-12 rounded-lg pl-4" type="text" required id="city" name="city" placeholder="City"/>
+        </div>
+  
       </div>
 
       <div className = "flex flex-col items-start gap-2">
