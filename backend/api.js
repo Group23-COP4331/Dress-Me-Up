@@ -4,6 +4,7 @@ const Card = require('./models/card');
 const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
 const ClothingItem = require('./models/clothingItem');
+const Outfit = require('./models/outfit');
 const multer = require('multer');
 const upload = multer({storage: multer.memoryStorage()});
 const axios = require('axios');
@@ -321,6 +322,27 @@ app.get('/auth/verify-email', async (req, res) => {
     } catch (e) {
       console.error("Error in /api/login:", e);
       res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post('/api/addOutfit', async (req, res) => {
+    try {
+        const {userId, name, top, bottom, shoes} = req.body;
+
+        const newOutfit = new Outfit({
+          UserId: userId, 
+          Name: name,
+          Top: top,
+          Bottom: bottom,
+          Shoes: shoes
+        });
+
+        await newOutfit.save();
+        res.status(200).json(newOutfit);
+    } catch (error) {
+        res.status(500).json({error: 'Error in addOutfit api',
+        details: error.message
+      });
     }
   });
 
