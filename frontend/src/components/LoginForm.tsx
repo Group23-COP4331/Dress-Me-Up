@@ -50,6 +50,8 @@ export default function LoginForm({setMessage} : LoginFormProps){
           firstName: res.firstName,
           lastName: res.lastName,
           id: res.id,
+          country: res.country,
+          city: res.city,
         };
       
         localStorage.setItem('user_data', JSON.stringify(user)); //store objet in local storage so we can use later
