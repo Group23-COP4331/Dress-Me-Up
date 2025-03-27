@@ -9,20 +9,33 @@ import shoe from "../assets/MyClosetImages/airforce1.png";
 export default function MyCloset() {
 
   const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [showCreateOutfitForm, setShowCreateOutfitForm] = useState(false);
+
+  //fields for creating an item
   const [itemName, setItemName] = useState('');
   const [itemColor, setItemColor] = useState('');
   const [itemImage, setItemImage] = useState<File | null>(null);
   const [itemCategory, setItemCategory] = useState('');
   const [itemSize, setItemSize] = useState('');
 
+  //fields for creating an outfit
+  const [selectedTop, setSelectedTop] = useState(null);
+  const [selectedBottom, setSelectedBottom] = useState(null);
+  const [selectedShoes, setSelectedShoes] = useState(null);
+
   //grid to hold placeholder items
   const items = [
-    { id: 1, name: "AirForce1", color: "Red", image: shoe, isFavorite: false },
-    { id: 2, name: "AirForce1", color: "Red", image: shoe, isFavorite: true },
-    { id: 3, name: "AirForce1", color: "Red", image: shoe, isFavorite: false },
-    { id: 4, name: "AirForce1", color: "Red", image: shoe, isFavorite: false },
-    { id: 5, name: "AirForce1", color: "Red", image: shoe, isFavorite: false },
+    { id: 1, name: "White Shirt", color: "White", image: shoe, isFavorite: false, category: "Tops", size: "M"},
+    { id: 2, name: "Black Hoodie", color: "Black", image: shoe, isFavorite: true, category: "Tops", size: "M"},
+    { id: 3, name: "Blue Jeans", color: "Blue", image: shoe, isFavorite: false, category: "Bottoms", size: "32x30"},
+    { id: 4, name: "Joggers", color: "Gray", image: shoe, isFavorite: false, category: "Bottoms", size: "M"},
+    { id: 5, name: "AirForce1", color: "White", image: shoe, isFavorite: false, category: "Shoes", size: "11"},
   ];
+
+  const tops = items.filter(item => item.category === "Tops");
+  const bottoms = items.filter(item => item.category === "Bottoms");
+  const shoes = items.filter(item => item.category === "Shoes");
+  
 
   return (
     //div on whole screen
@@ -135,6 +148,12 @@ export default function MyCloset() {
                       </svg>
                     </button>
                   </div>
+
+                  <div className="flex flex-row justify-between items-center">
+                    <p className="text-lg">Size: {item.size}</p>
+              
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -150,7 +169,9 @@ export default function MyCloset() {
         >
           Add Item
         </button>
-        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg">
+        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg"
+        onClick={() => setShowCreateOutfitForm(true)}
+        >
           Create Outfit
         </button>
       </div>
@@ -226,6 +247,88 @@ export default function MyCloset() {
           </div>
         </div>
       )}
+
+        {showCreateOutfitForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
+              <button
+                className="absolute top-2 right-2 text-xl font-bold"
+                onClick={() => setShowCreateOutfitForm(false)}
+              >
+                &times;
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Create A New Outfit</h2>
+              <form
+                className="flex flex-col gap-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+
+                  const outfit = {
+                    top: selectedTop,
+                    bottom: selectedBottom,
+                    shoes: selectedShoes,
+                  };
+
+                  console.log("🧵 New outfit created:", outfit);
+
+                  // TODO: Send outfit to backend with fetch('/api/createOutfit', ...)
+                  // Example: send just item IDs or full objects depending on backend
+                }}
+              >
+                <label className="text-black font-medium">Select a Top</label>
+                <select
+                  onChange={(e) =>
+                    setSelectedTop(tops.find((item) => item.id === e.target.value))
+                  }
+                  className="bg-themeGray border border-black p-2 rounded text-black"
+                >
+                  <option value="">-- Select Top --</option>
+                  {tops.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+
+                <label className="text-black font-medium">Select a Bottom</label>
+                <select
+                  onChange={(e) =>
+                    setSelectedBottom(bottoms.find((item) => item.id === e.target.value))
+                  }
+                  className="bg-themeGray border border-black p-2 rounded text-black"
+                >
+                  <option value="">-- Select Bottom --</option>
+                  {bottoms.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+
+                <label className="text-black font-medium">Select Shoes</label>
+                <select
+                  onChange={(e) =>
+                    setSelectedShoes(shoes.find((item) => item.id === e.target.value))
+                  }
+                  className="bg-themeGray border border-black p-2 rounded text-black"
+                >
+                  <option value="">-- Select Shoes --</option>
+                  {shoes.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+
+                <button type="submit" className="bg-themeGreen text-white p-2 rounded mt-4">
+                  Save Outfit
+                </button>
+              </form>
+
+            </div>
+          </div>
+        )}
+
     </div>
   );
 }
