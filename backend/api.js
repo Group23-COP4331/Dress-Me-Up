@@ -340,7 +340,7 @@ app.get('/auth/verify-email', async (req, res) => {
 
   app.post('/api/addOutfit', async (req, res) => {
     try {
-      const {userId, name, top, bottom, shoes} = req.body;
+      const {userId, name, top, bottom, shoes, weatherCategory} = req.body;
       
       if (!userId || !name || !top || !bottom || !shoes) {
         return res.status(400).json({ error: 'Fields are wrong!' });
@@ -351,7 +351,8 @@ app.get('/auth/verify-email', async (req, res) => {
         Name: name,
         Top: top,
         Bottom: bottom,
-        Shoes: shoes
+        Shoes: shoes,
+        WeatherCategory: weatherCategory
       });
 
       await newOutfit.save();
