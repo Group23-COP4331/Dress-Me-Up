@@ -79,7 +79,7 @@ export default function MyCloset() {
                 
               <div
                 key={item.id}
-                className="relative w-66 h-60 bg-themeGray rounded-lg shadow-md flex flex-col items-center justify-center border border-black gap-2"
+                className="relative w-72 h-60 bg-themeGray rounded-lg shadow-md flex flex-col items-center justify-center border border-black gap-2"
               >
 
 
