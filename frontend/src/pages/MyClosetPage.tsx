@@ -18,10 +18,38 @@ export default function MyCloset() {
   const [itemCategory, setItemCategory] = useState('');
   const [itemSize, setItemSize] = useState('');
 
+  const resetOutfitForm = () => {
+    setOutfitName('');
+    setSelectedTop(null);
+    setSelectedBottom(null);
+    setSelectedShoes(null);
+    setShowCreateOutfitForm(false);
+  };
+
+  const resetItemForm = () => 
+  {
+    setItemName('');
+    setItemColor('');
+    setItemCategory('');
+    setItemSize('');
+    setItemImage(null);
+  }
+
+  type ClothingItem = {
+    id: number;
+    name: string;
+    color: string;
+    image: string;
+    isFavorite: boolean;
+    category: string;
+    size: string;
+  };
+
   //fields for creating an outfit
-  const [selectedTop, setSelectedTop] = useState(null);
-  const [selectedBottom, setSelectedBottom] = useState(null);
-  const [selectedShoes, setSelectedShoes] = useState(null);
+  const [selectedTop, setSelectedTop] = useState<ClothingItem | null>(null);
+  const [selectedBottom, setSelectedBottom] = useState<ClothingItem | null>(null);
+  const [selectedShoes, setSelectedShoes] = useState<ClothingItem | null>(null);
+  const [outfitName, setOutfitName] = useState('');
 
   //grid to hold placeholder items
   const items = [
@@ -181,7 +209,11 @@ export default function MyCloset() {
           <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
             <button
               className="absolute top-2 right-2 text-xl font-bold"
-              onClick={() => setShowAddItemForm(false)}
+              onClick={() => 
+              {
+                resetItemForm();
+                setShowAddItemForm(false);
+              }}
             >
               &times;
             </button>
@@ -253,7 +285,11 @@ export default function MyCloset() {
             <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
               <button
                 className="absolute top-2 right-2 text-xl font-bold"
-                onClick={() => setShowCreateOutfitForm(false)}
+                onClick={() => 
+                {
+                  resetOutfitForm();
+                  setShowCreateOutfitForm(false);
+                }}
               >
                 &times;
               </button>
@@ -269,7 +305,7 @@ export default function MyCloset() {
                     shoes: selectedShoes,
                   };
 
-                  console.log("🧵 New outfit created:", outfit);
+                  console.log("New outfit created:", outfit);
 
                   // TODO: Send outfit to backend with fetch('/api/createOutfit', ...)
                   // Example: send just item IDs or full objects depending on backend
@@ -278,7 +314,8 @@ export default function MyCloset() {
                 <label className="text-black font-medium">Select a Top</label>
                 <select
                   onChange={(e) =>
-                    setSelectedTop(tops.find((item) => item.id === e.target.value))
+                    setSelectedTop(tops.find(item => item.id === parseInt(e.target.value)) || null)
+
                   }
                   className="bg-themeGray border border-black p-2 rounded text-black"
                 >
@@ -293,7 +330,7 @@ export default function MyCloset() {
                 <label className="text-black font-medium">Select a Bottom</label>
                 <select
                   onChange={(e) =>
-                    setSelectedBottom(bottoms.find((item) => item.id === e.target.value))
+                    setSelectedBottom(bottoms.find(item => item.id === parseInt(e.target.value)) || null)
                   }
                   className="bg-themeGray border border-black p-2 rounded text-black"
                 >
@@ -308,7 +345,7 @@ export default function MyCloset() {
                 <label className="text-black font-medium">Select Shoes</label>
                 <select
                   onChange={(e) =>
-                    setSelectedShoes(shoes.find((item) => item.id === e.target.value))
+                    setSelectedShoes(shoes.find(item => item.id === parseInt(e.target.value)) || null)
                   }
                   className="bg-themeGray border border-black p-2 rounded text-black"
                 >
@@ -319,6 +356,15 @@ export default function MyCloset() {
                     </option>
                   ))}
                 </select>
+
+                <label className="text-black font-medium">Give Your Outfit A Name!</label>
+                <input
+                  type="text"
+                  placeholder="Outfit Name"
+                  value={outfitName}
+                  onChange={(e) => setOutfitName(e.target.value)}
+                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                />
 
                 <button type="submit" className="bg-themeGreen text-white p-2 rounded mt-4">
                   Save Outfit
