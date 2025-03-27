@@ -190,17 +190,20 @@ app.get('/auth/verify-email', async (req, res) => {
   app.post('/api/getClothingItems', async (req, res, next) => {
     
     const {userId, search, jwtToken} = req.body;
-    if (!search) {
-      return res.status(400).json ({error: 'Search field is required'});
-    }
 
     try {
-      const _search = search.trim();
-      let regex = new RegExp(_search, 'i'); //creates regex to search by
-      const results = await ClothingItem.find({
-        UserId: userId,
-        $or: [{Name: regex },{Color: regex}] //searches for name or color
-      })
+      //gets all items for user if there is no search
+      if (!search || search.trim() === '') {
+        results = await ClothingItem.find({UserId: userId});
+      } else {
+        //searches for specific item based on search
+        const _search = search.trim();
+        let regex = new RegExp(_search, 'i'); //creates regex to search by
+        const results = await ClothingItem.find({
+          UserId: userId,
+          $or: [{Name: regex },{Color: regex}] //searches for name or color
+        })
+      }
       if (results.length === 0) {
         return res.status(404).json({error: 'No items found'});
       }
