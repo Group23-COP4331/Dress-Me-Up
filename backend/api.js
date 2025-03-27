@@ -397,7 +397,7 @@ app.get('/auth/verify-email', async (req, res) => {
   app.get('/api/weather', async (req, res) => {
     try {
       const { city, country } = req.query;
-      const API_KEY = '2e18e1b041698949b18ec7270162d99a';
+      const API_KEY = process.env.WEATHER_API_KEY;
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`;
 
       const response = await axios.get(url);
