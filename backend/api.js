@@ -350,6 +350,33 @@ app.get('/auth/verify-email', async (req, res) => {
     }
   });
 
+  app.post('/api/deleteOutfit', async (req, res, next) =>{
+    const _id = req.body; 
+    const id = _id;
+
+    try {
+      const deleted = await Outfit.findByIdAndDelete(id);
+
+      if (!deleted) {
+        return res.status(404).json({error: 'Outfit id not found'});
+      }
+
+      res.status(200).json({id, message: 'Outfit Deleted', error: ''});
+      }
+    catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  });
+
+  app.post('/api/getOutfits', async (req, res) => {
+    try {
+      const allOutfits = await Outfit.find();
+      res.status(200).json(allOutfits);
+    } catch (error) {
+      res.status(500).json({error: 'Error in /api/getOutfits'});
+    }
+  });
+
   app.get('/api/weather', async (req, res) => {
     try {
       const { city, country } = req.query;
