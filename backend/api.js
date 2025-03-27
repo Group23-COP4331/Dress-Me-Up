@@ -4,6 +4,7 @@ const Card = require('./models/card');
 const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
 const ClothingItem = require('./models/clothingItem');
+const Outfit = require('./models/outfit');
 const multer = require('multer');
 const upload = multer({storage: multer.memoryStorage()});
 const axios = require('axios');
@@ -36,16 +37,16 @@ app.post('/api/register', async (req, res) => {
     await newUser.save();
 
     // create custom json web token
-    const token = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const verifyToken = jsonWebToken.sign({ id: newUser.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // the verification link
     // Going to use process.env.ENV_NODE variable to check if we are on production or local host
     let verificationLink;
 
     if (process.env.NODE_ENV === 'production') { //if we are on production make verification link hit the api endpoint on the actual domain name
-      verificationLink = `http://dressmeupproject.com/auth/verify-email?token=${token}`;
+      verificationLink = `http://dressmeupproject.com/auth/verify-email?token=${verifyToken}`;
     } else { //otherwise jsut do local host
-      verificationLink = `http://localhost:5001/auth/verify-email?token=${token}`;
+      verificationLink = `http://localhost:5001/auth/verify-email?token=${verifyToken}`;
     }
 
 
@@ -312,6 +313,7 @@ app.get('/auth/verify-email', async (req, res) => {
       // >>> Create the JWT token here <<<
       const jwtToken = token.createToken(user.FirstName, user.LastName, user.UserId);
   
+      console.log("Login route token:", jwtToken)
       // Return user info + the token
       return res.status(200).json({
         id: user.UserId,
@@ -320,7 +322,7 @@ app.get('/auth/verify-email', async (req, res) => {
         verified: true,
         error: '',
         // The 'accessToken' property depends on your createJWT.js structure
-        jwtToken: jwtToken.accessToken  
+        jwtToken: jwtToken
       });
   
     } catch (e) {
@@ -329,6 +331,58 @@ app.get('/auth/verify-email', async (req, res) => {
     }
   });
   
+
+  app.post('/api/addOutfit', async (req, res) => {
+    try {
+      const {userId, name, top, bottom, shoes} = req.body;
+      
+      if (!userId || !name || !top || !bottom || !shoes) {
+        return res.status(400).json({ error: 'Fields are wrong!' });
+      }
+
+      const newOutfit = new Outfit({
+        UserId: userId, 
+        Name: name,
+        Top: top,
+        Bottom: bottom,
+        Shoes: shoes
+      });
+
+      await newOutfit.save();
+      res.status(200).json(newOutfit);
+    } catch (error) {
+        res.status(500).json({error: 'Error in addOutfit api',
+        details: error.message
+      });
+    }
+  });
+
+  app.post('/api/deleteOutfit', async (req, res, next) =>{
+    const _id = req.body; 
+    const id = _id;
+
+    try {
+      const deleted = await Outfit.findByIdAndDelete(id);
+
+      if (!deleted) {
+        return res.status(404).json({error: 'Outfit id not found'});
+      }
+
+      res.status(200).json({id, message: 'Outfit Deleted', error: ''});
+      }
+    catch(e) {
+      res.status(500).json({error: e.message});
+    }
+  });
+
+  app.post('/api/getOutfits', async (req, res) => {
+    try {
+      const allOutfits = await Outfit.find();
+      res.status(200).json(allOutfits);
+    } catch (error) {
+      res.status(500).json({error: 'Error in /api/getOutfits'});
+    }
+  });
 
   app.get('/api/weather', async (req, res) => {
     try {
