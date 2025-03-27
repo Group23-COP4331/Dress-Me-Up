@@ -7,6 +7,8 @@ const UserSchema = new Schema({
   LastName: { type: String, required: true },
   Login: { type: String, required: true, unique: true },
   Password: { type: String, required: true },
+  Country: {type: String, required:true},
+  City: {type: String, required: true},
   verified: { type: Boolean, default:false }
 });
 
