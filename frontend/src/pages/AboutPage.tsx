@@ -54,19 +54,19 @@ export default function AboutPage(){
                 <img src={Logo} alt="DressMeUp Logo" className = "w-24 h-24 rounded-lg" />
             </Link>
             <h1 className='text-6xl absolute top-0'>Meet the developers</h1>
-            <div className="flex flex-col justify-center items-center h-[30rem] w-[75rem] relative top-5 right-4"> 
-                <div className="flex flex-row justify-center gap-12 h-full">
+            <div className="flex flex-col justify-center items-center lg:h-[30rem] lg:w-[75rem] lg:relative lg:top-12 lg:right-4"> 
+                <div className="flex lex-row justify-center gap-12 h-full flex-wrap">
                     {devs.slice(0, 3).map((dev, index) => (
                         <ProfileCard key={index} {...dev} />
                     ))}
                 </div>
-                <div className="flex flex-row justify-center gap-12 h-full w-full">
+                <div className="flex flex-row justify-center gap-12 h-full w-full flex-wrap">
                 {devs.slice(3, 7).map((dev, index) => (
                         <ProfileCard key={index} {...dev} />
                     ))}
                 </div>
             </div>
-            <img src={Tree} alt="Tree" className="fixed top-10 scale-[1.25] z-[-1] h-auto"/> 
+            <img src={Tree} alt="Tree" className="collapse lg:visible fixed top-10 scale-[1.25] z-[-1] h-auto"/> 
         </div>
     ); 
 }

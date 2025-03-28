@@ -24,8 +24,8 @@ export default function DashboardPage(){
             <section 
             className="
                 flex flex-col items-center 
-                justify-center gap-16 md:flex-row lg:gap-32
-                h-auto lg:h-[100svh] w-full px-16 pb-16">
+                justify-center gap-16 lg:flex-row lg:gap-30
+                h-auto lg:h-[100svh] w-full lg:px-16 pb-16">
                 {previews.map((item, index) => (
                     <DashboardCard key={index} {...item} />
                 ))} 

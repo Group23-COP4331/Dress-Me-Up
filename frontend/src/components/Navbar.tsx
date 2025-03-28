@@ -3,7 +3,7 @@ import Logo from '../assets/GreenLogo.png';
 
 export default function Navbar() {
   return (
-    <nav className="flex items-center justify-between px-6 h-16 bg-themeGray shadow-md">
+    <nav className="flex items-center justify-between mb-24 lg:mb-0 px-6 h-16 bg-themeGray shadow-md">
       <div className="flex items-center">
         <Link to="/dashboard"> 
           <img
@@ -19,12 +19,12 @@ export default function Navbar() {
         <Link to="/mycloset" className="text-lg font-semibold text-white hover:text-blue-500">
           My Closet
         </Link>
-        <Link to="/ootd" className="text-lg font-semibold text-white hover:text-blue-500">
+        <Link to="/ootd" className="md:text-lg font-semibold text-white hover:text-blue-500">
           Outfit of the Day
         </Link>
       </div>
       <div className="flex items-center">
-        <button className="text-lg font-semibold text-white hover:text-blue-500">
+        <button className="md:text-lg font-semibold text-white hover:text-blue-500">
           Logout
         </button>
       </div>
