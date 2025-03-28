@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
+import {useEffect} from 'react';
 import logo from "../assets/GreenLogo.png";
 import redheart from "../assets/MyClosetImages/redheart.png";
 import plant from "../assets/MyClosetImages/plant.png";
@@ -36,7 +37,7 @@ export default function MyCloset() {
   }
 
   type ClothingItem = {
-    id: number;
+    id: string;
     name: string;
     color: string;
     image: string;
@@ -51,18 +52,66 @@ export default function MyCloset() {
   const [selectedShoes, setSelectedShoes] = useState<ClothingItem | null>(null);
   const [outfitName, setOutfitName] = useState('');
 
-  //grid to hold placeholder items
-  const items = [
-    { id: 1, name: "White Shirt", color: "White", image: shoe, isFavorite: false, category: "Tops", size: "M"},
-    { id: 2, name: "Black Hoodie", color: "Black", image: shoe, isFavorite: true, category: "Tops", size: "M"},
-    { id: 3, name: "Blue Jeans", color: "Blue", image: shoe, isFavorite: false, category: "Bottoms", size: "32x30"},
-    { id: 4, name: "Joggers", color: "Gray", image: shoe, isFavorite: false, category: "Bottoms", size: "M"},
-    { id: 5, name: "AirForce1", color: "White", image: shoe, isFavorite: false, category: "Shoes", size: "11"},
-  ];
+  const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
 
-  const tops = items.filter(item => item.category === "Tops");
-  const bottoms = items.filter(item => item.category === "Bottoms");
-  const shoes = items.filter(item => item.category === "Shoes");
+  useEffect(() => {
+    const fetchClothingItems = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+  
+        const response = await fetch("http://localhost:5001/api/getClothingItems", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            search: ".*",
+            jwtToken: "",
+          }),
+        });
+  
+        const data = await response.json();
+        console.log("Fetched data:", data);
+  
+        const itemsWithImages = data.results.map((item: any) => {
+          const byteArray = new Uint8Array(item.file.data); // Correct structure based on your log
+          const binaryString = byteArray.reduce(
+            (acc, byte) => acc + String.fromCharCode(byte),
+            ""
+          );
+          const base64String = btoa(binaryString);
+  
+          return {
+            id: item._id,
+            name: item.Name,
+            color: item.Color,
+            size: item.Size,
+            category: item.Category,
+            isFavorite: false,
+            image: `data:${item.fileType};base64,${base64String}`,
+          };
+        });
+  
+        setClothingItems(itemsWithImages);
+      } catch (err) {
+        console.error("❌ Failed to fetch items:", err);
+      }
+    };
+  
+    fetchClothingItems();
+  }, []);
+  
+  
+  const tops = clothingItems.filter(
+    item => item.category === 'Shirts' || item.category === 'LongSleeves'
+  );
+  
+  const bottoms = clothingItems.filter(
+    item => item.category === 'Pants' || item.category === 'Shorts'
+  );
+
+  const shoes = clothingItems.filter(item => item.category === "Shoes");
   
 
   return (
@@ -113,78 +162,65 @@ export default function MyCloset() {
             className="px-4 py-2 w-full bg-themeGray focus:outline-none text-black placeholder-black rounded-full"
           />
         </div>
-
+        
         {/* The grid of closet items */}
-        <div className="mt-20 w-full flex justify-center">
+        <div className="pt-36 w-full flex justify-center">
           <div className="grid grid-cols-3 gap-8">
-            {items.map((item) => (
-              <div className = "relative bg-themeLightBeige">
+            {clothingItems.map((item) => (
+              <div key={item.id} className="relative bg-themeLightBeige"> {/* ✅ key fixed here */}
 
-                {/* Top “plant” decoration not aligned properly will fix later*/}
-                <img
-                  src={plant}
-                  alt="plant"
-                  className="w-full h-10 object-cover rounded-t-lg"
-                />
-                
-              <div
-                key={item.id}
-                className="relative w-72 h-60 bg-themeGray rounded-lg shadow-md flex flex-col items-center justify-center border border-black gap-2"
-              >
+                <div className="relative w-72 bg-themeGray rounded-lg flex flex-col items-center border border-black gap-2 pb-4">
+                  {/* Uploaded clothing item image */}
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-40 w-full object-contain p-2 rounded"
+                    onError={(e) => (e.currentTarget.src = shoe)} // ✅ fallback to placeholder if broken
+                  />
 
-
-                {/* Shoe image this is a placeholder*/}
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="rounded shadow-lg"
-                />
-
-                {/* Name & color info for each item*/}
-                <div className="flex flex-col rounded-lg bg-themeLightBeige py-2">
-                  <div className="flex flex-row justify-between items-center">
-                    <p className="text-lg">{item.name}</p>
-                    <button>
-                      <img
-                        src={redheart}
-                        alt="Favorite"
-                        className="w-6 h-6"
-                        style={{
-                          filter: item.isFavorite ? "none" : "grayscale(100%)",
-                        }}
-                      />
-                    </button>
-                  </div>
-
-                  <div className="flex flex-row justify-between items-center gap-20">
-                    <p className="text-lg">Color: {item.color}</p>
-                    <button>
-                      {/* Edit (pencil) icon */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-700"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536M7.5 16.5l7.606-7.606a2 2 0 012.828 0l.464.464a2 2 0 010 2.828L10.5 19.5H7.5v-3z"
+                  {/* Name & color info for each item */}
+                  <div className="flex flex-col rounded-lg bg-themeLightBeige py-2">
+                    <div className="flex flex-row justify-between items-center">
+                      <p className="text-lg">{item.name}</p>
+                      <button>
+                        <img
+                          src={redheart}
+                          alt="Favorite"
+                          className="w-6 h-6"
+                          style={{
+                            filter: item.isFavorite ? "none" : "grayscale(100%)",
+                          }}
                         />
-                      </svg>
-                    </button>
-                  </div>
+                      </button>
+                    </div>
 
-                  <div className="flex flex-row justify-between items-center">
-                    <p className="text-lg">Size: {item.size}</p>
-              
-                  </div>
+                    <div className="flex flex-row justify-between items-center gap-20">
+                      <p className="text-lg">Color: {item.color}</p>
+                      <button>
+                        {/* Edit (pencil) icon */}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 text-gray-700"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.232 5.232l3.536 3.536M7.5 16.5l7.606-7.606a2 2 0 012.828 0l.464.464a2 2 0 010 2.828L10.5 19.5H7.5v-3z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
 
+                    <div className="flex flex-row justify-between items-center">
+                      <p className="text-lg">Size: {item.size}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
             ))}
           </div>
         </div>
@@ -224,26 +260,31 @@ export default function MyCloset() {
                   e.preventDefault();
 
                   const formData = new FormData();
+                  const userId = localStorage.getItem("userId");
+                  formData.append("userId", userId || "");
                   formData.append("name", itemName);
                   formData.append("color", itemColor);
+                  formData.append("category", itemCategory);
+                  formData.append("size", itemSize);
                   if(itemImage)
                   {
                     formData.append("image", itemImage);
                   }
 
                   try {
-                    const response = await fetch('/api/addClothingItem', {
+                    const response = await fetch('http://localhost:5001/api/addClothingItem', {
                       method: 'POST',
                       body: formData,
                     });
 
-                    if (response.ok) {
+                    if (response.ok) 
+                      {
                       console.log("Item added successfully");
+                      resetItemForm();
                       setShowAddItemForm(false);
-                      setItemName('');
-                      setItemColor('');
-                      setItemImage(null);
-                    } else {
+                    } 
+                    else 
+                    {
                       console.error("Error adding item");
                     }
                   } catch (error) {
@@ -265,6 +306,28 @@ export default function MyCloset() {
                   onChange={(e) => setItemColor(e.target.value)}
                   className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
                 />
+
+                <input
+                  type="text"
+                  placeholder="Item Size"
+                  value={itemSize}
+                  onChange={(e) => setItemSize(e.target.value)}
+                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                />
+                
+                <select
+                  value={itemCategory}
+                  onChange={(e) => setItemCategory(e.target.value)}
+                  className="bg-themeGray border border-black p-2 rounded text-black"
+                >
+                  <option value="">-- Select Category --</option>
+                  <option value="Shirts">Shirts</option>
+                  <option value="LongSleeves">LongSleeves</option>
+                  <option value="Pants">Pants</option>
+                  <option value="Shorts">Shorts</option>
+                  <option value="Shoes">Shoes</option>
+                </select>
+
                 <input
                   type="file"
                   accept="image/*"
@@ -296,25 +359,52 @@ export default function MyCloset() {
               <h2 className="text-xl font-semibold mb-4">Create A New Outfit</h2>
               <form
                 className="flex flex-col gap-4"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-
+                  console.log("🧪 Submit handler triggered");
+                
+                  if (!selectedTop || !selectedBottom || !selectedShoes || !outfitName) {
+                    alert("Please complete all fields!");
+                    return;
+                  }
+                
+                  const userId = localStorage.getItem("userId"); // adjust if you're using context/auth
+                
                   const outfit = {
+                    userId,
+                    name: outfitName,
                     top: selectedTop,
                     bottom: selectedBottom,
                     shoes: selectedShoes,
                   };
-
-                  console.log("New outfit created:", outfit);
-
-                  // TODO: Send outfit to backend with fetch('/api/createOutfit', ...)
-                  // Example: send just item IDs or full objects depending on backend
+                
+                  try {
+                    const response = await fetch('http://localhost:5001/api/addOutfit', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(outfit),
+                    });
+                
+                    if (response.ok) {
+                      const data = await response.json();
+                      console.log("✅ Outfit created:", data);
+                      resetOutfitForm();
+                      setShowCreateOutfitForm(false);
+                    } else {
+                      console.error("❌ Error saving outfit:", await response.json());
+                    }
+                  } catch (err) {
+                    console.error("❌ API error:", err);
+                  }
                 }}
+                
               >
                 <label className="text-black font-medium">Select a Top</label>
                 <select
                   onChange={(e) =>
-                    setSelectedTop(tops.find(item => item.id === parseInt(e.target.value)) || null)
+                    setSelectedTop(tops.find(item => item.id === (e.target.value)) || null)
 
                   }
                   className="bg-themeGray border border-black p-2 rounded text-black"
@@ -330,7 +420,7 @@ export default function MyCloset() {
                 <label className="text-black font-medium">Select a Bottom</label>
                 <select
                   onChange={(e) =>
-                    setSelectedBottom(bottoms.find(item => item.id === parseInt(e.target.value)) || null)
+                    setSelectedBottom(bottoms.find(item => item.id === (e.target.value)) || null)
                   }
                   className="bg-themeGray border border-black p-2 rounded text-black"
                 >
@@ -345,7 +435,7 @@ export default function MyCloset() {
                 <label className="text-black font-medium">Select Shoes</label>
                 <select
                   onChange={(e) =>
-                    setSelectedShoes(shoes.find(item => item.id === parseInt(e.target.value)) || null)
+                    setSelectedShoes(shoes.find(item => item.id === (e.target.value)) || null)
                   }
                   className="bg-themeGray border border-black p-2 rounded text-black"
                 >
