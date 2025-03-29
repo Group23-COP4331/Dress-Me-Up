@@ -32,3 +32,6 @@ dist-ssr/
 # Ignore build artifacts
 backend/node_modules/.package-lock.json
 frontend/*.tsbuildinfo
+
+# TypeScript build info
+*.tsbuildinfo
