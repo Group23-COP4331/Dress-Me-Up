@@ -111,10 +111,10 @@ app.get('/auth/verify-email', async (req, res) => {
 });
 
 app.post("/api/requestResetPassword", async (req, res) => {
-  const { email } = req.body;
+  const { login } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ Login: login });
     if (!user)
       return res.status(404).json({ message: "User does not exist" });
 
@@ -129,7 +129,7 @@ app.post("/api/requestResetPassword", async (req, res) => {
     }
 
     const msg = {
-      to: email,
+      to: login,
       from: 'dressmeupprojectemail@gmail.com',
       subject: "Password Reset for DressMeUp",
       html: `<p>Click the following link to reset your password for DressMeUp!</p>
