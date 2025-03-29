@@ -38,7 +38,6 @@ dependencies:
   responsive_framework: ^1.5.1  # For better responsive layout
   camera: ^0.10.0
   image_picker: ^0.8.7
-  http: ^0.13.5
   jwt_decoder: ^2.0.1
 
   # The following adds the Cupertino Icons font to your application.

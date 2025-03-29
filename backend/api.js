@@ -51,7 +51,7 @@ app.post('/api/register', async (req, res) => {
     if (process.env.NODE_ENV === 'production') { //if we are on production make verification link hit the api endpoint on the actual domain name
       verificationLink = `http://dressmeupproject.com/verify-email?token=${verifyToken}`;
     } else { //otherwise jsut do local host
-      verificationLink = `http://localhost:5001/verify-email?token=${verifyToken}`;
+      verificationLink = `http://localhost:5173/verify-email?token=${verifyToken}`;
     }
 
     // wait for the email to send

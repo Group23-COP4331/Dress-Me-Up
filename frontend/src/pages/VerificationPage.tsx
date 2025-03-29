@@ -16,12 +16,12 @@ const VerifyEmailPage = () => {
         const token = searchParams.get('token');
         if (!token) throw new Error('Missing verification token');
         
-        const response = await axios.get(`/auth/verify-email?token=${token}`);
+        const response = await axios.get(`http://dressmeupproject.com:5001/auth/verify-email?token=${token}`);
         
         if (response.data.message) {
           setStatus('success');
           setMessage(response.data.message);
-          setTimeout(() => navigate('/login'), 5000);
+          setTimeout(() => navigate('/login'), 3000);
         }
       } catch (error) {
         setStatus('error');
@@ -63,7 +63,7 @@ const VerifyEmailPage = () => {
               <div className="text-3xl text-themeGreen mb-4">✓</div>
               <h2 className="text-2xl text-white mb-4">{message}</h2>
               <p className="text-white mb-4">
-                Redirecting to login in <span className="text-themeGreen">5</span> seconds...
+                Redirecting to login in <span className="text-themeGreen">3</span> seconds...
               </p>
             </div>
           )}
