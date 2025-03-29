@@ -1,7 +1,7 @@
 // src/pages/VerifyEmailPage.tsx
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import logo from "../assets/GreenLogo.png";
 
 const VerifyEmailPage = () => {
@@ -16,7 +16,7 @@ const VerifyEmailPage = () => {
         const token = searchParams.get('token');
         if (!token) throw new Error('Missing verification token');
         
-        const response = await axios.get(`/auth/verify-email?token=${token}`);
+        const response = await axios.get(`/api/auth/verify-email?token=${token}`);
         
         if (response.data.message) {
           setStatus('success');

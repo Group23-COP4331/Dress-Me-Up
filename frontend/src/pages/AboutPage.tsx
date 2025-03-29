@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 import ProfileCard from '../components/ProfileCard';
 import Logo from '../assets/GreenLogo.png';
