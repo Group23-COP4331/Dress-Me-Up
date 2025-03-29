@@ -77,7 +77,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.get('/auth/verify-email', async (req, res) => {
+app.get('/api/auth/verify-email', async (req, res) => {
 
   console.log("Hitting verify-email");
 

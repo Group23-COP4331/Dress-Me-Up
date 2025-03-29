@@ -16,7 +16,7 @@ const VerifyEmailPage = () => {
         const token = searchParams.get('token');
         if (!token) throw new Error('Missing verification token');
         
-        const response = await axios.get(`http://dressmeupproject.com:5001/auth/verify-email?token=${token}`);
+        const response = await axios.get(`http://dressmeupproject.com:5001/api/auth/verify-email?token=${token}`);
         
         if (response.data.message) {
           setStatus('success');
