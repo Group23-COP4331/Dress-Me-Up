@@ -12,6 +12,9 @@ const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
 const sendEmailVerification = require('./sendEmailVerification');
 
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 module.exports = function (app) {
 
 app.post('/api/register', async (req, res) => {
@@ -50,7 +53,6 @@ app.post('/api/register', async (req, res) => {
     } else { //otherwise jsut do local host
       verificationLink = `http://localhost:5001/verify-email?token=${verifyToken}`;
     }
-
 
     // wait for the email to send
     await sendEmailVerification(newUser.Login.trim(), verificationLink);
@@ -106,6 +108,58 @@ app.get('/auth/verify-email', async (req, res) => {
         console.error('Error during email verification:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+app.post("/api/requestResetPassword", async (req, res) => {
+  const { login } = req.body;
+
+  try {
+    const user = await User.findOne({ Login: login });
+    if (!user)
+      return res.status(404).json({ message: "User does not exist" });
+
+    const resetToken = jsonWebToken.sign({ id: user.UserId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    let requestLink;
+
+    if (process.env.NODE_ENV === 'production') {
+      requestLink = 'http://dressmeupproject.com/api/resetPassword?token=${resetToken}';
+    } else {
+      requestLink = 'http://localhost:5001/api/resetPassword?token=${resetToken}';
+    }
+
+    const msg = {
+      to: login,
+      from: 'dressmeupprojectemail@gmail.com',
+      subject: "Password Reset for DressMeUp",
+      html: `<p>Click the following link to reset your password for DressMeUp!</p>
+        <a href="${requestLink}">Reset Password</a>`
+    };
+
+    await sgMail.send(msg);
+    return res.status(200).json({ message: "Reset password link sent!" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error in requestResetPassword API", error });
+  }
+});
+
+app.post("/api/resetPassword", async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const decodedToken = jsonWebToken.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findOne({ UserId: decodedToken.id });
+    if (!user)
+      return res.status(404).json({ message: "User does not exist" });
+
+    user.Password = newPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password has been reset!" });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error in resetPassword API", error });
+  }
 });
 
   app.post('/api/addcard', async (req, res, next) => {
