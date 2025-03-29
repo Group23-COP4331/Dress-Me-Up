@@ -17,6 +17,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = function (app) {
 
+  const cors = require('cors');
+app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173'] }));
+
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
 
@@ -77,7 +80,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.get('/api/auth/verify-email', async (req, res) => {
+app.get('/auth/verify-email', async (req, res) => {
 
   console.log("Hitting verify-email");
 
