@@ -18,6 +18,8 @@ function LoggedInTest() {
   //const userId = ud.id;
   const firstName = ud.firstName;
   const lastName = ud.lastName;
+  const country = ud.country;
+  const city = ud.city;
 
   // Logout function
   const doLogout = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -28,7 +30,7 @@ function LoggedInTest() {
 
   return (
     <div id="loggedInDiv">
-      <span id="userName">Logged In As {firstName} {lastName}</span>
+      <span id="userName">Logged In As {firstName} {lastName} Where you live {country}, {city}</span>
       <br />
       <button
         type="button"

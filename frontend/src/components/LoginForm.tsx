@@ -50,6 +50,8 @@ export default function LoginForm({setMessage} : LoginFormProps){
           firstName: res.firstName,
           lastName: res.lastName,
           id: res.id,
+          country: res.country,
+          city: res.city,
         };
       
         localStorage.setItem('user_data', JSON.stringify(user)); //store objet in local storage so we can use later
@@ -70,20 +72,20 @@ export default function LoginForm({setMessage} : LoginFormProps){
         <div className = "flex flex-col items-start gap-2"> {/*Wrap labels and inputs in another flex col so lable lines up left with input box */}
           <label htmlFor="email"> Email </label>
           {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
-          <input onChange = {(e) => {setEmail(e.target.value)}} className = "w-[500px] h-12 rounded-lg pl-4" type="email" required id="email" name="email" placeholder='Youraddress@example.com' />
+          <input onChange = {(e) => {setEmail(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4" type="email" required id="email" name="email" placeholder='Email@example.com' />
         </div>
 
         <div className = "flex flex-col items-start gap-2 relative">
           <label htmlFor="password"> Password </label>
           {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
-          <input onChange = {(e) => {setPassword(e.target.value)}} className = "w-[500px] h-12 rounded-lg pl-4 " type= {showPassword? 'text': 'password'} required id="password" name="password" placeholder='Password'/>
+          <input onChange = {(e) => {setPassword(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4 " type= {showPassword? 'text': 'password'} required id="password" name="password" placeholder='Password'/>
 
           <button type = "button" className = {`absolute bottom-2 right-4 ${loginPassword ? '': 'opacity-50 cursor-not-allowed'}`} disabled={!loginPassword} onClick = {() => setVisibility((prev)=> !prev)}> {/*On click of this button we toggle the bool of our showPassword so that state changes and everything using show password re-renders. Also have disabled so that when password is not empty so !password it returns true which enables button to have onclick functionality */}
             <img src = {showPassword? hide: show} alt = "toggle password icon" className = "w-8 h-8 pointer-events-none" />
           </button>
         </div>
 
-        <button className = "text-2xl text-white w-[500px] h-12 bg-themeGreen rounded-lg mt-10 hover:scale-105"type="submit">Submit</button>
+        <button className = "text-2xl text-white w-full md:w-[500px] h-12 bg-themeGreen rounded-lg hover:scale-105"type="submit">Submit</button>
 
       </div>
     </form>
