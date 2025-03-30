@@ -3,7 +3,7 @@ import Logo from '../assets/GreenLogo.png';
 
 export default function Navbar() {
   return (
-    <nav className="flex items-center justify-between mb-24 lg:mb-0 px-6 h-16 bg-themeGray shadow-md">
+    <nav className="flex items-center justify-between mb-24 lg:mb-0 px-6 h-16 bg-themeGray shadow-lg">
       <div className="flex items-center">
         <Link to="/dashboard"> 
           <img
