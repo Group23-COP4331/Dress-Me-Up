@@ -2,7 +2,12 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 exports.createToken = function(firstName, lastName, userId) {
-    const payload = { firstName, lastName, userId };
+    // Standardize payload for Flutter compatibility
+    const payload = { 
+        userId: userId.toString(), // Ensure string type
+        firstName: firstName || '',
+        lastName: lastName || ''
+    };
     return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
@@ -18,7 +23,16 @@ exports.isExpired = function(token) {
 exports.refresh = function(token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
-        return jwt.sign({ firstName: decoded.firstName, lastName: decoded.lastName, userId: decoded.userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        // Maintain consistent payload structure
+        return jwt.sign(
+            { 
+                userId: decoded.userId, 
+                firstName: decoded.firstName, 
+                lastName: decoded.lastName 
+            }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: "1h" }
+        );
     } catch (e) {
         return "";
     }
