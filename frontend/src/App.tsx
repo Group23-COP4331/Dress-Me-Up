@@ -5,10 +5,24 @@ import LoginPage from './pages/LoginPage';
 import AboutPage from './pages/AboutPage';
 import LoggedInTest from './pages/LoggedInTest';
 import MyClosetPage from './pages/MyClosetPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <Router> {/*This  wraps the entire app and makes it so we can use routing*/}
+
+      <ToastContainer 
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={true}
+              closeOnClick
+              pauseOnHover
+              draggable
+              theme="colored" // or "light" or "dark"
+            />
+
       <Routes> {/*This wraps all the routes and each <Route> component inside <Routes> defiines a path and a component that should be rendered when user visits that path*/}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
