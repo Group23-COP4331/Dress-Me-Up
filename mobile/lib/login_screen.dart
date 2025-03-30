@@ -70,10 +70,14 @@ Future<void> _login() async {
       } else {
         // Successful login - navigate to CardsScreen
         final jwtToken = data['jwtToken'] ?? '';
-        final userId = data['id']?.toString() ?? '';
+        final userId = data['userId']?.toString() ?? '';
         
 if (userId.isEmpty) {
-    throw Exception('Invalid user ID in JWT');
+  setState(() {
+    _errorMessage = 'Login failed: Invalid user ID';
+    _isLoading = false;
+  });
+  return; // Exit instead of crashing
 }
 
         Navigator.pushReplacement(
