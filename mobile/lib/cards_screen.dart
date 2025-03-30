@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:image_picker/image_picker.dart';
 
 import 'clothing_item_screen.dart'; // Assuming this is your AddClothingItemScreen
@@ -22,7 +22,7 @@ class CardsScreen extends StatefulWidget {
 
 class _CardsScreenState extends State<CardsScreen> {
   late String _currentJwtToken;
-  // Replace the card list with a clothing items list.
+  // List to hold clothing items.
   List<Map<String, dynamic>> _clothingItems = [];
   String _message = '';
 
@@ -57,8 +57,6 @@ class _CardsScreenState extends State<CardsScreen> {
           _clothingItems.add(newItem);
           // Optionally update _currentJwtToken if your API returns a refreshed token.
         });
-
-        
       }
     }
   }
@@ -78,14 +76,13 @@ class _CardsScreenState extends State<CardsScreen> {
           children: [
             // Button to launch the camera and then the add clothing item form.
             ElevatedButton.icon(
-  onPressed: _takePictureAndAddItem,
-  icon: const Icon(Icons.camera_alt),
-  label: const Text('Add Clothing Item'),
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFFB6C7AA), // themeGreen
-  ),
-),
-
+              onPressed: _takePictureAndAddItem,
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Add Clothing Item'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFB6C7AA), // themeGreen
+              ),
+            ),
             const SizedBox(height: 20),
             if (_message.isNotEmpty)
               Text(
@@ -101,20 +98,13 @@ class _CardsScreenState extends State<CardsScreen> {
                       itemCount: _clothingItems.length,
                       itemBuilder: (context, index) {
                         final item = _clothingItems[index];
-
-                        if (item['file'] != null) {
-  final decodedBytes = base64Decode(item['file']);
-  return Image.memory(decodedBytes, fit: BoxFit.cover);
-}
                         return Card(
                           color: const Color(0xFFF6E6CB), // themeLightBeige
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 8),
+                          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Display the image. This assumes that item['file'] contains
-                              // a base64-encoded string of the image.
+                              // Display the image if available.
                               if (item['file'] != null)
                                 Image.memory(
                                   base64Decode(item['file']),

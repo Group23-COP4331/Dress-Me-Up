@@ -51,19 +51,18 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
     request.fields['size'] = size;
     request.fields['jwtToken'] = widget.jwtToken;
 
-    // Add image file
+    // Add image file with explicitly set content type
     request.files.add(
-  await http.MultipartFile.fromPath(
-    'image',
-    widget.imageFile.path,
-    contentType: MediaType('image', 'jpeg'), // explicitly set to JPEG
-  ),
-);
+      await http.MultipartFile.fromPath(
+        'image',
+        widget.imageFile.path,
+        contentType: MediaType('image', 'jpeg'),
+      ),
+    );
 
-// ignore: avoid_print
-print("Fields: ${request.fields}");
-// ignore: avoid_print
-print("Number of files: ${request.files.length}");
+    // Debug prints
+    print("Fields: ${request.fields}");
+    print("Number of files: ${request.files.length}");
 
     try {
       var response = await request.send();
@@ -92,38 +91,93 @@ print("Number of files: ${request.files.length}");
 
   @override
   Widget build(BuildContext context) {
+    // Define your website's color palette
+    const themeGreen = Color(0xFFB6C7AA);
+    const themeGray = Color(0xFFA0937D);
+    const themeDarkBeige = Color(0xFFE7D4B5);
+    const themeLightBeige = Color(0xFFF6E6CB);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Clothing Item')),
+      backgroundColor: themeLightBeige,
+      appBar: AppBar(
+        title: const Text('Add Clothing Item'),
+        backgroundColor: themeDarkBeige,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Image.file(widget.imageFile, height: 200),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: _colorController,
-              decoration: const InputDecoration(labelText: 'Color'),
-            ),
-            TextField(
-              controller: _categoryController,
-              decoration: const InputDecoration(labelText: 'Category'),
-            ),
-            TextField(
-              controller: _sizeController,
-              decoration: const InputDecoration(labelText: 'Size'),
+            // Display the image without caption overlay
+            Image.file(
+              widget.imageFile,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
             const SizedBox(height: 20),
+            // Name TextField
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeGray),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Color TextField
+            TextField(
+              controller: _colorController,
+              decoration: InputDecoration(
+                labelText: 'Color',
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeGray),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Category TextField
+            TextField(
+              controller: _categoryController,
+              decoration: InputDecoration(
+                labelText: 'Category',
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeGray),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Size TextField
+            TextField(
+              controller: _sizeController,
+              decoration: InputDecoration(
+                labelText: 'Size',
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeGray),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Submit button
             ElevatedButton(
               onPressed: _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeGreen,
+              ),
               child: const Text('Submit'),
             ),
             if (_message.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: Text(_message, style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  _message,
+                  style: const TextStyle(color: Colors.red),
+                ),
               ),
           ],
         ),
