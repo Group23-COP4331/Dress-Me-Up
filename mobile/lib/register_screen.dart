@@ -112,7 +112,7 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     body: Container(
-      color: Theme.of(context).colorScheme.background,
+      color: const Color(0xFFF6E6CB),
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),

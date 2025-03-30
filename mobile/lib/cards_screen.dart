@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-import 'clothing_item_screen.dart'; // Import your new screen
+import 'clothing_item_screen.dart'; // Assuming this is your AddClothingItemScreen
 
 class CardsScreen extends StatefulWidget {
   final String jwtToken;
@@ -21,10 +21,9 @@ class CardsScreen extends StatefulWidget {
 }
 
 class _CardsScreenState extends State<CardsScreen> {
-  final TextEditingController _addCardController = TextEditingController();
-  final TextEditingController _searchCardController = TextEditingController();
   late String _currentJwtToken;
-  List<String> _cards = [];
+  // Replace the card list with a clothing items list.
+  List<Map<String, dynamic>> _clothingItems = [];
   String _message = '';
 
   @override
@@ -41,7 +40,7 @@ class _CardsScreenState extends State<CardsScreen> {
       imageQuality: 85,
     );
     if (image != null) {
-      // Navigate to the form screen and await the result (new item)
+      // Navigate to the add clothing item form and await the result (new item)
       final newItem = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -52,157 +51,96 @@ class _CardsScreenState extends State<CardsScreen> {
           ),
         ),
       );
-      // If a new item was returned, update the list of items
+      // If a new item was returned, update the list.
       if (newItem != null) {
         setState(() {
-          _cards.add(newItem['Name']); // Adjust according to your item structure
+          _clothingItems.add(newItem);
           // Optionally update _currentJwtToken if your API returns a refreshed token.
         });
+
+        
       }
-    }
-  }
-
-  Future<void> _addCard() async {
-    final cardText = _addCardController.text;
-    if (cardText.isEmpty) {
-      setState(() => _message = 'Card text is required');
-      return;
-    }
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('http://dressmeupproject.com:5001/api/addcard'),
-    );
-
-    request.headers['Authorization'] = 'Bearer $_currentJwtToken';
-    request.headers['Content-Type'] = 'multipart/form-data';
-
-    request.fields.addAll({
-      'card': cardText,
-      'userId': widget.userId,
-    });
-
-    try {
-      var response = await request.send();
-      var body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-
-      if (response.statusCode == 200) {
-        setState(() {
-          _message = 'Card added successfully';
-          _addCardController.clear();
-          if (data['jwtToken'] != null) {
-            _currentJwtToken = data['jwtToken'];
-          }
-        });
-      } else {
-        setState(() => _message = 'Error: ${data['error'] ?? 'Unknown error'}');
-      }
-    } catch (e) {
-      setState(() => _message = 'Connection error: $e');
-    }
-  }
-
-  Future<void> _searchCards() async {
-    final searchQuery = _searchCardController.text.trim();
-    if (searchQuery.isEmpty) return;
-
-    try {
-      final response = await http.post(
-        Uri.parse('http://dressmeupproject.com:5001/api/searchcards'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $_currentJwtToken'
-        },
-        body: jsonEncode({
-          'userId': widget.userId,
-          'search': searchQuery,
-          'jwtToken': _currentJwtToken,
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        setState(() {
-          _cards = List<String>.from(data['results'] ?? []);
-          _message = 'Found ${_cards.length} cards';
-          _currentJwtToken = data['jwtToken'] ?? _currentJwtToken;
-        });
-      } else {
-        setState(() => _message = 'Error: ${data['error']}');
-      }
-    } catch (e) {
-      setState(() => _message = 'Search failed: ${e.toString()}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cards')),
+      // Set the background to the light beige from your website.
+      backgroundColor: const Color(0xFFF6E6CB), // themeLightBeige
+      appBar: AppBar(
+        title: const Text('My Closet'),
+        backgroundColor: const Color(0xFFE7D4B5), // themeDarkBeige
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Section
-            TextField(
-              controller: _searchCardController,
-              decoration: const InputDecoration(labelText: 'Search Cards'),
-            ),
-            ElevatedButton(
-              onPressed: _searchCards,
-              child: const Text('Search'),
-            ),
-            const SizedBox(height: 20),
-            // Button to launch the camera and then the add item form
+            // Button to launch the camera and then the add clothing item form.
             ElevatedButton.icon(
-              onPressed: _takePictureAndAddItem,
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Add Clothing Item'),
-            ),
+  onPressed: _takePictureAndAddItem,
+  icon: const Icon(Icons.camera_alt),
+  label: const Text('Add Clothing Item'),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFFB6C7AA), // themeGreen
+  ),
+),
+
             const SizedBox(height: 20),
-            // Manual card addition section (if needed)
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _addCardController,
-                    decoration: const InputDecoration(labelText: 'Card Text'),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _addCard,
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: _addCard,
-              child: const Text('Add Card with Image'),
-            ),
-            const SizedBox(height: 20),
-            Text(_message),
-            const SizedBox(height: 20),
-            const Text('Your Cards:'),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _cards.length,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text(_cards[index]),
-                ),
+            if (_message.isNotEmpty)
+              Text(
+                _message,
+                style: const TextStyle(color: Colors.red),
               ),
+            const SizedBox(height: 20),
+            // Display the list of clothing items.
+            Expanded(
+              child: _clothingItems.isEmpty
+                  ? const Center(child: Text('No clothing items yet.'))
+                  : ListView.builder(
+                      itemCount: _clothingItems.length,
+                      itemBuilder: (context, index) {
+                        final item = _clothingItems[index];
+
+                        if (item['file'] != null) {
+  final decodedBytes = base64Decode(item['file']);
+  return Image.memory(decodedBytes, fit: BoxFit.cover);
+}
+                        return Card(
+                          color: const Color(0xFFF6E6CB), // themeLightBeige
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Display the image. This assumes that item['file'] contains
+                              // a base64-encoded string of the image.
+                              if (item['file'] != null)
+                                Image.memory(
+                                  base64Decode(item['file']),
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              const SizedBox(height: 8),
+                              // Display the clothing item's name as a caption.
+                              Text(
+                                item['Name'] ?? 'Unnamed',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _addCardController.dispose();
-    _searchCardController.dispose();
-    super.dispose();
   }
 }

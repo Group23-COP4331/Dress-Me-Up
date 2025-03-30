@@ -22,6 +22,7 @@ function App() {
               pauseOnHover
               draggable
               theme="colored" // or "light" or "dark"
+                aria-label="toast-container"
             />
 
       <Routes> {/*This wraps all the routes and each <Route> component inside <Routes> defiines a path and a component that should be rendered when user visits that path*/}

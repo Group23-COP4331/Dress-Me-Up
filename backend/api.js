@@ -189,7 +189,7 @@ app.post("/api/resetPassword", async (req, res) => {
 
   //Need to add jwtToken to this
   app.post('/api/addClothingItem', upload.single('image'), async (req, res, next) => {
-    console.log('Files received:', req.files);
+    console.log('Files received:', req.file);
     console.log('--- Incoming addClothingItem Request ---');
   console.log('Body:', req.body);
   console.log('File:', req.file);
@@ -239,7 +239,8 @@ app.post("/api/resetPassword", async (req, res) => {
       await newItem.save();
 
       const refreshedToken = jwtToken;
-      res.status(201).json({error: 'It Worked', jwtToken: refreshedToken, newItem});
+      res.status(201).json({error: 'It Worked', jwtToken: refreshedToken, newItem_doc,
+    file: base64File});
     } catch(e) {
       res.status(500).json({error: e.message, jwtToken: ''});
     }
