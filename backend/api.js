@@ -191,58 +191,59 @@ app.post("/api/resetPassword", async (req, res) => {
   app.post('/api/addClothingItem', upload.single('image'), async (req, res, next) => {
     console.log('Files received:', req.file);
     console.log('--- Incoming addClothingItem Request ---');
-  console.log('Body:', req.body);
-  console.log('File:', req.file);
-    const {userId, name, color, category, size, jwtToken} = req.body;
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
+    const { userId, name, color, category, size, jwtToken } = req.body;
     try {
-
-      // if(token.isExpired(jwtToken))
-      // {
-      //   res.status(401).json({error: 'The JWT is no longer valid', jwtToken: ''});
-      //   return;
-      // }
-
-      // const userId = token.decode(jwtToken).userId;
-
-      if(!name || !color || !category || !size)
-      {
-        return res.status(400).json({error: 'Complete all fields', jwtToken: ''});
+      if (!name || !color || !category || !size) {
+        return res.status(400).json({ error: 'Complete all fields', jwtToken: '' });
       }
-
-      if(!req.file)
-      {
-        return res.status(400).json({error: 'Image is required', jwtToken: ''});
+    
+      if (!req.file) {
+        return res.status(400).json({ error: 'Image is required', jwtToken: '' });
       }
-
-      if(req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/png' && 
-        req.file.mimetype != 'image/heic' && req.file.mimetype != 'image/heif' && 
-        req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/webp') 
-      {
-        return res.status(400).json({error: 'Invalid image format', jwtToken: ''});
+    
+      if (
+        req.file.mimetype != 'image/jpeg' &&
+        req.file.mimetype != 'image/png' &&
+        req.file.mimetype != 'image/heic' &&
+        req.file.mimetype != 'image/heif' &&
+        req.file.mimetype != 'image/jpg' &&
+        req.file.mimetype != 'image/webp'
+      ) {
+        return res.status(400).json({ error: 'Invalid image format', jwtToken: '' });
       }
-
-      if(req.file.size > 10 * 1024 * 1024)
-      {
-        return res.status(400).json({error: 'Image exceeds 10MB', jwtToken: ''});
+    
+      if (req.file.size > 10 * 1024 * 1024) {
+        return res.status(400).json({ error: 'Image exceeds 10MB', jwtToken: '' });
       }
-
+    
       const newItem = new ClothingItem({
-        UserId: userId, 
+        UserId: userId,
         Name: name,
-        Color: color, 
-        Category: category, 
-        Size: size, 
-        file: req.file.buffer, 
-        fileType: req.file.mimetype
+        Color: color,
+        Category: category,
+        Size: size,
+        file: req.file.buffer,
+        fileType: req.file.mimetype,
       });
-
+    
       await newItem.save();
-
-      const refreshedToken = jwtToken;
-      res.status(201).json({error: 'It Worked', jwtToken: refreshedToken, newItem_doc,
-    file: base64File});
-    } catch(e) {
-      res.status(500).json({error: e.message, jwtToken: ''});
+    
+      // Convert the Mongoose document to a plain object
+      let newItemObj = newItem.toObject();
+      // Convert the file Buffer to a base64 string
+      newItemObj.file = newItemObj.file.toString('base64');
+    
+      const refreshedToken = jwtToken; // Adjust if you need to refresh the token
+    
+      res.status(201).json({
+        error: '',
+        jwtToken: refreshedToken,
+        newItem: newItemObj
+      });
+    } catch (e) {
+      res.status(500).json({ error: e.message, jwtToken: '' });
     }
   });
 
