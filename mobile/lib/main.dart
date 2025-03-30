@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'camera_screen.dart' show CameraScreen; // Add this line
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'login_screen.dart' show LoginScreen;
-import 'register_screen.dart' show RegisterScreen;
-import 'cards_screen.dart' show CardsScreen;
-import 'item_form_screen.dart' show ItemFormScreen; // Add this import
+import 'login_screen.dart';
+import 'register_screen.dart';
+import 'cards_screen.dart';
+import 'clothing_item_screen.dart'; // Import the add clothing item screen
 
 void main() {
   runApp(const MyApp());
@@ -31,35 +29,25 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
-        '/add-item': (context) { // Add this new route
+        '/cards': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+          return CardsScreen(
+            jwtToken: args['jwtToken']!,
+            userId: args['userId']!,
+          );
+        },
+        // New route for the clothing item form screen
+        '/add-item': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return ItemFormScreen(
+          return AddClothingItemScreen(
             imageFile: args['imageFile'] as File,
             jwtToken: args['jwtToken'] as String,
+            userId: args['userId'] as String,
           );
         },
       },
+      // Optionally, you can handle dynamic routes with onGenerateRoute if needed.
       onGenerateRoute: (settings) {
-        // Existing cards route
-        if (settings.name == '/cards') {
-          final args = settings.arguments as Map<String, String>;
-          return MaterialPageRoute(
-            builder: (context) => CardsScreen(
-              jwtToken: args['jwtToken']!,
-              userId: args['userId']!,
-            ),
-          );
-        }
-        
-        // Add item form route
-        if (settings.name == '/camera') {
-          return MaterialPageRoute(
-            builder: (context) => CameraScreen(
-              jwtToken: (settings.arguments as Map)['jwtToken'] as String,
-            ),
-          );
-        }
-        
         return null;
       },
     );

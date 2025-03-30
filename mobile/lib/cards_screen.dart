@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+
+import 'clothing_item_screen.dart'; // Import your new screen
 
 class CardsScreen extends StatefulWidget {
   final String jwtToken;
@@ -26,37 +26,39 @@ class _CardsScreenState extends State<CardsScreen> {
   late String _currentJwtToken;
   List<String> _cards = [];
   String _message = '';
-  File? _cardImage;
-  late CameraController _cameraController;
-  bool _isCameraInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _currentJwtToken = widget.jwtToken;
-    _initializeCamera();
   }
 
-  Future<void> _initializeCamera() async {
-    final cameras = await availableCameras();
-    _cameraController = CameraController(
-      cameras.first,
-      ResolutionPreset.medium,
-    );
-    await _cameraController.initialize();
-    if (!mounted) return;
-    setState(() => _isCameraInitialized = true);
-  }
-
-  Future<void> _takePicture() async {
+  /// Uses ImagePicker to take a picture and then navigates to the add‑clothing‑item form.
+  Future<void> _takePictureAndAddItem() async {
     final image = await ImagePicker().pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.rear,
       imageQuality: 85,
     );
-    
     if (image != null) {
-      setState(() => _cardImage = File(image.path));
+      // Navigate to the form screen and await the result (new item)
+      final newItem = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddClothingItemScreen(
+            imageFile: File(image.path),
+            jwtToken: _currentJwtToken,
+            userId: widget.userId,
+          ),
+        ),
+      );
+      // If a new item was returned, update the list of items
+      if (newItem != null) {
+        setState(() {
+          _cards.add(newItem['Name']); // Adjust according to your item structure
+          // Optionally update _currentJwtToken if your API returns a refreshed token.
+        });
+      }
     }
   }
 
@@ -72,19 +74,9 @@ class _CardsScreenState extends State<CardsScreen> {
       Uri.parse('http://dressmeupproject.com:5001/api/addcard'),
     );
 
-    // Add JWT token and headers
     request.headers['Authorization'] = 'Bearer $_currentJwtToken';
     request.headers['Content-Type'] = 'multipart/form-data';
 
-    // Add image if captured
-    if (_cardImage != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'file',
-        _cardImage!.path,
-      ));
-    }
-
-    // Add other fields
     request.fields.addAll({
       'card': cardText,
       'userId': widget.userId,
@@ -99,7 +91,6 @@ class _CardsScreenState extends State<CardsScreen> {
         setState(() {
           _message = 'Card added successfully';
           _addCardController.clear();
-          _cardImage = null;
           if (data['jwtToken'] != null) {
             _currentJwtToken = data['jwtToken'];
           }
@@ -113,37 +104,37 @@ class _CardsScreenState extends State<CardsScreen> {
   }
 
   Future<void> _searchCards() async {
-  final searchQuery = _searchCardController.text.trim();
-  if (searchQuery.isEmpty) return;
+    final searchQuery = _searchCardController.text.trim();
+    if (searchQuery.isEmpty) return;
 
-  try {
-    final response = await http.post(
-      Uri.parse('http://dressmeupproject.com:5001/api/searchcards'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $_currentJwtToken'
-      },
-      body: jsonEncode({
-        'userId': widget.userId,
-        'search': searchQuery,
-        'jwtToken': _currentJwtToken
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://dressmeupproject.com:5001/api/searchcards'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_currentJwtToken'
+        },
+        body: jsonEncode({
+          'userId': widget.userId,
+          'search': searchQuery,
+          'jwtToken': _currentJwtToken,
+        }),
+      );
 
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        _cards = List<String>.from(data['results'] ?? []);
-        _message = 'Found ${_cards.length} cards';
-        _currentJwtToken = data['jwtToken'] ?? _currentJwtToken;
-      });
-    } else {
-      setState(() => _message = 'Error: ${data['error']}');
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        setState(() {
+          _cards = List<String>.from(data['results'] ?? []);
+          _message = 'Found ${_cards.length} cards';
+          _currentJwtToken = data['jwtToken'] ?? _currentJwtToken;
+        });
+      } else {
+        setState(() => _message = 'Error: ${data['error']}');
+      }
+    } catch (e) {
+      setState(() => _message = 'Search failed: ${e.toString()}');
     }
-  } catch (e) {
-    setState(() => _message = 'Search failed: ${e.toString()}');
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +145,7 @@ class _CardsScreenState extends State<CardsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Section (unchanged)
+            // Search Section
             TextField(
               controller: _searchCardController,
               decoration: const InputDecoration(labelText: 'Search Cards'),
@@ -163,19 +154,15 @@ class _CardsScreenState extends State<CardsScreen> {
               onPressed: _searchCards,
               child: const Text('Search'),
             ),
-
             const SizedBox(height: 20),
-            
-            // Camera Preview Section
-            if (_isCameraInitialized && _cardImage == null)
-              SizedBox(
-                height: 200,
-                child: CameraPreview(_cameraController),
-              ),
-            
-            if (_cardImage != null)
-              Image.file(_cardImage!, height: 200),
-            
+            // Button to launch the camera and then the add item form
+            ElevatedButton.icon(
+              onPressed: _takePictureAndAddItem,
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Add Clothing Item'),
+            ),
+            const SizedBox(height: 20),
+            // Manual card addition section (if needed)
             Row(
               children: [
                 Expanded(
@@ -185,17 +172,15 @@ class _CardsScreenState extends State<CardsScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.camera_alt),
-                  onPressed: _takePicture,
+                  icon: const Icon(Icons.send),
+                  onPressed: _addCard,
                 ),
               ],
             ),
-            
             ElevatedButton(
               onPressed: _addCard,
               child: const Text('Add Card with Image'),
             ),
-            
             const SizedBox(height: 20),
             Text(_message),
             const SizedBox(height: 20),
@@ -216,7 +201,8 @@ class _CardsScreenState extends State<CardsScreen> {
 
   @override
   void dispose() {
-    _cameraController.dispose();
+    _addCardController.dispose();
+    _searchCardController.dispose();
     super.dispose();
   }
 }
