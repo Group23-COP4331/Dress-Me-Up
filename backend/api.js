@@ -183,29 +183,60 @@ app.get('/auth/verify-email', async (req, res) => {
 
 
   //Need to add jwtToken to this
-  app.post('/api/getClothingItems', async (req, res, next) => {
-    
-    const {userId, search, jwtToken} = req.body;
-    if (!search) {
-      return res.status(400).json ({error: 'Search field is required'});
-    }
-
+  // GET route: /api/getClothingItems?userId=...&page=1&limit=12
+  app.get('/api/getClothingItems', async (req, res) => {
+    const { userId, page = 1, limit = 12, category, search } = req.query;
+    const skip = (page - 1) * limit;
+  
     try {
-      const _search = search.trim();
-      let regex = new RegExp(_search, 'i'); //creates regex to search by
-      const results = await ClothingItem.find({
-        UserId: userId,
-        $or: [{Name: regex },{Color: regex}] //searches for name or color
-      })
-      if (results.length === 0) {
-        return res.status(404).json({error: 'No items found'});
+      const query = { UserId: userId };
+  
+      // Optional: filter by category
+      if (category) {
+        query.Category = category;
       }
-      res.status(200).json({results, error: '', count: results.length});
-    } catch(e) {
-      res.status(500).json({error: e.message});
-    }
-  })
+  
+      // Optional: search term (case-insensitive match on Name or Color)
+      if (search) {
+        const regex = new RegExp(search, 'i');
+        query.$or = [
+          { Name: regex },
+          { Color: regex }
+        ];
+      }
 
+      if (req.query.favorite === 'true') {
+        query.isFavorite = true;
+      }
+  
+      const items = await ClothingItem.find(query)
+        .skip(parseInt(skip))
+        .limit(parseInt(limit));
+  
+      res.json({ results: items });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch items' });
+    }
+  });
+
+  app.post('/api/toggleFavorite', async (req, res) => {
+    const { _id } = req.body;
+  
+    try {
+      const item = await ClothingItem.findById(_id);
+      if (!item) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+  
+      item.isFavorite = !item.isFavorite;
+      await item.save();
+  
+      res.status(200).json({ message: 'Favorite updated', isFavorite: item.isFavorite });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to toggle favorite' });
+    }
+  });
+  
   //need to add jwtToken to this
   app.post('/api/updateClothingItem', upload.single('image'), async (req, res, next) => {
     const {_id, name, color, category, size, jwtToken} = req.body;
