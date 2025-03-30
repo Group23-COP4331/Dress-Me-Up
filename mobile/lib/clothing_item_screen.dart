@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class AddClothingItemScreen extends StatefulWidget {
   final File imageFile;
@@ -51,7 +52,13 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
     request.fields['jwtToken'] = widget.jwtToken;
 
     // Add image file
-    request.files.add(await http.MultipartFile.fromPath('image', widget.imageFile.path));
+    request.files.add(
+  await http.MultipartFile.fromPath(
+    'image',
+    widget.imageFile.path,
+    contentType: MediaType('image', 'jpeg'), // explicitly set to JPEG
+  ),
+);
 
 // ignore: avoid_print
 print("Fields: ${request.fields}");
