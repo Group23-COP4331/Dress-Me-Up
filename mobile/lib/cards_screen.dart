@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-
-import 'clothing_item_screen.dart'; // Assuming this is your AddClothingItemScreen
+import 'dart:io';
+import 'clothing_item_screen.dart' as AddClothingItemScreen;
 
 class CardsScreen extends StatefulWidget {
   final String jwtToken;
@@ -22,7 +21,6 @@ class CardsScreen extends StatefulWidget {
 
 class _CardsScreenState extends State<CardsScreen> {
   late String _currentJwtToken;
-  // List to hold clothing items.
   List<Map<String, dynamic>> _clothingItems = [];
   String _message = '';
 
@@ -30,32 +28,60 @@ class _CardsScreenState extends State<CardsScreen> {
   void initState() {
     super.initState();
     _currentJwtToken = widget.jwtToken;
+    _fetchClothingItems();  // Fetch clothing items on screen load
   }
 
-  /// Uses ImagePicker to take a picture and then navigates to the add‑clothing‑item form.
+  // Fetch clothing items from the API
+Future<void> _fetchClothingItems() async {
+  final response = await http.get(
+    Uri.parse('http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}'),
+    headers: {
+      'Authorization': 'Bearer $_currentJwtToken', // Pass the JWT token in the header
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> items = jsonDecode(response.body)['results'];
+
+    setState(() {
+      _clothingItems = List<Map<String, dynamic>>.from(items); // Cast to the correct type
+    });
+  } else {
+    setState(() {
+      _message = 'Failed to load clothing items';
+    });
+  }
+}
+
+
+  // Handle logout
+  void _logout() {
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  // Handle adding a new clothing item via the camera
   Future<void> _takePictureAndAddItem() async {
     final image = await ImagePicker().pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.rear,
       imageQuality: 85,
     );
+
     if (image != null) {
-      // Navigate to the add clothing item form and await the result (new item)
       final newItem = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddClothingItemScreen(
+          builder: (context) => AddClothingItemScreen.AddClothingItemScreen(
             imageFile: File(image.path),
             jwtToken: _currentJwtToken,
             userId: widget.userId,
           ),
         ),
       );
-      // If a new item was returned, update the list.
+
       if (newItem != null) {
         setState(() {
-          _clothingItems.add(newItem);
-          // Optionally update _currentJwtToken if your API returns a refreshed token.
+          _clothingItems.add(newItem); // Add the new item to the list
         });
       }
     }
@@ -63,24 +89,36 @@ class _CardsScreenState extends State<CardsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Define your website's color palette
+    const themeGreen = Color(0xFFB6C7AA);
+    const themeGray = Color(0xFFA0937D);
+    const themeDarkBeige = Color(0xFFE7D4B5);
+    const themeLightBeige = Color(0xFFF6E6CB);
+
     return Scaffold(
-      // Set the background to the light beige from your website.
-      backgroundColor: const Color(0xFFF6E6CB), // themeLightBeige
+      backgroundColor: themeLightBeige,
       appBar: AppBar(
         title: const Text('My Closet'),
-        backgroundColor: const Color(0xFFE7D4B5), // themeDarkBeige
+        backgroundColor: themeDarkBeige,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Button to launch the camera and then the add clothing item form.
             ElevatedButton.icon(
               onPressed: _takePictureAndAddItem,
               icon: const Icon(Icons.camera_alt),
               label: const Text('Add Clothing Item'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFB6C7AA), // themeGreen
+                backgroundColor: themeGreen,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
             ),
             const SizedBox(height: 20),
@@ -90,7 +128,6 @@ class _CardsScreenState extends State<CardsScreen> {
                 style: const TextStyle(color: Colors.red),
               ),
             const SizedBox(height: 20),
-            // Display the list of clothing items.
             Expanded(
               child: _clothingItems.isEmpty
                   ? const Center(child: Text('No clothing items yet.'))
@@ -99,30 +136,43 @@ class _CardsScreenState extends State<CardsScreen> {
                       itemBuilder: (context, index) {
                         final item = _clothingItems[index];
                         return Card(
-                          color: const Color(0xFFF6E6CB), // themeLightBeige
-                          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Display the image if available.
-                              if (item['file'] != null)
-                                Image.memory(
-                                  base64Decode(item['file']),
-                                  height: 200,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
+                          color: themeLightBeige,
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (item['file'] != null)
+                                  Image.memory(
+                                    base64Decode(item['file']),
+                                    height: 200,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  item['Name'] ?? 'Unnamed',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: themeGray,
+                                  ),
                                 ),
-                              const SizedBox(height: 8),
-                              // Display the clothing item's name as a caption.
-                              Text(
-                                item['Name'] ?? 'Unnamed',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                const SizedBox(height: 5),
+                                Text(
+                                  item['Category'] ?? 'Category Not Available',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: themeGray,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },

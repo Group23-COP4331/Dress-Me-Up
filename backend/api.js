@@ -18,7 +18,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 module.exports = function (app) {
 
   const cors = require('cors');
-app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173'] }));
+app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173', 'http://localhost:5001'] }));
 
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
@@ -475,14 +475,42 @@ app.post("/api/resetPassword", async (req, res) => {
     }
   });
 
-  app.post('/api/getOutfits', async (req, res) => {
+  app.get('/api/getClothingItems', async (req, res) => {
+    const { userId, page = 1, limit = 12, category, search } = req.query;
+    const skip = (page - 1) * limit;
+  
     try {
-      const allOutfits = await Outfit.find();
-      res.status(200).json(allOutfits);
-    } catch (error) {
-      res.status(500).json({error: 'Error in /api/getOutfits'});
+      const query = { UserId: userId };
+  
+      if (category) {
+        query.Category = category;
+      }
+  
+      if (search) {
+        const regex = new RegExp(search, 'i');
+        query.$or = [
+          { Name: regex },
+          { Color: regex }
+        ];
+      }
+  
+      const items = await ClothingItem.find(query)
+        .skip(parseInt(skip))
+        .limit(parseInt(limit));
+  
+      // Convert the image buffer to base64 for each item
+      const result = items.map(item => {
+        const itemObj = item.toObject();
+        itemObj.file = itemObj.file.toString('base64'); // Convert to base64
+        return itemObj;
+      });
+  
+      res.json({ results: result });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch items' });
     }
   });
+  
 
   app.get('/api/weather', async (req, res) => {
     try {
