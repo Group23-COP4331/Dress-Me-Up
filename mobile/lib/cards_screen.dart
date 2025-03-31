@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'clothing_item_screen.dart' as AddClothingItemScreen;
+import 'edit_clothing_item_screen.dart' as EditClothingItemScreen;
 import "my_outfits_screen.dart" as MyOutfitsScreen;
+import 'package:image_picker/image_picker.dart';
 
 class CardsScreen extends StatefulWidget {
   final String jwtToken;
@@ -30,10 +30,9 @@ class _CardsScreenState extends State<CardsScreen> {
   void initState() {
     super.initState();
     _currentJwtToken = widget.jwtToken;
-    _fetchClothingItems(); // Fetch clothing items on screen load
+    _fetchClothingItems();
   }
 
-  // Fetch clothing items from the API
   Future<void> _fetchClothingItems() async {
     try {
       final response = await http.get(
@@ -42,9 +41,6 @@ class _CardsScreenState extends State<CardsScreen> {
           'Authorization': 'Bearer $_currentJwtToken',
         },
       );
-
-      print("Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> items = jsonDecode(response.body)['results'];
@@ -63,12 +59,10 @@ class _CardsScreenState extends State<CardsScreen> {
     }
   }
 
-  // Handle logout
   void _logout() {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
-  // Handle adding a new clothing item via the camera
   Future<void> _takePictureAndAddItem() async {
     final image = await ImagePicker().pickImage(
       source: ImageSource.camera,
@@ -90,7 +84,7 @@ class _CardsScreenState extends State<CardsScreen> {
 
       if (newItem != null) {
         setState(() {
-          _clothingItems.add(newItem); // Add the new item to the list
+          _clothingItems.add(newItem);
         });
       }
     }
@@ -98,7 +92,6 @@ class _CardsScreenState extends State<CardsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Define your website's color palette
     const themeGreen = Color(0xFFB6C7AA);
     const themeGray = Color(0xFFA0937D);
     const themeDarkBeige = Color(0xFFE7D4B5);
@@ -111,20 +104,20 @@ class _CardsScreenState extends State<CardsScreen> {
         backgroundColor: themeDarkBeige,
         actions: [
           IconButton(
-      icon: const Icon(Icons.checkroom),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyOutfitsScreen.MyOutfitsScreen(
-              jwtToken: widget.jwtToken,
-              userId: widget.userId,
-            ),
+            icon: const Icon(Icons.checkroom),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyOutfitsScreen.MyOutfitsScreen(
+                    jwtToken: widget.jwtToken,
+                    userId: widget.userId,
+                  ),
+                ),
+              );
+            },
+            tooltip: 'My Outfits',
           ),
-        );
-      },
-      tooltip: 'My Outfits',
-    ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,
@@ -159,45 +152,69 @@ class _CardsScreenState extends State<CardsScreen> {
                       itemCount: _clothingItems.length,
                       itemBuilder: (context, index) {
                         final item = _clothingItems[index];
-                        print("Item file type: ${item['file'].runtimeType}");
-                        return Card(
-                          color: themeLightBeige,
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (item['file'] != null)
-                                  // Directly decode and display the image
-                                  Image.memory(
-                                    base64Decode(item['file']),
-                                    height: 200,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  item['Name'] ?? 'Unnamed',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: themeGray,
-                                  ),
+                        return InkWell(
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditClothingItemScreen.EditClothingItemScreen(
+                                  clothingItem: item,
+                                  jwtToken: _currentJwtToken,
+                                  userId: widget.userId,
                                 ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  item['Category'] ?? 'Category Not Available',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: themeGray,
+                              ),
+                            );
+
+                            if (result != null) {
+                              if (result == 'deleted') {
+                                setState(() {
+                                  _clothingItems.removeAt(index);
+                                });
+                              } else if (result is Map<String, dynamic>) {
+                                setState(() {
+                                  _clothingItems[index] = result;
+                                });
+                              }
+                            }
+                          },
+                          child: Card(
+                            color: themeLightBeige,
+                            elevation: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  if (item['file'] != null)
+                                    Image.memory(
+                                      base64Decode(item['file']),
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    item['Name'] ?? 'Unnamed',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeGray,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    item['Category'] ?? 'Category Not Available',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: themeGray,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );

@@ -352,7 +352,13 @@ app.post("/api/resetPassword", async (req, res) => {
         item.fileType = req.file.mimetype;
       }
       await item.save();
-      res.status(200).json({item, message: 'Item Updated', error: ''});
+      const updatedItem = item.toObject();
+if (updatedItem.file && Buffer.isBuffer(updatedItem.file)) {
+  updatedItem.file = updatedItem.file.toString('base64');
+}
+console.log('Sending item:', typeof updatedItem.file); // Should log "string"
+
+res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     } catch(e) {
       res.status(500).json({error: e.message});
     }
