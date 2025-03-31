@@ -280,7 +280,7 @@ export default function MyCloset() {
       <div className="flex-1 overflow-y-auto px-8 pb-32">
 
         {/* Search Bar*/}
-        <div className="sticky top-0 z-10 bg-themeLightBeige py-4">
+        <div className="sticky top-0 z-10 py-4">
           <input
             type="text"
             placeholder="Search ..."
