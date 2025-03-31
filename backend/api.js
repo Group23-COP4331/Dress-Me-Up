@@ -275,7 +275,7 @@ app.post("/api/resetPassword", async (req, res) => {
         query.isFavorite = true;
       }
   
-      const items = await ClothingItems.find(query)
+      const items = await clothingitems.find(query)
         .skip(parseInt(skip))
         .limit(parseInt(limit));
   
