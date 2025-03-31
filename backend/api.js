@@ -251,20 +251,17 @@ app.post("/api/resetPassword", async (req, res) => {
   //Need to add jwtToken to this
   // GET route: /api/getClothingItems?userId=...&page=1&limit=12
   app.get('/api/getClothingItems', async (req, res) => {
-
     console.log("Received getClothingItems request");
-    const { userId, page = 1, limit = 2, category, search } = req.query;
+    const { userId, page = 1, limit = 12, category, search } = req.query;
     const skip = (page - 1) * limit;
   
     try {
       const query = { UserId: userId };
   
-      // Optional: filter by category
       if (category) {
         query.Category = category;
       }
   
-      // Optional: search term (case-insensitive match on Name or Color)
       if (search) {
         const regex = new RegExp(search, 'i');
         query.$or = [
@@ -272,26 +269,36 @@ app.post("/api/resetPassword", async (req, res) => {
           { Color: regex }
         ];
       }
-
-      if (req.query.favorite === 'true') {
-        query.isFavorite = true;
-      }
-
-
   
-        items = await ClothingItem.find(query)
+      const items = await ClothingItem.find(query)
         .skip(parseInt(skip))
         .limit(parseInt(limit));
   
-      
-    console.log("Items fetched: ", items.length);
-    res.json({ results: items });
-  } catch (err) {
-    console.error("Error in getClothingItems:", err);
-    res.status(500).json({ error: 'Failed to fetch items' });
-  }
+      // Convert the image buffer to base64 for each item
+      const result = items.map(item => {
+        const itemObj = item.toObject();
+        // If the file is an object with a data property, convert it:
+        if (itemObj.file && itemObj.file.data) {
+          itemObj.file = Buffer.from(itemObj.file.data).toString('base64');
+        } else if (itemObj.file && typeof itemObj.file === 'object') {
+          // Fallback if it's already an object but without .data, try JSON.stringify:
+          itemObj.file = JSON.stringify(itemObj.file);
+        } else if (itemObj.file && typeof itemObj.file === 'string') {
+          // Already a base64 string – do nothing
+        }
+        return itemObj;
+      });
+  
+      console.log("Items fetched: ", items.length);
+      res.json({ results: result });
+    } catch (err) {
+      console.error("Error in getClothingItems:", err);
+      res.status(500).json({ error: 'Failed to fetch items' });
+    }
   });
 
+
+  
   app.post('/api/toggleFavorite', async (req, res) => {
     const { _id } = req.body;
   

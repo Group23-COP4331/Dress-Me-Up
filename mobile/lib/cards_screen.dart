@@ -156,6 +156,7 @@ class _CardsScreenState extends State<CardsScreen> {
                       itemCount: _clothingItems.length,
                       itemBuilder: (context, index) {
                         final item = _clothingItems[index];
+                        print("Item file type: ${item['file'].runtimeType}");
                         return Card(
                           color: themeLightBeige,
                           elevation: 4,
