@@ -452,32 +452,36 @@ app.post("/api/resetPassword", async (req, res) => {
     }
   });
 
-  app.post('/api/deleteOutfit', async (req, res, next) =>{
-    const _id = req.body; 
-    const id = _id;
-
+  app.post('/api/deleteOutfit', async (req, res) => {
+    const { _id } = req.body; // ✅ Destructure _id properly
+  
     try {
-      const deleted = await Outfit.findByIdAndDelete(id);
-
+      const deleted = await Outfit.findByIdAndDelete(_id);
+  
       if (!deleted) {
-        return res.status(404).json({error: 'Outfit id not found'});
+        return res.status(404).json({ error: 'Outfit id not found' });
       }
-
-      res.status(200).json({id, message: 'Outfit Deleted', error: ''});
-      }
-    catch(e) {
-      res.status(500).json({error: e.message});
+  
+      res.status(200).json({ _id, message: 'Outfit Deleted', error: '' });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
     }
   });
+  
 
   app.post('/api/getOutfits', async (req, res) => {
     try {
-      const allOutfits = await Outfit.find();
+      const allOutfits = await Outfit.find()
+        .populate('Top')
+        .populate('Bottom')
+        .populate('Shoes');
+  
       res.status(200).json(allOutfits);
     } catch (error) {
-      res.status(500).json({error: 'Error in /api/getOutfits'});
+      res.status(500).json({ error: 'Error in /api/getOutfits', details: error.message });
     }
   });
+  
 
   app.get('/api/weather', async (req, res) => {
     try {
