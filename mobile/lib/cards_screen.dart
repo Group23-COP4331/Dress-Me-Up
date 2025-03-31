@@ -33,26 +33,33 @@ class _CardsScreenState extends State<CardsScreen> {
 
   // Fetch clothing items from the API
 Future<void> _fetchClothingItems() async {
-  final response = await http.get(
-    Uri.parse('http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}'),
-    headers: {
-      'Authorization': 'Bearer $_currentJwtToken', // Pass the JWT token in the header
-    },
-  );
+  try {
+    final response = await http.get(
+      Uri.parse('http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}'),
+      headers: {
+        'Authorization': 'Bearer $_currentJwtToken',
+      },
+    );
 
-  if (response.statusCode == 200) {
-    final List<dynamic> items = jsonDecode(response.body)['results'];
+    print("Status code: ${response.statusCode}");
+    print("Response body: ${response.body}");
 
+    if (response.statusCode == 200) {
+      final List<dynamic> items = jsonDecode(response.body)['results'];
+      setState(() {
+        _clothingItems = List<Map<String, dynamic>>.from(items);
+      });
+    } else {
+      setState(() {
+        _message = 'Failed to load clothing items';
+      });
+    }
+  } catch (e) {
     setState(() {
-      _clothingItems = List<Map<String, dynamic>>.from(items); // Cast to the correct type
-    });
-  } else {
-    setState(() {
-      _message = 'Failed to load clothing items';
+      _message = 'Error: $e';
     });
   }
 }
-
 
   // Handle logout
   void _logout() {

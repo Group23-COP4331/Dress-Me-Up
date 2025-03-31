@@ -281,10 +281,13 @@ app.post("/api/resetPassword", async (req, res) => {
         .skip(parseInt(skip))
         .limit(parseInt(limit));
   
-      res.json({ results: items });
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch items' });
-    }
+      
+    console.log("Items fetched: ", items.length);
+    res.json({ results: items });
+  } catch (err) {
+    console.error("Error in getClothingItems:", err);
+    res.status(500).json({ error: 'Failed to fetch items' });
+  }
   });
 
   app.post('/api/toggleFavorite', async (req, res) => {
