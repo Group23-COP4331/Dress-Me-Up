@@ -2,16 +2,21 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 import logo from "../assets/GreenLogo.png";
 import redheart from "../assets/MyClosetImages/redheart.png";
+import { X, ChevronRight } from "lucide-react"; // Import icons
 import plant from "../assets/shrub.png";
 import { toast } from 'react-toastify';
 import { useRef, useCallback } from "react";
 import Navbar from '../components/Navbar';
 
-
 //shoe is a placeholder import we will change this with the images users upload
+
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
 
+
+
 export default function MyCloset() {
+
+  const [isOpen, setIsOpen] = useState(false);
 
   // Removes default padding and width opon rendering
   useEffect(() => {
@@ -188,11 +193,11 @@ export default function MyCloset() {
   
   return (
     //div on whole screen
-    <div className=" h-screen overflow-auto">
+    <div className=" h-screen overflow-y-auto">
       <Navbar/> 
       {/* Search Bar*/}
-      <div className="flex flex-col min-w-screen items-center justify-center">
-        <div className="mt-4 md:top-0 z-[-1] py-4 w-[75%] ">
+      <div className="flex flex-col items-center justify-center">
+        <div className="mt-4 top-16 z-10 py-4 w-[75%]">
           <input
             type="text"
             placeholder="Search ..."
@@ -223,94 +228,7 @@ export default function MyCloset() {
 
       {/* Sidebar surrounding buttons on the left */}
       <div className="w-64 flex flex-col items-center justify-center h-auto lg:h-[100svh] ">
-  
-        {/* Menu Buttons */}
-        <div className="flex flex-col w-5/6 h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-5 shadow-md sticky">
-          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md">
-            Saved Fits
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-            onClick={() => {
-              setActiveCategory("Shirts");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Shirts
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-            onClick={() => {
-              setActiveCategory("Long Sleeves");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Long Sleeves
-          </button>
-          <button 
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-            onClick={() => {
-              setActiveCategory("Pants");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Pants
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-            onClick={() => {
-              setActiveCategory("Shorts");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Shorts
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-            onClick={() => {
-              setActiveCategory("Shoes");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Shoes
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg  shadow-md flex items-center justify-center gap-2"
-            onClick={() => {
-              setFavoriteOnly(true);        // 🔒 Lock to favorites
-              setActiveCategory('');        // Clear category filter if needed
-              setSearchTerm('');            // Optional: clear search
-              setClothingItems([]);         // Reset list
-              setPage(1);                   // Restart pagination
-              setHasMore(true);             // Allow loading more
-            }}
-          >
-            Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-            onClick={() => {
-              setFavoriteOnly(false);      // 👈 Reset
-              setActiveCategory('');
-              setSearchTerm('');
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Clear Filters
-          </button>
-        </div>
+            <Sidebar />
       </div>
 
       {/* Main Content */}
@@ -668,4 +586,141 @@ export default function MyCloset() {
 
     </div>
   );
+
+function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
+  
+
+  return (
+      <>
+        {/* Half-Oval Menu Toggle Button for Smaller Screens */}
+        {!isOpen && (
+          <button 
+            className="md:hidden fixed top-1/2 left-0 transform -translate-y-1/2 bg-themeGreen text-white px-3 py-4 rounded-r-full shadow-md z-20 flex items-center"
+            onClick={() => setIsOpen(true)}
+          >
+            <ChevronRight size={24} />
+          </button>
+        )}
+
+        {/* Sidebar Full-Screen Overlay for Small Screens */}
+        {isOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 z-40 flex items-center justify-center">
+            <div className="w-[250px] h-auto bg-themeGray rounded-lg py-5 shadow-lg flex flex-col items-center gap-4 relative">
+              {/* Close Button (X icon) */}
+              <button className="relative left-24 text-white" onClick={() => setIsOpen(false)}>
+                <X size={28} />
+              </button>
+
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md">
+                Saved Fits
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+                onClick={() => {
+                  setActiveCategory("Shirts");
+                  setIsOpen(false);
+                }}
+              >
+                Shirts
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+                onClick={() => {
+                  setActiveCategory("Long Sleeves");
+                  setIsOpen(false);
+                }}
+              >
+                Long Sleeves
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+                onClick={() => {
+                  setActiveCategory("Pants");
+                  setIsOpen(false);
+                }}
+              >
+                Pants
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+                onClick={() => {
+                  setActiveCategory("Shorts");
+                  setIsOpen(false);
+                }}
+              >
+                Shorts
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+                onClick={() => {
+                  setActiveCategory("Shoes");
+                  setIsOpen(false);
+                }}
+              >
+                Shoes
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md flex items-center justify-center gap-2"
+                onClick={() => {
+                  setFavoriteOnly(true);
+                  setActiveCategory('');
+                  setSearchTerm('');
+                  setIsOpen(false);
+                }}
+              >
+                Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
+              </button>
+              <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+                onClick={() => {
+                  setFavoriteOnly(false);
+                  setActiveCategory('');
+                  setSearchTerm('');
+                  setIsOpen(false);
+                }}
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Sidebar for Larger Screens */}
+        <div className="hidden md:flex flex-col w-[215px] h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-5 shadow-md fixed top-52">
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md">
+            Saved Fits
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+            onClick={() => setActiveCategory("Shirts")}
+          >
+            Shirts
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+            onClick={() => setActiveCategory("Long Sleeves")}
+          >
+            Long Sleeves
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+            onClick={() => setActiveCategory("Pants")}
+          >
+            Pants
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+            onClick={() => setActiveCategory("Shorts")}
+          >
+            Shorts
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+            onClick={() => setActiveCategory("Shoes")}
+          >
+            Shoes
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md flex items-center justify-center gap-2"
+            onClick={() => setFavoriteOnly(true)}
+          >
+            Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
+          </button>
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+            onClick={() => setFavoriteOnly(false)}
+          >
+            Clear Filters
+          </button>
+        </div>
+      </>
+    );
+  }
 }
