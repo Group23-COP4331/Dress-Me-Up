@@ -78,12 +78,13 @@ export default function MyCloset() {
       try {
         const userId = localStorage.getItem("userId"); // ✅ move this inside
         const favoriteParam = favoriteOnly ? `&favorite=true` : '';
-        const categoryParam = activeCategory ? `&category=${activeCategory}` : '';
-        const searchParam = searchTerm ? `&search=${searchTerm}` : '';
+        const categoryParam = activeCategory ? `&category=${encodeURIComponent(activeCategory)}` : '';
+        const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
+
   
         const response = await fetch(
           `http://localhost:5001/api/getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`
-        );
+        );        
   
         const data = await response.json();
   
@@ -137,9 +138,6 @@ export default function MyCloset() {
     },
     [loading, hasMore]
   );
-  
-  
-  
   
   const tops = clothingItems.filter(
     item => item.category === 'Shirts' || item.category === 'LongSleeves'
@@ -277,7 +275,7 @@ export default function MyCloset() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-8 pb-32">
+      <div className="flex-1 overflow-y-auto px-10 pb-32">
 
         {/* Search Bar*/}
         <div className="sticky top-0 z-10 bg-themeLightBeige py-4">
