@@ -280,9 +280,9 @@ app.post("/api/resetPassword", async (req, res) => {
         // If the file is an object with a data property, convert it:
         if (itemObj.file && itemObj.file.data) {
           itemObj.file = Buffer.from(itemObj.file.data).toString('base64');
-        } else if (itemObj.file && typeof itemObj.file === 'object') {
-          // Fallback if it's already an object but without .data, try JSON.stringify:
-          itemObj.file = JSON.stringify(itemObj.file);
+        } else if (Buffer.isBuffer(itemObj.file)) {
+          // It's already a Buffer
+          itemObj.file = itemObj.file.toString('base64');
         } else if (itemObj.file && typeof itemObj.file === 'string') {
           // Already a base64 string – do nothing
         }
@@ -298,7 +298,7 @@ app.post("/api/resetPassword", async (req, res) => {
   });
 
 
-  
+
   app.post('/api/toggleFavorite', async (req, res) => {
     const { _id } = req.body;
   
