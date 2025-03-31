@@ -5,6 +5,7 @@ const Weather = require('./models/weather');
 const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
 const ClothingItem = require('./models/clothingItem');
 const Outfit = require('./models/outfit');
+const OutfitPlan = require('./models/outfitPlan');
 const multer = require('multer');
 const upload = multer({storage: multer.memoryStorage()});
 const axios = require('axios');
@@ -360,8 +361,34 @@ app.post("/api/resetPassword", async (req, res) => {
     }
   })
 
-
-
+  app.post('/api/outfitPlan', async (req, res, next) => {
+    const {userId, name, date, outfitId} = req.body;
+    try{
+      const newPlan = new OutfitPlan({
+        UserId: userId,
+        Name: name,
+        Date: new Date(date),
+        OutfitId: outfitId
+      })
+      await newPlan.save();
+      res.status(200).json({message: 'Outfit Planned', error: ''});
+    } catch (error) {
+      console.log(OutfitPlan);
+      res.status(500).json({error: 'Error in outfitPlan api',
+      details: error.message
+    });
+    }
+  })
+  ///query: /api/getPlans?userId=...
+  app.get('/api/getPlans', async (req, res, next) => {
+    const {userId} = req.query;
+    try{
+      const plans = await OutfitPlan.find({UserId: userId});
+      res.status(200).json(plans);
+    }catch (e) {
+      res.status(500).json({error: e.message});
+    }
+  })
 
   app.post('/api/searchcards', async (req, res, next) => {
     const { userId, search, jwtToken } = req.body;
