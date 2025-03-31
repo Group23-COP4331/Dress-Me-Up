@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'clothing_item_screen.dart' as AddClothingItemScreen;
+import "my_outfits_screen.dart" as MyOutfitsScreen;
 
 class CardsScreen extends StatefulWidget {
   final String jwtToken;
@@ -109,6 +110,21 @@ class _CardsScreenState extends State<CardsScreen> {
         title: const Text('My Closet'),
         backgroundColor: themeDarkBeige,
         actions: [
+          IconButton(
+      icon: const Icon(Icons.checkroom),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyOutfitsScreen.MyOutfitsScreen(
+              jwtToken: widget.jwtToken,
+              userId: widget.userId,
+            ),
+          ),
+        );
+      },
+      tooltip: 'My Outfits',
+    ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,

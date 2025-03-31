@@ -489,41 +489,59 @@ app.post("/api/resetPassword", async (req, res) => {
     }
   });
 
-  app.get('/api/getClothingItems', async (req, res) => {
-    const { userId, page = 1, limit = 12, category, search } = req.query;
-    const skip = (page - 1) * limit;
-  
-    try {
-      const query = { UserId: userId };
-  
-      if (category) {
-        query.Category = category;
-      }
-  
-      if (search) {
-        const regex = new RegExp(search, 'i');
-        query.$or = [
-          { Name: regex },
-          { Color: regex }
-        ];
-      }
-  
-      const items = await ClothingItem.find(query)
-        .skip(parseInt(skip))
-        .limit(parseInt(limit));
-  
-      // Convert the image buffer to base64 for each item
-      const result = items.map(item => {
-        const itemObj = item.toObject();
-        itemObj.file = itemObj.file.toString('base64'); // Convert to base64
-        return itemObj;
-      });
-  
-      res.json({ results: result });
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch items' });
+app.get('/api/getOutfits', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const outfits = await Outfit.find({ UserId: userId });
+    res.json({ results: outfits });
+  } catch (err) {
+    console.error("Error in getOutfits:", err);
+    res.status(500).json({ error: 'Failed to fetch outfits' });
+  }
+});
+
+app.post('/api/updateOutfit', async (req, res) => {
+  const { _id, name, top, bottom, shoes, weatherCategory } = req.body;
+  try {
+    const outfit = await Outfit.findById(_id);
+    if (!outfit) {
+      return res.status(404).json({ error: 'Outfit not found' });
     }
-  });
+    // Update outfit properties if provided
+    if (name) outfit.Name = name;
+    if (top) outfit.Top = top;
+    if (bottom) outfit.Bottom = bottom;
+    if (shoes) outfit.Shoes = shoes;
+    if (weatherCategory !== undefined) outfit.WeatherCategory = weatherCategory;
+    
+    await outfit.save();
+    res.status(200).json({ updatedOutfit: outfit });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.post('/api/updateOutfit', async (req, res) => {
+  const { _id, name, top, bottom, shoes, weatherCategory } = req.body;
+  try {
+    const outfit = await Outfit.findById(_id);
+    if (!outfit) {
+      return res.status(404).json({ error: 'Outfit not found' });
+    }
+    // Update outfit properties if provided
+    if (name) outfit.Name = name;
+    if (top) outfit.Top = top;
+    if (bottom) outfit.Bottom = bottom;
+    if (shoes) outfit.Shoes = shoes;
+    if (weatherCategory !== undefined) outfit.WeatherCategory = weatherCategory;
+    
+    await outfit.save();
+    res.status(200).json({ updatedOutfit: outfit });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
   
 
   app.get('/api/weather', async (req, res) => {
