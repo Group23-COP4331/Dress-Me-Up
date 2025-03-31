@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'clothing_item_screen.dart' as AddClothingItemScreen;
 
 class CardsScreen extends StatefulWidget {
@@ -28,38 +30,50 @@ class _CardsScreenState extends State<CardsScreen> {
   void initState() {
     super.initState();
     _currentJwtToken = widget.jwtToken;
-    _fetchClothingItems();  // Fetch clothing items on screen load
+    _fetchClothingItems(); // Fetch clothing items on screen load
   }
 
   // Fetch clothing items from the API
-Future<void> _fetchClothingItems() async {
-  try {
-    final response = await http.get(
-      Uri.parse('http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}'),
-      headers: {
-        'Authorization': 'Bearer $_currentJwtToken',
-      },
-    );
+  Future<void> _fetchClothingItems() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}'),
+        headers: {
+          'Authorization': 'Bearer $_currentJwtToken',
+        },
+      );
 
-    print("Status code: ${response.statusCode}");
-    print("Response body: ${response.body}");
+      print("Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
-    if (response.statusCode == 200) {
-      final List<dynamic> items = jsonDecode(response.body)['results'];
+      if (response.statusCode == 200) {
+        final List<dynamic> items = jsonDecode(response.body)['results'];
+        setState(() {
+          _clothingItems = List<Map<String, dynamic>>.from(items);
+        });
+      } else {
+        setState(() {
+          _message = 'Failed to load clothing items';
+        });
+      }
+    } catch (e) {
       setState(() {
-        _clothingItems = List<Map<String, dynamic>>.from(items);
-      });
-    } else {
-      setState(() {
-        _message = 'Failed to load clothing items';
+        _message = 'Error: $e';
       });
     }
-  } catch (e) {
-    setState(() {
-      _message = 'Error: $e';
-    });
   }
-}
+
+  // Compress image bytes using flutter_image_compress
+  Future<Uint8List?> _compressImage(String base64Image) async {
+    final Uint8List imageBytes = base64Decode(base64Image);
+    final compressedBytes = await FlutterImageCompress.compressWithList(
+      imageBytes,
+      minWidth: 200,
+      minHeight: 200,
+      quality: 50, // Adjust quality as needed (0-100)
+    );
+    return compressedBytes;
+  }
 
   // Handle logout
   void _logout() {
@@ -155,11 +169,33 @@ Future<void> _fetchClothingItems() async {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 if (item['file'] != null)
-                                  Image.memory(
-                                    base64Decode(item['file']),
-                                    height: 200,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
+                                  FutureBuilder<Uint8List?>(
+                                    future: _compressImage(item['file']),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Container(
+                                          height: 200,
+                                          child: const Center(child: CircularProgressIndicator()),
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        return Container(
+                                          height: 200,
+                                          child: const Center(child: Icon(Icons.error)),
+                                        );
+                                      } else if (!snapshot.hasData || snapshot.data == null) {
+                                        return Container(
+                                          height: 200,
+                                          child: const Center(child: Text('No image')),
+                                        );
+                                      } else {
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          height: 200,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        );
+                                      }
+                                    },
                                   ),
                                 const SizedBox(height: 10),
                                 Text(
