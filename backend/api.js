@@ -498,8 +498,28 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
   app.get('/api/getOutfits', async (req, res) => {
     const { userId } = req.query;
     try {
-      const outfits = await Outfit.find({ UserId: userId });
-      res.json({ results: outfits });
+      const outfits = await Outfit.find({ UserId: userId })
+        .populate('Top')
+        .populate('Bottom')
+        .populate('Shoes');
+  
+      // Convert image buffers to base64
+      const results = outfits.map((outfit) => {
+        const toBase64 = (file) => {
+          if (!file) return null;
+          if (file.data) return Buffer.from(file.data).toString('base64');
+          if (Buffer.isBuffer(file)) return file.toString('base64');
+          return file;
+        };
+  
+        if (outfit.Top && outfit.Top.file) outfit.Top.file = toBase64(outfit.Top.file);
+        if (outfit.Bottom && outfit.Bottom.file) outfit.Bottom.file = toBase64(outfit.Bottom.file);
+        if (outfit.Shoes && outfit.Shoes.file) outfit.Shoes.file = toBase64(outfit.Shoes.file);
+  
+        return outfit;
+      });
+  
+      res.json({ results });
     } catch (err) {
       console.error("Error in getOutfits:", err);
       res.status(500).json({ error: 'Failed to fetch outfits' });

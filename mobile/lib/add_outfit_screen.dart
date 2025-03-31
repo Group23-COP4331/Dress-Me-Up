@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'select_clothing_item_screen.dart'; // Ensure this file exists
+import 'select_clothing_item_screen.dart';
 
 class AddOutfitScreen extends StatefulWidget {
   final String jwtToken;
@@ -36,6 +36,7 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
     setState(() {
       _isLoading = true;
     });
+
     final response = await http.post(
       Uri.parse('http://dressmeupproject.com:5001/api/addOutfit'),
       headers: {
@@ -51,9 +52,11 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
         'weatherCategory': _selectedWeather,
       }),
     );
+
     setState(() {
       _isLoading = false;
     });
+
     if (response.statusCode == 200) {
       final newOutfit = jsonDecode(response.body);
       Navigator.pop(context, newOutfit);
@@ -64,7 +67,12 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
     }
   }
 
-  Widget _buildSelectButton(String label, Map<String, dynamic>? selectedItem, List<String> allowedCategories) {
+  Widget _clothingItemButton({
+    required String label,
+    required Map<String, dynamic>? selectedItem,
+    required List<String> allowedCategories,
+    required void Function(Map<String, dynamic>) onItemSelected,
+  }) {
     return ElevatedButton(
       onPressed: () async {
         final selected = await Navigator.push(
@@ -77,15 +85,10 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
             ),
           ),
         );
+
         if (selected != null) {
           setState(() {
-            if (allowedCategories.contains('shirts') || allowedCategories.contains('longsleeves')) {
-              _selectedTop = selected;
-            } else if (allowedCategories.contains('pants') || allowedCategories.contains('shorts')) {
-              _selectedBottom = selected;
-            } else if (allowedCategories.contains('shoes')) {
-              _selectedShoes = selected;
-            }
+            onItemSelected(selected);
           });
         }
       },
@@ -107,8 +110,10 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
               ),
             ),
           Text(
-            selectedItem == null ? 'Select $label' : 'Selected: ${selectedItem['Name']}',
-            style: TextStyle(color: themeGray),
+            selectedItem == null
+                ? 'Select $label'
+                : 'Selected: ${selectedItem['Name']}',
+            style: const TextStyle(color: themeGray),
           ),
         ],
       ),
@@ -131,22 +136,40 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Outfit Name',
-                labelStyle: TextStyle(color: themeGray),
-                enabledBorder: UnderlineInputBorder(
+                labelStyle: const TextStyle(color: themeGray),
+                enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: themeGreen),
                 ),
-                focusedBorder: UnderlineInputBorder(
+                focusedBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: themeGreen),
                 ),
               ),
-              style: TextStyle(color: themeGray),
+              style: const TextStyle(color: themeGray),
             ),
             const SizedBox(height: 10),
-            _buildSelectButton('Top', _selectedTop, ['shirts', 'longsleeves']),
+
+            _clothingItemButton(
+              label: 'Top',
+              selectedItem: _selectedTop,
+              allowedCategories: ['shirts', 'longsleeves'],
+              onItemSelected: (item) => _selectedTop = item,
+            ),
             const SizedBox(height: 10),
-            _buildSelectButton('Bottom', _selectedBottom, ['pants', 'shorts']),
+
+            _clothingItemButton(
+              label: 'Bottom',
+              selectedItem: _selectedBottom,
+              allowedCategories: ['pants', 'shorts'],
+              onItemSelected: (item) => _selectedBottom = item,
+            ),
             const SizedBox(height: 10),
-            _buildSelectButton('Shoe', _selectedShoes, ['shoes']),
+
+            _clothingItemButton(
+              label: 'Shoe',
+              selectedItem: _selectedShoes,
+              allowedCategories: ['shoes'],
+              onItemSelected: (item) => _selectedShoes = item,
+            ),
             const SizedBox(height: 20),
 
             DropdownButtonFormField<String>(
@@ -164,9 +187,9 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
               },
               decoration: InputDecoration(
                 labelText: 'Weather Category',
-                labelStyle: TextStyle(color: themeGray),
+                labelStyle: const TextStyle(color: themeGray),
                 border: const OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
+                focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: themeGreen),
                 ),
               ),
