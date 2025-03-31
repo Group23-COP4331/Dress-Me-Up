@@ -251,6 +251,8 @@ app.post("/api/resetPassword", async (req, res) => {
   //Need to add jwtToken to this
   // GET route: /api/getClothingItems?userId=...&page=1&limit=12
   app.get('/api/getClothingItems', async (req, res) => {
+
+    console.log("Received getClothingItems request");
     const { userId, page = 1, limit = 12, category, search } = req.query;
     const skip = (page - 1) * limit;
   
