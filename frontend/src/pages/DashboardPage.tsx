@@ -9,6 +9,7 @@ export default function DashboardPage(){
         {title: 'My Closet', desc: 'Your wardrobe, reimagined. Organize, favorite, and style your outfits effortlessly.', pic: closetImage, route: '/mycloset'},
         {title: 'Outfit of the Day', desc:'Stay ahead of the forecast and seamlessly plan outfits for every occasion.', pic: calendarImage, route: '/mycloset'}
     ];
+
     // Removes default padding and width opon rendering
     useEffect(() => {
         document.getElementById("root")?.classList.add("dashboard");
@@ -25,7 +26,7 @@ export default function DashboardPage(){
             className="
                 flex flex-col items-center 
                 justify-center gap-16 lg:flex-row lg:gap-32
-                h-auto lg:h-[100svh] w-full lg:px-16 pb-16">
+                h-auto lg:h-[100svh] w-full mt-24 lg:mt-0 lg:px-16 pb-16">
                 {previews.map((item, index) => (
                     <DashboardCard key={index} {...item} />
                 ))} 

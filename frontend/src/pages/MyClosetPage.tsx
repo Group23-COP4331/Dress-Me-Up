@@ -5,12 +5,22 @@ import redheart from "../assets/MyClosetImages/redheart.png";
 import plant from "../assets/shrub.png";
 import { toast } from 'react-toastify';
 import { useRef, useCallback } from "react";
+import Navbar from '../components/Navbar';
 
 
 //shoe is a placeholder import we will change this with the images users upload
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
 
 export default function MyCloset() {
+
+  // Removes default padding and width opon rendering
+  useEffect(() => {
+    document.getElementById("root")?.classList.add("dashboard");
+
+    return () => {
+        document.getElementById("root")?.classList.remove("dashboard");
+    };
+}, []);
 
   const resetItemForm = () => 
     {
@@ -178,22 +188,49 @@ export default function MyCloset() {
   
   return (
     //div on whole screen
-    <div className="relative flex h-screen bg-themeLightBeige p-2">
-      {/* Sidebar surrounding buttons on the left */}
-      <div className="fixed left-0 top-0 h-full w-64 flex flex-col items-center p-4 bg-themeLightBeige">
-        <img
-          src={logo}
-          alt="DressMeUp Logo"
-          className="w-32 h-32 rounded-lg mb-4"
+    <div className=" h-screen overflow-auto">
+      <Navbar/> 
+      {/* Search Bar*/}
+      <div className="flex flex-col min-w-screen items-center justify-center">
+        <div className="mt-4 md:top-0 z-[-1] py-4 w-[75%] ">
+          <input
+            type="text"
+            placeholder="Search ..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setClothingItems([]); // reset results
+              setPage(1);            // reset pagination
+              setHasMore(true);      // allow more fetches
+            }}
+            className="w-full max-w-xl mx-auto px-4 py-2 bg-themeGray rounded-full text-black placeholder-black shadow-md"
         />
+        </div>
 
-        {/* Menu Buttons on the left side of the screen*/}
-        <div className="flex flex-col w-5/6 h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-2">
-          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg">
+      <div className="md:fixed md:right-8 md:top-1/2 md:-translate-y-1/2 flex flex-row md:flex-col gap-4">
+        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md"
+        onClick={() => setShowAddItemForm(true)}
+        >
+          Add Item
+        </button>
+        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md"
+        onClick={() => setShowCreateOutfitForm(true)}
+        >
+          Create Outfit
+        </button>
+      </div>
+    </div>
+
+      {/* Sidebar surrounding buttons on the left */}
+      <div className="w-64 flex flex-col items-center justify-center h-auto lg:h-[100svh] ">
+  
+        {/* Menu Buttons */}
+        <div className="flex flex-col w-5/6 h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-5 shadow-md sticky">
+          <button className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md">
             Saved Fits
           </button>
           <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
             onClick={() => {
               setActiveCategory("Shirts");
               setClothingItems([]);
@@ -204,7 +241,7 @@ export default function MyCloset() {
             Shirts
           </button>
           <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
             onClick={() => {
               setActiveCategory("Long Sleeves");
               setClothingItems([]);
@@ -214,8 +251,8 @@ export default function MyCloset() {
           >
             Long Sleeves
           </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
+          <button 
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
             onClick={() => {
               setActiveCategory("Pants");
               setClothingItems([]);
@@ -226,7 +263,7 @@ export default function MyCloset() {
             Pants
           </button>
           <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
             onClick={() => {
               setActiveCategory("Shorts");
               setClothingItems([]);
@@ -237,7 +274,7 @@ export default function MyCloset() {
             Shorts
           </button>
           <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
             onClick={() => {
               setActiveCategory("Shoes");
               setClothingItems([]);
@@ -248,7 +285,7 @@ export default function MyCloset() {
             Shoes
           </button>
           <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg flex items-center justify-center gap-2"
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg  shadow-md flex items-center justify-center gap-2"
             onClick={() => {
               setFavoriteOnly(true);        // 🔒 Lock to favorites
               setActiveCategory('');        // Clear category filter if needed
@@ -261,7 +298,7 @@ export default function MyCloset() {
             Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
           </button>
           <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
+            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
             onClick={() => {
               setFavoriteOnly(false);      // 👈 Reset
               setActiveCategory('');
@@ -277,24 +314,9 @@ export default function MyCloset() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-8 pb-32">
-
-        {/* Search Bar*/}
-        <div className="sticky top-0 z-10 py-4">
-          <input
-            type="text"
-            placeholder="Search ..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setClothingItems([]); // reset results
-              setPage(1);            // reset pagination
-              setHasMore(true);      // allow more fetches
-            }}
-            className="w-full max-w-xl mx-auto px-4 py-2 bg-themeGray rounded-full text-black placeholder-black"
-        />
-        </div>
-        
+            
+      <div className="flex-1 flex items-center flex-col overflow-y-auto px-8 pb-32">
+      {/* Create outfit and add item buttons */}        
         {/* The grid of closet items */}
         <div className="pt-36 w-full flex justify-center">
           {loading ? (
@@ -376,7 +398,6 @@ export default function MyCloset() {
                               setEditingItem(item);
                             }}
                           >
-                            ✏️
                         </button>
 
                         </div>
@@ -399,20 +420,6 @@ export default function MyCloset() {
 
       </div>
 
-      {/* Create outfit and add item buttons */}
-      <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg"
-        onClick={() => setShowAddItemForm(true)}
-        >
-          Add Item
-        </button>
-        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg"
-        onClick={() => setShowCreateOutfitForm(true)}
-        >
-          Create Outfit
-        </button>
-      </div>
-      
       {(showAddItemForm || editingItem) && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">

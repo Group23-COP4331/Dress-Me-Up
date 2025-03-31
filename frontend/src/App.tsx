@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import AboutPage from './pages/AboutPage';
 import LoggedInTest from './pages/LoggedInTest';
 import MyClosetPage from './pages/MyClosetPage';
+import DashboardPage from './pages/DashboardPage';
+import { ToastContainer } from 'react-toastify/unstyled';
 
 function App() {
   return (
