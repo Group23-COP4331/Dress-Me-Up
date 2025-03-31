@@ -495,16 +495,16 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     }
   });
 
-app.get('/api/getOutfits', async (req, res) => {
-  const { userId } = req.query;
-  try {
-    const outfits = await Outfit.find({ UserId: userId });
-    res.json({ results: outfits });
-  } catch (err) {
-    console.error("Error in getOutfits:", err);
-    res.status(500).json({ error: 'Failed to fetch outfits' });
-  }
-});
+  app.get('/api/getOutfits', async (req, res) => {
+    const { userId } = req.query;
+    try {
+      const outfits = await Outfit.find({ UserId: userId });
+      res.json({ results: outfits });
+    } catch (err) {
+      console.error("Error in getOutfits:", err);
+      res.status(500).json({ error: 'Failed to fetch outfits' });
+    }
+  });
 
 app.post('/api/updateOutfit', async (req, res) => {
   const { _id, name, top, bottom, shoes, weatherCategory } = req.body;

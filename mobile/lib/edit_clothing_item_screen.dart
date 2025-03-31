@@ -1,36 +1,32 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
+import 'select_clothing_item_screen.dart';
 
-class EditClothingItemScreen extends StatefulWidget {
-  final Map<String, dynamic> clothingItem;
+class EditOutfitScreen extends StatefulWidget {
+  final Map<String, dynamic> outfit;
   final String jwtToken;
   final String userId;
 
-  const EditClothingItemScreen({
+  const EditOutfitScreen({
     Key? key,
-    required this.clothingItem,
+    required this.outfit,
     required this.jwtToken,
     required this.userId,
   }) : super(key: key);
 
   @override
-  _EditClothingItemScreenState createState() => _EditClothingItemScreenState();
+  State<EditOutfitScreen> createState() => _EditOutfitScreenState();
 }
 
-class _EditClothingItemScreenState extends State<EditClothingItemScreen> {
-  late TextEditingController _nameController;
-  late TextEditingController _colorController;
-  late TextEditingController _categoryController;
-  late TextEditingController _sizeController;
-  File? _selectedImage; // Optional new image
-  String _message = '';
+class _EditOutfitScreenState extends State<EditOutfitScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  Map<String, dynamic>? _top;
+  Map<String, dynamic>? _bottom;
+  Map<String, dynamic>? _shoes;
+  String? _selectedWeather;
   bool _isLoading = false;
 
-  // Define your color palette
   static const themeGreen = Color(0xFFB6C7AA);
   static const themeGray = Color(0xFFA0937D);
   static const themeDarkBeige = Color(0xFFE7D4B5);
@@ -39,257 +35,146 @@ class _EditClothingItemScreenState extends State<EditClothingItemScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.clothingItem['Name'] ?? '');
-    _colorController = TextEditingController(text: widget.clothingItem['Color'] ?? '');
-    _categoryController = TextEditingController(text: widget.clothingItem['Category'] ?? '');
-    _sizeController = TextEditingController(text: widget.clothingItem['Size'] ?? '');
+    _nameController.text = widget.outfit['Name'] ?? '';
+    _selectedWeather = widget.outfit['WeatherCategory'] ?? 'Any';
+    _fetchClothingItems();
   }
 
-  Future<void> _pickImage() async {
-    final image = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
-    );
-    if (image != null) {
-      setState(() {
-        _selectedImage = File(image.path);
-      });
-    }
-  }
-
-  Future<void> _submit() async {
-    final name = _nameController.text.trim();
-    final color = _colorController.text.trim();
-    final category = _categoryController.text.trim();
-    final size = _sizeController.text.trim();
-
-    if (name.isEmpty || color.isEmpty || category.isEmpty || size.isEmpty) {
-      setState(() => _message = 'Please fill out all fields.');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    var uri = Uri.parse('http://dressmeupproject.com:5001/api/updateClothingItem');
-    var request = http.MultipartRequest('POST', uri);
-
-    // Pass necessary fields and the item _id
-    request.fields['_id'] = widget.clothingItem['_id'];
-    request.fields['userId'] = widget.userId;
-    request.fields['name'] = name;
-    request.fields['color'] = color;
-    request.fields['category'] = category;
-    request.fields['size'] = size;
-    request.fields['jwtToken'] = widget.jwtToken;
-
-    // If a new image was selected, add it to the request.
-    if (_selectedImage != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'image',
-          _selectedImage!.path,
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
-    }
-
+  Future<void> _fetchClothingItems() async {
     try {
-      var response = await request.send();
-      var body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-      setState(() {
-        _isLoading = false;
-      });
+      final ids = [widget.outfit['Top'], widget.outfit['Bottom'], widget.outfit['Shoes']];
+      final response = await http.post(
+        Uri.parse('http://dressmeupproject.com:5001/api/getClothingItemsByIds'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'ids': ids}),
+      );
       if (response.statusCode == 200) {
-        // Return the updated item to the previous screen.
-        Navigator.pop(context, data['item']);
-      } else {
+        final items = List<Map<String, dynamic>>.from(jsonDecode(response.body)['results']);
         setState(() {
-          _message = data['error'] ?? 'Unknown error';
+          _top = items.firstWhere((item) => item['_id'] == widget.outfit['Top']);
+          _bottom = items.firstWhere((item) => item['_id'] == widget.outfit['Bottom']);
+          _shoes = items.firstWhere((item) => item['_id'] == widget.outfit['Shoes']);
         });
       }
     } catch (e) {
+      print('Failed to load clothing items: $e');
+    }
+  }
+
+  Future<void> _saveChanges() async {
+    setState(() => _isLoading = true);
+
+    final response = await http.post(
+      Uri.parse('http://dressmeupproject.com:5001/api/updateOutfit'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        '_id': widget.outfit['_id'],
+        'name': _nameController.text,
+        'top': _top?['_id'] ?? '',
+        'bottom': _bottom?['_id'] ?? '',
+        'shoes': _shoes?['_id'] ?? '',
+        'weatherCategory': _selectedWeather ?? '',
+      }),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (response.statusCode == 200) {
+      Navigator.pop(context, jsonDecode(response.body)['updatedOutfit']);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update outfit')),
+      );
+    }
+  }
+
+  Widget _clothingTile(Map<String, dynamic>? item, String label) {
+    if (item == null) return Text('No $label selected');
+    return ListTile(
+      leading: item['file'] != null
+          ? Image.memory(
+              base64Decode(item['file']),
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            )
+          : const Icon(Icons.image_not_supported),
+      title: Text(item['Name'] ?? label),
+      subtitle: Text(item['Category'] ?? ''),
+    );
+  }
+
+  Future<void> _selectItem(String type, List<String> categories) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectClothingItemScreen(
+          jwtToken: widget.jwtToken,
+          userId: widget.userId,
+          allowedCategories: categories,
+        ),
+      ),
+    );
+    if (result != null) {
       setState(() {
-        _isLoading = false;
-        _message = 'Error: $e';
+        if (type == 'Top') _top = result;
+        if (type == 'Bottom') _bottom = result;
+        if (type == 'Shoes') _shoes = result;
       });
     }
   }
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    _colorController.dispose();
-    _categoryController.dispose();
-    _sizeController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _deleteClothingItem() async {
-  final confirm = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Confirm Deletion'),
-      content: const Text('Are you sure you want to delete this item?'),
-      actions: [
-        TextButton(
-          child: const Text('Cancel'),
-          onPressed: () => Navigator.of(context).pop(false),
-        ),
-        TextButton(
-          child: const Text('Delete'),
-          onPressed: () => Navigator.of(context).pop(true),
-        ),
-      ],
-    ),
-  );
-
-  if (confirm != true) return;
-
-  setState(() => _isLoading = true);
-
-  final response = await http.post(
-    Uri.parse('http://dressmeupproject.com:5001/api/deleteClothingItem'),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: jsonEncode({
-      '_id': widget.clothingItem['_id'],
-      'jwtToken': widget.jwtToken,
-    }),
-  );
-
-  setState(() => _isLoading = false);
-
-  if (response.statusCode == 200) {
-    Navigator.pop(context, 'deleted'); // Return a flag to indicate deletion
-  } else {
-    final body = jsonDecode(response.body);
-    setState(() {
-      _message = body['error'] ?? 'Failed to delete item.';
-    });
-  }
-}
-
-  @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: themeLightBeige,
       appBar: AppBar(
-        title: const Text('Edit Clothing Item'),
+        title: const Text('Edit Outfit'),
         backgroundColor: themeDarkBeige,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Display the current image from the item (if available)
-            widget.clothingItem['file'] != null
-                ? Image.memory(
-                    base64Decode(widget.clothingItem['file']),
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  )
-                : Container(),
-            const SizedBox(height: 10),
-            // If a new image is selected, show its preview
-            if (_selectedImage != null)
-              Image.file(
-                _selectedImage!,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.image),
-              label: const Text('Change Image'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: themeGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Name input
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name (Ex: Graphic T-Shirt)',
-                border: const OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: themeGray),
-                ),
-              ),
+              decoration: const InputDecoration(labelText: 'Outfit Name'),
             ),
             const SizedBox(height: 10),
-            // Color input
-            TextField(
-              controller: _colorController,
-              decoration: InputDecoration(
-                labelText: 'Color (Ex: Pink, Yellow)',
-                border: const OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: themeGray),
-                ),
-              ),
+            _clothingTile(_top, 'Top'),
+            ElevatedButton(
+              onPressed: () => _selectItem('Top', ['shirts', 'longsleeves']),
+              child: const Text('Change Top'),
+            ),
+            _clothingTile(_bottom, 'Bottom'),
+            ElevatedButton(
+              onPressed: () => _selectItem('Bottom', ['pants', 'shorts']),
+              child: const Text('Change Bottom'),
+            ),
+            _clothingTile(_shoes, 'Shoes'),
+            ElevatedButton(
+              onPressed: () => _selectItem('Shoes', ['shoes']),
+              child: const Text('Change Shoes'),
             ),
             const SizedBox(height: 10),
-            // Category input
-            TextField(
-              controller: _categoryController,
-              decoration: InputDecoration(
-                labelText: 'Category (Ex: Shirts, Pants, Longsleeves)',
-                border: const OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: themeGray),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Size input
-            TextField(
-              controller: _sizeController,
-              decoration: InputDecoration(
-                labelText: 'Size (Ex: S for Small, M for Medium)',
-                border: const OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: themeGray),
-                ),
-              ),
+            DropdownButtonFormField<String>(
+              value: _selectedWeather,
+              decoration: const InputDecoration(labelText: 'Weather Category'),
+              items: const [
+                DropdownMenuItem(value: 'Hot', child: Text('Hot')),
+                DropdownMenuItem(value: 'Cold', child: Text('Cold')),
+                DropdownMenuItem(value: 'Normal', child: Text('Normal')),
+                DropdownMenuItem(value: 'Rainy', child: Text('Rainy')),
+                DropdownMenuItem(value: 'Sunny', child: Text('Sunny')),
+                DropdownMenuItem(value: 'Cloudy', child: Text('Cloudy')),
+              ],
+              onChanged: (value) => setState(() => _selectedWeather = value),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _isLoading ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: themeGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Save Changes'),
-            ),
-            const SizedBox(height: 10),
-TextButton(
-  onPressed: _isLoading ? null : _deleteClothingItem,
-  child: const Text(
-    'Delete Item',
-    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-  ),
-),
-
-            if (_message.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  _message,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
+              onPressed: _isLoading ? null : _saveChanges,
+              child: _isLoading ? const CircularProgressIndicator() : const Text('Save Changes'),
+            )
           ],
         ),
       ),

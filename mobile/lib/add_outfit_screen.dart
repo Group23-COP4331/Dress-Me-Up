@@ -23,8 +23,10 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
   Map<String, dynamic>? _selectedBottom;
   Map<String, dynamic>? _selectedShoes;
   bool _isLoading = false;
+  String? _selectedWeather = 'Normal';
 
-  // Use the same color palette as your other screens:
+  static const weatherOptions = ['Cold', 'Normal', 'Rainy', 'Sunny', 'Cloudy'];
+
   static const themeGreen = Color(0xFFB6C7AA);
   static const themeGray = Color(0xFFA0937D);
   static const themeDarkBeige = Color(0xFFE7D4B5);
@@ -46,7 +48,7 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
         'top': _selectedTop?['_id'] ?? '',
         'bottom': _selectedBottom?['_id'] ?? '',
         'shoes': _selectedShoes?['_id'] ?? '',
-        // You can include 'weatherCategory' if needed
+        'weatherCategory': _selectedWeather,
       }),
     );
     setState(() {
@@ -62,7 +64,6 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
     }
   }
 
-  // Helper widget to build a selection button
   Widget _buildSelectButton(String label, Map<String, dynamic>? selectedItem, List<String> allowedCategories) {
     return ElevatedButton(
       onPressed: () async {
@@ -92,9 +93,24 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
         backgroundColor: themeGreen,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),
-      child: Text(
-        selectedItem == null ? 'Select $label' : 'Selected: ${selectedItem['Name']}',
-        style: TextStyle(color: themeGray),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (selectedItem != null && selectedItem['file'] != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Image.memory(
+                base64Decode(selectedItem['file']),
+                width: 30,
+                height: 30,
+                fit: BoxFit.cover,
+              ),
+            ),
+          Text(
+            selectedItem == null ? 'Select $label' : 'Selected: ${selectedItem['Name']}',
+            style: TextStyle(color: themeGray),
+          ),
+        ],
       ),
     );
   }
@@ -111,7 +127,6 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Outfit name input
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -127,13 +142,37 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
               style: TextStyle(color: themeGray),
             ),
             const SizedBox(height: 10),
-            // Selection buttons for Top, Bottom, and Shoes:
             _buildSelectButton('Top', _selectedTop, ['shirts', 'longsleeves']),
             const SizedBox(height: 10),
             _buildSelectButton('Bottom', _selectedBottom, ['pants', 'shorts']),
             const SizedBox(height: 10),
             _buildSelectButton('Shoe', _selectedShoes, ['shoes']),
             const SizedBox(height: 20),
+
+            DropdownButtonFormField<String>(
+              value: _selectedWeather,
+              items: weatherOptions.map((weather) {
+                return DropdownMenuItem(
+                  value: weather,
+                  child: Text(weather),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedWeather = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Weather Category',
+                labelStyle: TextStyle(color: themeGray),
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeGreen),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
             ElevatedButton(
               onPressed: _isLoading ? null : _addOutfit,
               style: ElevatedButton.styleFrom(
