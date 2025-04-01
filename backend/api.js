@@ -254,32 +254,37 @@ app.post("/api/resetPassword", async (req, res) => {
   // GET route: /api/getClothingItems?userId=...&page=1&limit=12
   app.get('/api/getClothingItems', async (req, res) => {
     console.log("🛠️ Received getClothingItems request");
-  
+
     const { userId, page = 1, limit = 12, category, search } = req.query;
     console.log("🔍 Incoming query params:", req.query);
-  
+
     const skip = (page - 1) * limit;
-  
+
     try {
       const query = { UserId: userId.toString() };
 
       if (category) {
-        query.Category = { $regex: new RegExp(`^${category}$`, 'i') }; // case-insensitive exact match
+        const categories = Array.isArray(category)
+          ? category
+          : category.split(',');
+
+        query.Category = {
+          $in: categories.map(c => new RegExp(`^${c}$`, 'i')) // case-insensitive match
+        };
       }
-      
-  
+
       if (search) {
         query.Name = { $regex: search, $options: 'i' };
       }
 
       console.log("🧩 MongoDB query:", query);
-  
+
       const items = await ClothingItem.find(query)
         .skip(parseInt(skip))
         .limit(parseInt(limit));
-  
+
       console.log("📦 Items fetched from DB:", items.length);
-  
+
       const result = items.map(item => {
         const itemObj = item.toObject();
         if (itemObj.file && itemObj.file.data) {
@@ -289,13 +294,14 @@ app.post("/api/resetPassword", async (req, res) => {
         }
         return itemObj;
       });
-  
+
       res.json({ results: result });
     } catch (err) {
       console.error("❌ Error in getClothingItems:", err);
       res.status(500).json({ error: 'Failed to fetch items' });
     }
   });
+
   
 
 
