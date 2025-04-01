@@ -27,29 +27,38 @@ class _EditOutfitsScreenState extends State<EditOutfitsScreen> {
     print("Editing outfit: ${jsonEncode(outfit)}");
   }
 
-  Widget _clothingPreview(Map<String, dynamic>? item, String label) {
-    if (item == null || item is! Map || item.isEmpty) {
-      return Text('$label: (unresolved ID)');
-    }
+  Widget _clothingPreview(dynamic item, String label) {
+  if (item == null) {
+    return Text('$label: N/A');
+  }
+
+  if (item is String) {
+    return Text('$label: (unresolved ID)');
+  }
+
+  if (item is Map<String, dynamic>) {
+    final name = item['Name'];
+    final imageData = item['file'];
 
     return Row(
       children: [
-        if (item['file'] != null && item['file'] is String)
+        if (imageData is String)
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Image.memory(
-              base64Decode(item['file']),
+              base64Decode(imageData),
               width: 40,
               height: 40,
               fit: BoxFit.cover,
             ),
           ),
-        Expanded(
-          child: Text('$label: ${item['Name'] ?? 'Unnamed'}'),
-        ),
+        Expanded(child: Text('$label: ${name ?? "Unnamed"}')),
       ],
     );
   }
+
+  return Text('$label: (invalid data)');
+}
 
   @override
   Widget build(BuildContext context) {

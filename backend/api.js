@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('./models/user');
 const Card = require('./models/card');
 const Weather = require('./models/weather');
@@ -5,22 +6,20 @@ const token = require('./createJWT');
 const ClothingItem = require('./models/clothingItem');
 const Outfit = require('./models/outfit');
 const multer = require('multer');
-const upload = multer({storage: multer.memoryStorage()});
+const upload = multer({ storage: multer.memoryStorage() });
 const axios = require('axios');
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
 const sendEmailVerification = require('./sendEmailVerification');
-const compression = require('compression'); // ✅ Added compression
+const compression = require('compression');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = function (app) {
-
   const cors = require('cors');
   app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173', 'http://localhost:5001'] }));
-  app.use(compression()); // ✅ Enable response compression
-
+  app.use(compression());
 
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
@@ -444,27 +443,25 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
 
   app.post('/api/addOutfit', async (req, res) => {
     try {
-      const {userId, name, top, bottom, shoes, weatherCategory} = req.body;
-      
+      const { userId, name, top, bottom, shoes, weatherCategory } = req.body;
+
       if (!userId || !name || !top || !bottom || !shoes) {
         return res.status(400).json({ error: 'Fields are wrong!' });
       }
 
       const newOutfit = new Outfit({
-        UserId: userId, 
+        UserId: userId,
         Name: name,
-        Top: top,
-        Bottom: bottom,
-        Shoes: shoes,
-        WeatherCategory: weatherCategory
+        Top: mongoose.Types.ObjectId(top),
+        Bottom: mongoose.Types.ObjectId(bottom),
+        Shoes: mongoose.Types.ObjectId(shoes),
+        WeatherCategory: weatherCategory,
       });
 
       await newOutfit.save();
       res.status(200).json(newOutfit);
     } catch (error) {
-        res.status(500).json({error: 'Error in addOutfit api',
-        details: error.message
-      });
+      res.status(500).json({ error: 'Error in addOutfit api', details: error.message });
     }
   });
 
@@ -520,26 +517,25 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     }
   });
 
-app.post('/api/updateOutfit', async (req, res) => {
-  const { _id, name, top, bottom, shoes, weatherCategory } = req.body;
-  try {
-    const outfit = await Outfit.findById(_id);
-    if (!outfit) {
-      return res.status(404).json({ error: 'Outfit not found' });
+  app.post('/api/updateOutfit', async (req, res) => {
+    const { _id, name, top, bottom, shoes, weatherCategory } = req.body;
+    try {
+      const outfit = await Outfit.findById(_id);
+      if (!outfit) {
+        return res.status(404).json({ error: 'Outfit not found' });
+      }
+      if (name) outfit.Name = name;
+      if (top) outfit.Top = mongoose.Types.ObjectId(top);
+      if (bottom) outfit.Bottom = mongoose.Types.ObjectId(bottom);
+      if (shoes) outfit.Shoes = mongoose.Types.ObjectId(shoes);
+      if (weatherCategory !== undefined) outfit.WeatherCategory = weatherCategory;
+
+      await outfit.save();
+      res.status(200).json({ updatedOutfit: outfit });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    // Update outfit properties if provided
-    if (name) outfit.Name = name;
-    if (top) outfit.Top = top;
-    if (bottom) outfit.Bottom = bottom;
-    if (shoes) outfit.Shoes = shoes;
-    if (weatherCategory !== undefined) outfit.WeatherCategory = weatherCategory;
-    
-    await outfit.save();
-    res.status(200).json({ updatedOutfit: outfit });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  });
 
 
 app.post('/api/updateOutfit', async (req, res) => {
