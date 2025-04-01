@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const OutfitSchema = new Schema({
-  UserId: Number,
+  UserId: { type: String, required: true },
   Name: String,
   Top: { type: Schema.Types.ObjectId, ref: 'ClothingItem' },
   Bottom: { type: Schema.Types.ObjectId, ref: 'ClothingItem' },
