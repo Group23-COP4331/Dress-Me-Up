@@ -297,7 +297,7 @@ const handleDeleteOutfit = async (id: string) => {
   
   return (
     //div on whole screen
-    <div className=" h-screen overflow-auto">
+    <div className=" h-screen overflow-y-auto">
       <Navbar />
 
       {/* Header Content*/}
@@ -336,9 +336,9 @@ const handleDeleteOutfit = async (id: string) => {
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center  px-10 pt-24 pb-32">
+      <div className="flex-1 flex items-center justify-center pt-12">
         {/* The grid of closet items OR saved outfits */}
-        <div className=" w-[70%] flex items-center justify-center ">
+        <div className=" w-[70%] flex items-center justify-center">
           {loading ? (
             <p className="text-center text-lg mt-10">Loading closet...</p>
           ) : showOutfits ? (
@@ -424,7 +424,7 @@ const handleDeleteOutfit = async (id: string) => {
               </div>
             </div>
           ) : (
-            <div className="pt-24 flex flex-wrap flex-col lg:flex-row gap-8 items-center justify-center overflow-y-scroll">
+            <div className="pt-8 flex flex-wrap flex-col lg:flex-row gap-8 items-center justify-center ">
               {clothingItems.map((item, idx) => (
                 <div
                   key={item.id}
