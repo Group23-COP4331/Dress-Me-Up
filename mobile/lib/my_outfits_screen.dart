@@ -120,26 +120,33 @@ Widget _buildClothingRow(String label, dynamic item) {
   if (item == null) return Text('$label: N/A');
 
   if (item is String) {
-    // If it's still a string ID instead of an object
     return Text('$label: (unresolved ID)');
   }
 
-  return Row(
-    children: [
-      if (item['file'] != null)
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: Image.memory(
-            base64Decode(item['file']),
-            width: 40,
-            height: 40,
-            fit: BoxFit.cover,
+  if (item is Map<String, dynamic>) {
+    final name = item['Name'];
+    final imageData = item['file'];
+
+    return Row(
+      children: [
+        if (imageData is String)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Image.memory(
+              base64Decode(imageData),
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-      Text('$label: ${item['Name'] ?? 'N/A'}'),
-    ],
-  );
+        Text('$label: ${name ?? "N/A"}'),
+      ],
+    );
+  }
+
+  return Text('$label: (invalid data)');
 }
+
 
 
   @override

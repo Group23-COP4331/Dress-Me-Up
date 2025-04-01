@@ -518,6 +518,9 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
   
         return outfit;
       });
+
+      console.log("Populated Outfit Sample:", JSON.stringify(outfits[0], null, 2));
+
   
       res.json({ results });
     } catch (err) {
