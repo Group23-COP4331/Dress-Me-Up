@@ -45,8 +45,12 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
         },
       );
 
+      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        debugPrint("Outfits JSON: ${jsonEncode(data)}");
+
         setState(() {
           _outfits = data['results'] ?? [];
           if (_outfits.isEmpty) {
@@ -116,6 +120,8 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
   Widget _buildClothingRow(String label, dynamic item) {
     if (item == null) return Text('$label: N/A');
     if (item is String) return Text('$label: (unresolved ID)');
+    if (item == null || item is! Map) return Text('$label: (unresolved)');
+
 
     final name = item['Name'];
     final imageData = item['file'];

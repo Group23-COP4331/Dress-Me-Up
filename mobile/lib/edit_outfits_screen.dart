@@ -37,9 +37,9 @@ class _EditOutfitsScreenState extends State<EditOutfitsScreen> {
     super.initState();
     final outfit = widget.existingOutfit;
     _nameController = TextEditingController(text: outfit['Name'] ?? '');
-    _selectedTop = outfit['Top'];
-    _selectedBottom = outfit['Bottom'];
-    _selectedShoes = outfit['Shoes'];
+_selectedTop = outfit['Top'] is Map ? outfit['Top'] : null;
+_selectedBottom = outfit['Bottom'] is Map ? outfit['Bottom'] : null;
+_selectedShoes = outfit['Shoes'] is Map ? outfit['Shoes'] : null;
     _selectedWeather = outfit['WeatherCategory'] ?? 'Normal';
   }
 

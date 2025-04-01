@@ -21,7 +21,7 @@ class SelectClothingItemScreen extends StatefulWidget {
 class _SelectClothingItemScreenState extends State<SelectClothingItemScreen> {
   List<dynamic> _items = [];
   String _message = '';
-  static final Map<String, List<dynamic>> _cache = {};
+  static final Map<String, List<dynamic>> _cache = {}; // simple in-memory cache
 
   @override
   void initState() {
@@ -30,65 +30,72 @@ class _SelectClothingItemScreenState extends State<SelectClothingItemScreen> {
   }
 
   Future<void> _fetchItems() async {
-    final cacheKey = widget.allowedCategories.join(',').toLowerCase();
+  final cacheKey = widget.allowedCategories.join(',').toLowerCase();
 
-    if (_cache.containsKey(cacheKey)) {
+  if (_cache.containsKey(cacheKey)) {
+    if (!mounted) return;
+    setState(() {
+      _items = _cache[cacheKey]!;
+      if (_items.isEmpty) {
+        _message = 'No items available in this category.';
+      }
+    });
+    return;
+  }
+
+  try {
+    debugPrint('🛠️ Fetching clothing items for: $cacheKey');
+
+    final categoryParams = widget.allowedCategories
+        .map((cat) => 'category=${Uri.encodeComponent(cat)}')
+        .join('&');
+
+    final url = Uri.parse(
+      'http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}&$categoryParams',
+    );
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer ${widget.jwtToken}',
+      },
+    );
+
+    if (!mounted) return;
+
+    if (response.statusCode == 200) {
+      debugPrint('🧾 getClothingItems raw response: ${response.body}');
+      final data = jsonDecode(response.body);
+      final items = data['results'] ?? [];
+
+      final allowed = widget.allowedCategories.map((e) => e.toLowerCase()).toSet();
+      final filteredItems = items.where((item) {
+        final category = item['Category']?.toString().toLowerCase() ?? '';
+        return allowed.contains(category);
+      }).toList();
+
+      if (!mounted) return;
       setState(() {
-        _items = _cache[cacheKey]!;
+        _items = filteredItems;
+        _cache[cacheKey] = filteredItems;
         if (_items.isEmpty) {
           _message = 'No items available in this category.';
         }
       });
-      return;
-    }
-
-    try {
-      debugPrint('🛠️ Fetching clothing items for: $cacheKey');
-
-      final categoryParams = widget.allowedCategories
-          .map((cat) => 'category=${Uri.encodeComponent(cat)}')
-          .join('&');
-
-      final url = Uri.parse(
-        'http://dressmeupproject.com:5001/api/getClothingItems?userId=${widget.userId}&$categoryParams',
-      );
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer ${widget.jwtToken}',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        debugPrint('🧾 getClothingItems raw response: ${response.body}');
-        final data = jsonDecode(response.body);
-        final items = data['results'] ?? [];
-
-        final allowed = widget.allowedCategories.map((e) => e.toLowerCase()).toSet();
-        final filteredItems = items.where((item) {
-          final category = item['Category']?.toString().toLowerCase() ?? '';
-          return allowed.contains(category);
-        }).toList();
-
-        setState(() {
-          _items = filteredItems;
-          _cache[cacheKey] = filteredItems;
-          if (_items.isEmpty) {
-            _message = 'No items available in this category.';
-          }
-        });
-      } else {
-        setState(() {
-          _message = 'Failed to load items.';
-        });
-      }
-    } catch (e) {
+    } else {
+      if (!mounted) return;
       setState(() {
-        _message = 'Error: $e';
+        _message = 'Failed to load items.';
       });
     }
+  } catch (e) {
+    if (!mounted) return;
+    setState(() {
+      _message = 'Error: $e';
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
