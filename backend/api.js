@@ -262,6 +262,15 @@ app.post("/api/resetPassword", async (req, res) => {
   
     try {
       const query = { UserId: userId.toString() };
+
+      if (category) {
+        query.Category = category;
+      }
+  
+      if (search) {
+        query.Name = { $regex: search, $options: 'i' };
+      }
+      
       console.log("🧩 MongoDB query:", query);
   
       const items = await ClothingItem.find(query)
@@ -541,28 +550,6 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       res.status(500).json({ error: error.message });
     }
   });
-
-
-app.post('/api/updateOutfit', async (req, res) => {
-  const { _id, name, top, bottom, shoes, weatherCategory } = req.body;
-  try {
-    const outfit = await Outfit.findById(_id);
-    if (!outfit) {
-      return res.status(404).json({ error: 'Outfit not found' });
-    }
-    // Update outfit properties if provided
-    if (name) outfit.Name = name;
-    if (top) outfit.Top = top;
-    if (bottom) outfit.Bottom = bottom;
-    if (shoes) outfit.Shoes = shoes;
-    if (weatherCategory !== undefined) outfit.WeatherCategory = weatherCategory;
-    
-    await outfit.save();
-    res.status(200).json({ updatedOutfit: outfit });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
   
 
   app.get('/api/weather', async (req, res) => {

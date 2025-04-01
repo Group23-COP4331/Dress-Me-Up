@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'select_clothing_item_screen.dart';
 
 class EditOutfitsScreen extends StatefulWidget {
   final String jwtToken;
@@ -18,81 +20,138 @@ class EditOutfitsScreen extends StatefulWidget {
 }
 
 class _EditOutfitsScreenState extends State<EditOutfitsScreen> {
-  late Map<String, dynamic> outfit;
+  late TextEditingController _nameController;
+  Map<String, dynamic>? _selectedTop;
+  Map<String, dynamic>? _selectedBottom;
+  Map<String, dynamic>? _selectedShoes;
+  String? _selectedWeather;
+  bool _isSaving = false;
+
+  static const themeGreen = Color(0xFFB6C7AA);
+  static const themeGray = Color(0xFFA0937D);
+  static const themeDarkBeige = Color(0xFFE7D4B5);
+  static const themeLightBeige = Color(0xFFF6E6CB);
 
   @override
   void initState() {
     super.initState();
-    outfit = widget.existingOutfit;
-    print("Editing outfit: ${jsonEncode(outfit)}");
+    final outfit = widget.existingOutfit;
+    _nameController = TextEditingController(text: outfit['Name'] ?? '');
+    _selectedTop = outfit['Top'];
+    _selectedBottom = outfit['Bottom'];
+    _selectedShoes = outfit['Shoes'];
+    _selectedWeather = outfit['WeatherCategory'] ?? 'Normal';
   }
 
-  Widget _clothingPreview(dynamic item, String label) {
-  if (item == null) {
-    return Text('$label: N/A');
+  Future<void> _updateOutfit() async {
+    setState(() => _isSaving = true);
+
+    final response = await http.post(
+      Uri.parse('http://dressmeupproject.com:5001/api/updateOutfit'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${widget.jwtToken}',
+      },
+      body: jsonEncode({
+        '_id': widget.existingOutfit['_id'],
+        'name': _nameController.text,
+        'top': _selectedTop?['_id'],
+        'bottom': _selectedBottom?['_id'],
+        'shoes': _selectedShoes?['_id'],
+        'weatherCategory': _selectedWeather,
+      }),
+    );
+
+    setState(() => _isSaving = false);
+
+    if (response.statusCode == 200) {
+      final updated = jsonDecode(response.body)['updatedOutfit'];
+      Navigator.pop(context, updated);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update outfit')),
+      );
+    }
   }
 
-  if (item is String) {
-    return Text('$label: (unresolved ID)');
+  Future<void> _selectClothingItem(
+    String label,
+    List<String> allowedCategories,
+    void Function(Map<String, dynamic>) onSelected,
+  ) async {
+    final selected = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectClothingItemScreen(
+          jwtToken: widget.jwtToken,
+          userId: widget.userId,
+          allowedCategories: allowedCategories,
+        ),
+      ),
+    );
+    if (selected != null) setState(() => onSelected(selected));
   }
 
-  if (item is Map<String, dynamic>) {
-    final name = item['Name'];
-    final imageData = item['file'];
-
-    return Row(
-      children: [
-        if (imageData is String)
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Image.memory(
-              base64Decode(imageData),
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
+  Widget _clothingPreview(dynamic item, String label, List<String> allowedCategories, void Function(Map<String, dynamic>) onSelected) {
+    return GestureDetector(
+      onTap: () => _selectClothingItem(label, allowedCategories, onSelected),
+      child: Row(
+        children: [
+          if (item != null && item is Map<String, dynamic> && item['file'] != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Image.memory(
+                base64Decode(item['file']),
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        Expanded(child: Text('$label: ${name ?? "Unnamed"}')),
-      ],
+          Text('$label: ${item?['Name'] ?? "Tap to select"}')
+        ],
+      ),
     );
   }
-
-  return Text('$label: (invalid data)');
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Outfit')),
+      backgroundColor: Color(0xFFF6E6CB),
+      appBar: AppBar(title: const Text('Edit Outfit'),backgroundColor: themeDarkBeige,),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: outfit.isEmpty
-            ? const Center(child: Text('No outfit data provided.'))
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      outfit['Name'] ?? 'Unnamed Outfit',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _clothingPreview(outfit['Top'], 'Top'),
-                  const SizedBox(height: 8),
-                  _clothingPreview(outfit['Bottom'], 'Bottom'),
-                  const SizedBox(height: 8),
-                  _clothingPreview(outfit['Shoes'], 'Shoes'),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Weather: ${outfit['WeatherCategory'] ?? 'N/A'}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
+        child: Column(
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Outfit Name'),
+            ),
+            const SizedBox(height: 10),
+            _clothingPreview(_selectedTop, 'Top', ['shirts', 'longsleeves'], (item) => _selectedTop = item),
+            const SizedBox(height: 10),
+            _clothingPreview(_selectedBottom, 'Bottom', ['pants', 'shorts'], (item) => _selectedBottom = item),
+            const SizedBox(height: 10),
+            _clothingPreview(_selectedShoes, 'Shoes', ['shoes'], (item) => _selectedShoes = item),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              value: _selectedWeather,
+              items: ['Cold', 'Normal', 'Rainy', 'Sunny', 'Cloudy'].map((weather) {
+                return DropdownMenuItem(
+                  value: weather,
+                  child: Text(weather),
+                );
+              }).toList(),
+              onChanged: (val) => setState(() => _selectedWeather = val),
+              decoration: const InputDecoration(labelText: 'Weather Category'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _isSaving ? null : _updateOutfit,
+              child: _isSaving ? const CircularProgressIndicator() : const Text('Save Changes'),
+              style: ElevatedButton.styleFrom(backgroundColor: themeGreen),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -130,7 +130,12 @@ class _EditClothingItemScreenState extends State<EditClothingItemScreen> {
     setState(() => _isLoading = false);
 
     if (response.statusCode == 200) {
-      Navigator.pop(context, 'deleted');
+      final body = jsonDecode(response.body);
+      if (body['error'] == '') {
+        Navigator.pop(context, 'deleted');
+      } else {
+        setState(() => _message = body['error']);
+      }
     } else {
       final body = jsonDecode(response.body);
       setState(() => _message = body['error'] ?? 'Failed to delete item.');

@@ -45,9 +45,6 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
         },
       );
 
-      debugPrint("GET Outfits Status code: ${response.statusCode}");
-      debugPrint("GET Outfits Response body: ${response.body}");
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -94,8 +91,8 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
     }
   }
 
-  void _editOutfit(Map<String, dynamic> outfit) {
-    Navigator.push(
+  void _editOutfit(Map<String, dynamic> outfit) async {
+    final updatedOutfit = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditOutfitScreen.EditOutfitsScreen(
@@ -104,54 +101,40 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
           existingOutfit: outfit,
         ),
       ),
-    ).then((updatedOutfit) {
-      if (updatedOutfit != null) {
-        final index = _outfits.indexWhere((o) => o['_id'] == updatedOutfit['_id']);
-        if (index != -1) {
-          setState(() {
-            _outfits[index] = updatedOutfit;
-          });
-        }
+    );
+
+    if (updatedOutfit != null) {
+      final index = _outfits.indexWhere((o) => o['_id'] == updatedOutfit['_id']);
+      if (index != -1) {
+        setState(() {
+          _outfits[index] = updatedOutfit;
+        });
       }
-    });
+    }
   }
 
   Widget _buildClothingRow(String label, dynamic item) {
-    debugPrint("[$label] Type: ${item.runtimeType}");
-    try {
-      debugPrint("[$label] Content: ${jsonEncode(item)}");
-    } catch (_) {
-      debugPrint("[$label] Couldn't stringify item.");
-    }
-
     if (item == null) return Text('$label: N/A');
+    if (item is String) return Text('$label: (unresolved ID)');
 
-    if (item is String) {
-      return Text('$label: (unresolved ID)');
-    }
+    final name = item['Name'];
+    final imageData = item['file'];
 
-    if (item is Map<String, dynamic>) {
-      final name = item['Name'];
-      final imageData = item['file'];
-
-      return Row(
-        children: [
-          if (imageData is String)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Image.memory(
-                base64Decode(imageData),
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
+    return Row(
+      children: [
+        if (imageData is String)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Image.memory(
+              base64Decode(imageData),
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
             ),
-          Text('$label: ${name ?? "N/A"}'),
-        ],
-      );
-    }
-
-    return Text('$label: (invalid data)');
+          ),
+        Text('$label: ${name ?? "N/A"}'),
+      ],
+    );
   }
 
   @override
@@ -167,8 +150,8 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
         child: Column(
           children: [
             ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final newOutfit = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddOutfitScreen.AddOutfitScreen(
@@ -176,14 +159,14 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
                       userId: widget.userId,
                     ),
                   ),
-                ).then((newOutfit) {
-                  if (newOutfit != null) {
-                    setState(() {
-                      _outfits.add(newOutfit);
-                      _message = '';
-                    });
-                  }
-                });
+                );
+
+                if (newOutfit != null) {
+                  setState(() {
+                    _outfits.add(newOutfit);
+                    _message = '';
+                  });
+                }
               },
               icon: const Icon(Icons.add),
               label: const Text('Add Outfit'),
@@ -205,7 +188,6 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
                       itemCount: _outfits.length,
                       itemBuilder: (context, index) {
                         final outfit = _outfits[index];
-                        debugPrint("Rendering Outfit: ${jsonEncode(outfit)}");
 
                         return Card(
                           color: themeLightBeige,
