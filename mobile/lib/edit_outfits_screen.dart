@@ -1,174 +1,110 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'select_clothing_item_screen.dart';
 
-class EditOutfitScreen extends StatefulWidget {
+class EditOutfitsScreen extends StatefulWidget {
   final String jwtToken;
   final String userId;
-  final Map<String, dynamic> outfit;
+    final Map<String, dynamic> existingOutfit; // 👈 ADD THIS
 
-  const EditOutfitScreen({
+  const EditOutfitsScreen({
     Key? key,
     required this.jwtToken,
     required this.userId,
-    required this.outfit,
+    required this.existingOutfit, // 👈 Add this
   }) : super(key: key);
 
   @override
-  _EditOutfitScreenState createState() => _EditOutfitScreenState();
+  _EditOutfitsScreenState createState() => _EditOutfitsScreenState();
 }
 
-class _EditOutfitScreenState extends State<EditOutfitScreen> {
-  final _nameController = TextEditingController();
-  Map<String, dynamic>? _topItem;
-  Map<String, dynamic>? _bottomItem;
-  Map<String, dynamic>? _shoesItem;
-  String? _selectedWeather;
+class _EditOutfitsScreenState extends State<EditOutfitsScreen> {
+  List<dynamic> outfits = [];
   bool _isLoading = true;
-
-  static const weatherOptions = ['Cold', 'Normal', 'Rainy', 'Sunny', 'Cloudy'];
-
-  static const themeGreen = Color(0xFFB6C7AA);
-  static const themeGray = Color(0xFFA0937D);
-  static const themeLightBeige = Color(0xFFF6E6CB);
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.outfit['Name'] ?? '';
-    _selectedWeather = widget.outfit['WeatherCategory'] ?? 'Normal';
-    _fetchClothingItems();
+    _fetchOutfits();
   }
 
-  Future<void> _fetchClothingItems() async {
-    final ids = [widget.outfit['Top'], widget.outfit['Bottom'], widget.outfit['Shoes']];
-    final responses = await Future.wait(ids.map((id) =>
-      http.get(Uri.parse('http://dressmeupproject.com:5001/api/getClothingItemById?id=$id'))
-    ));
-
-    setState(() {
-      _topItem = jsonDecode(responses[0].body);
-      _bottomItem = jsonDecode(responses[1].body);
-      _shoesItem = jsonDecode(responses[2].body);
-      _isLoading = false;
-    });
-  }
-
-  Widget _clothingPreview(Map<String, dynamic>? item, String label, List<String> allowedCategories, void Function(Map<String, dynamic>) onItemSelected) {
-    return InkWell(
-      onTap: () async {
-        final selected = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SelectClothingItemScreen(
-              jwtToken: widget.jwtToken,
-              userId: widget.userId,
-              allowedCategories: allowedCategories,
-            ),
-          ),
-        );
-        if (selected != null) {
-          setState(() {
-            onItemSelected(selected);
-          });
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: themeGray),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            if (item != null && item['file'] != null)
-              Image.memory(
-                base64Decode(item['file']),
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                item != null ? item['Name'] ?? label : 'Select $label',
-                style: TextStyle(fontSize: 16, color: themeGray),
-              ),
-            ),
-            const Icon(Icons.edit, color: themeGray),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _saveChanges() async {
-    final response = await http.post(
-      Uri.parse('http://dressmeupproject.com:5001/api/updateOutfit'),
+  Future<void> _fetchOutfits() async {
+    final response = await http.get(
+      Uri.parse('http://dressmeupproject.com:5001/api/getOutfits?userId=${widget.userId}'),
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': 'Bearer ${widget.jwtToken}',
       },
-      body: jsonEncode({
-        '_id': widget.outfit['_id'],
-        'name': _nameController.text.trim(),
-        'top': _topItem?['_id'],
-        'bottom': _bottomItem?['_id'],
-        'shoes': _shoesItem?['_id'],
-        'weatherCategory': _selectedWeather,
-      }),
     );
 
     if (response.statusCode == 200) {
-      final updatedOutfit = jsonDecode(response.body)['updatedOutfit'];
-      Navigator.pop(context, updatedOutfit);
+      final data = jsonDecode(response.body);
+      setState(() {
+        outfits = data['results'];
+        _isLoading = false;
+      });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update outfit')),
-      );
+      setState(() {
+        _isLoading = false;
+      });
+      // Handle error UI here if needed
     }
+  }
+
+  Widget _clothingPreview(Map<String, dynamic>? item, String label) {
+    if (item == null) return Text('$label: Not selected');
+
+    return Row(
+      children: [
+        if (item['file'] != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Image.memory(
+              base64Decode(item['file']),
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+          ),
+        Expanded(child: Text('$label: ${item['Name']}')),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: themeLightBeige,
-      appBar: AppBar(
-        title: const Text('Edit Outfit'),
-        backgroundColor: themeGreen,
-      ),
+      appBar: AppBar(title: const Text('My Outfits')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Outfit Name'),
+          : ListView.builder(
+              itemCount: outfits.length,
+              itemBuilder: (context, index) {
+                final outfit = outfits[index];
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          outfit['Name'] ?? 'Unnamed Outfit',
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        _clothingPreview(outfit['Top'], 'Top'),
+                        const SizedBox(height: 4),
+                        _clothingPreview(outfit['Bottom'], 'Bottom'),
+                        const SizedBox(height: 4),
+                        _clothingPreview(outfit['Shoes'], 'Shoes'),
+                        const SizedBox(height: 8),
+                        Text('Weather: ${outfit['WeatherCategory'] ?? 'N/A'}'),
+                      ],
+                    ),
                   ),
-                  _clothingPreview(_topItem, 'Top', ['shirts', 'longsleeves'], (item) => _topItem = item),
-                  _clothingPreview(_bottomItem, 'Bottom', ['pants', 'shorts'], (item) => _bottomItem = item),
-                  _clothingPreview(_shoesItem, 'Shoes', ['shoes'], (item) => _shoesItem = item),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    value: _selectedWeather,
-                    decoration: const InputDecoration(labelText: 'Weather Category'),
-                    items: weatherOptions.map((weather) {
-                      return DropdownMenuItem(value: weather, child: Text(weather));
-                    }).toList(),
-                    onChanged: (val) => setState(() => _selectedWeather = val),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _saveChanges,
-                    child: const Text('Save Changes'),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
     );
   }

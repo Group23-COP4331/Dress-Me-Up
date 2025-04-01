@@ -22,7 +22,6 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
   List<dynamic> _outfits = [];
   String _message = '';
 
-  // Define your app's color palette (same as CardsScreen)
   static const themeGreen = Color(0xFFB6C7AA);
   static const themeGray = Color(0xFFA0937D);
   static const themeDarkBeige = Color(0xFFE7D4B5);
@@ -69,7 +68,6 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
     }
   }
 
-  // Delete an outfit
   Future<void> _deleteOutfit(String outfitId) async {
     try {
       final response = await http.post(
@@ -96,19 +94,17 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
     }
   }
 
-  // Navigate to an edit screen
   void _editOutfit(Map<String, dynamic> outfit) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditOutfitScreen.EditOutfitScreen(
+        builder: (context) => EditOutfitScreen.EditOutfitsScreen(
           jwtToken: widget.jwtToken,
           userId: widget.userId,
-          outfit: outfit,
+          existingOutfit: outfit,
         ),
       ),
     ).then((updatedOutfit) {
-      // If the user saved changes, update the local list
       if (updatedOutfit != null) {
         final index = _outfits.indexWhere((o) => o['_id'] == updatedOutfit['_id']);
         if (index != -1) {
@@ -119,6 +115,32 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
       }
     });
   }
+
+Widget _buildClothingRow(String label, dynamic item) {
+  if (item == null) return Text('$label: N/A');
+
+  if (item is String) {
+    // If it's still a string ID instead of an object
+    return Text('$label: (unresolved ID)');
+  }
+
+  return Row(
+    children: [
+      if (item['file'] != null)
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Image.memory(
+            base64Decode(item['file']),
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+          ),
+        ),
+      Text('$label: ${item['Name'] ?? 'N/A'}'),
+    ],
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +154,6 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Add Outfit button styled like the Add Clothing Item button in CardsScreen:
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
@@ -160,13 +181,11 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Show message if any:
             if (_message.isNotEmpty)
               Text(
                 _message,
                 style: const TextStyle(color: Colors.red),
               ),
-            // Display the list of outfits
             Expanded(
               child: _outfits.isEmpty
                   ? const Center(child: Text('No outfits yet.'))
@@ -184,27 +203,24 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  outfit['Name'] ?? 'Unnamed Outfit',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: themeGray,
+                                Center(
+                                  child: Text(
+                                    outfit['Name'] ?? 'Unnamed Outfit',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeGray,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 5),
-                                Text(
-                                  'Top: ${outfit['Top'] ?? 'N/A'}\n'
-                                  'Bottom: ${outfit['Bottom'] ?? 'N/A'}\n'
-                                  'Shoes: ${outfit['Shoes'] ?? 'N/A'}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: themeGray,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
+                                _buildClothingRow('Top', outfit['Top']),
+                                const SizedBox(height: 5),
+                                _buildClothingRow('Bottom', outfit['Bottom']),
+                                const SizedBox(height: 5),
+                                _buildClothingRow('Shoes', outfit['Shoes']),
                                 const SizedBox(height: 5),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
