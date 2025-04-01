@@ -264,13 +264,14 @@ app.post("/api/resetPassword", async (req, res) => {
       const query = { UserId: userId.toString() };
 
       if (category) {
-        query.Category = category;
+        query.Category = { $regex: new RegExp(`^${category}$`, 'i') }; // case-insensitive exact match
       }
+      
   
       if (search) {
         query.Name = { $regex: search, $options: 'i' };
       }
-      
+
       console.log("🧩 MongoDB query:", query);
   
       const items = await ClothingItem.find(query)
