@@ -11,15 +11,14 @@ import Ethan from "../assets/About-Images/ethan.jpg";
 export default function AboutPage(){
     const devs = [
         { 
-            name: "Kevin Pereda",
-            role: "Project Manager",
-            pic: Kevin
+            name: "Daniel Perera",
+            role: "Project Manager, Database",
+            pic: Daniel          
         },
         { 
-            // IMPORT PROFILE PHOTO
-            name: "Daniel Pereda",
-            role: "Database, API",
-            pic: Daniel
+            name: "Kevin Pereda",
+            role: "Front End",
+            pic: Kevin
         },
         { 
             // IMPORT PROFILE PHOTO
@@ -27,28 +26,26 @@ export default function AboutPage(){
             role: "Front End",
         },
         { 
-            
-            name: "Sadie Burns",
-            role: "Front End, Mobile",
-            // IMPORT PROFILE PHOTO
-        },
-        { 
             name: "Ethan McKissic",
             role: "Front End",
             pic: Ethan
         },
         { 
-            name: "Ernesto Perez",
-            role: "Front End, API",
-            // IMPORT PROFILE PHOTO
-        },
-        { 
             name: "Kenneth Arias",
             role: "API",
             // IMPORT PROFILE PHOTO
+        },
+        { 
+            name: "Sadie Burns",
+            role: "API",
+            // IMPORT PROFILE PHOTO
+        },
+        { 
+            name: "Ernesto Perez",
+            role: "Front End, API",
+            // IMPORT PROFILE PHOTO
         }
     ];
-
     // Removes default padding and width opon rendering
     useEffect(() => {
         document.getElementById("root")?.classList.add("dashboard");

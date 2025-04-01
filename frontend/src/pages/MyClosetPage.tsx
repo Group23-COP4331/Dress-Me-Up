@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {useEffect} from 'react';
 import logo from "../assets/GreenLogo.png";
+import { X, ChevronRight } from "lucide-react"; // Import icons
 import redheart from "../assets/MyClosetImages/redheart.png";
 import plant from "../assets/shrub.png";
 import { toast } from 'react-toastify';
@@ -9,9 +10,18 @@ import { useRef, useCallback } from "react";
 
 //shoe is a placeholder import we will change this with the images users upload
 import shoe from "../assets/MyClosetImages/airforce1.png"; 
+import Navbar from '../components/Navbar';
 
 export default function MyCloset() {
 
+  // Removes default padding and width opon rendering
+  useEffect(() => {
+    document.getElementById("root")?.classList.add("dashboard");
+
+    return () => {
+        document.getElementById("root")?.classList.remove("dashboard");
+    }; }, []);
+  
   const resetItemForm = () => 
     {
       setItemName('');
@@ -125,7 +135,7 @@ export default function MyCloset() {
     let ignore = false;
   
     const fetchClothingItems = async () => {
-      const userId = localStorage.getItem("userId");
+      const userId = 1;
       if (!userId) {
         console.warn("No userId found in localStorage");
         return;
@@ -137,8 +147,14 @@ export default function MyCloset() {
         const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
   
         const response = await fetch(
-          `http://localhost:5001/api/getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`
+          `http://localhost:5001/api/getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`,{
+            method: "GET",
+          }
         );
+
+        console.log("Response Status:", response.status);
+        console.log("Response Headers:", response.headers);
+        console.log("Raw Response:", response);
   
         const data = await response.json();
   
@@ -161,6 +177,7 @@ export default function MyCloset() {
         if (!ignore) {
           if (itemsWithImages.length === 0) setHasMore(false);
           setClothingItems((prev) => [...prev, ...itemsWithImages]);
+          console.log("Items loaded");
         }
       } catch (err) {
         console.error("Fetch failed:", err);
@@ -254,128 +271,13 @@ const handleDeleteOutfit = async (id: string) => {
   
   return (
     //div on whole screen
-    <div className="relative flex h-screen bg-themeLightBeige p-2">
-      {/* Sidebar surrounding buttons on the left */}
-      <div className="fixed left-0 top-0 h-full w-64 flex flex-col items-center p-4 bg-themeLightBeige">
-        <img
-          src={logo}
-          alt="DressMeUp Logo"
-          className="w-32 h-32 rounded-lg mb-4"
-        />
+    <div className=" h-screen overflow-auto">
+      <Navbar />
 
-        {/* Menu Buttons on the left side of the screen*/}
-        <div className="flex flex-col w-5/6 h-auto gap-4 justify-center items-center bg-themeGray rounded-lg py-2">
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={async () => {
-              setShowOutfits(true);
-              try {
-                const response = await fetch("http://localhost:5001/api/getOutfits", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                });
-                if (response.ok) {
-                  const data = await response.json();
-                  setOutfits(data);
-                } else {
-                  toast.error("Failed to fetch outfits");
-                }
-              } catch (err) {
-                console.error("Outfit fetch error:", err);
-              }
-            }}
-          >
-            Saved Fits
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={() => {
-              setActiveCategory("Shirts");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Shirts
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={() => {
-              setActiveCategory("Long Sleeves");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Long Sleeves
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={() => {
-              setActiveCategory("Pants");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Pants
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={() => {
-              setActiveCategory("Shorts");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Shorts
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={() => {
-              setActiveCategory("Shoes");
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Shoes
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg flex items-center justify-center gap-2"
-            onClick={() => {
-              setFavoriteOnly(true);        // 🔒 Lock to favorites
-              setActiveCategory('');        // Clear category filter if needed
-              setSearchTerm('');            // Optional: clear search
-              setClothingItems([]);         // Reset list
-              setPage(1);                   // Restart pagination
-              setHasMore(true);             // Allow loading more
-            }}
-          >
-            Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
-          </button>
-          <button
-            className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg"
-            onClick={() => {
-              setFavoriteOnly(false);      // 👈 Reset
-              setActiveCategory('');
-              setSearchTerm('');
-              setClothingItems([]);
-              setPage(1);
-              setHasMore(true);
-            }}
-          >
-            Clear Filters
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-10 pb-32">
-
+      {/* Header Content*/}
+      <div className="flex flex-col min-w-screen items-center justify-center">
         {/* Search Bar*/}
-        <div className="sticky top-0 z-10 bg-themeLightBeige py-4">
+        <div className="mt-4 top-16 py-4 w-[75%]">
           <input
             type="text"
             placeholder="Search ..."
@@ -386,19 +288,38 @@ const handleDeleteOutfit = async (id: string) => {
               setPage(1);            // reset pagination
               setHasMore(true);      // allow more fetches
             }}
-            className="w-full max-w-xl mx-auto px-4 py-2 bg-themeGray rounded-full text-black placeholder-black"
+            className="w-full max-w-xl mx-auto px-4 py-2 bg-white rounded-full text-black placeholder-black shadow-lg z-10"
         />
         </div>
-        
+
+        {/* Create outfit and add item buttons */}
+        <div className="md:fixed md:right-8 md:top-1/2 md:-translate-y-1/2 flex flex-row md:flex-col gap-4">
+          <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md"
+          onClick={() => setShowAddItemForm(true)}
+          >
+            Add Item
+          </button>
+          <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md"
+          onClick={() => setShowCreateOutfitForm(true)}
+          >
+            Create Outfit
+          </button>
+        </div>
+      </div>
+
+      <Sidebar />
+      
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center overflow-y-auto px-10 pt-24 pb-32">
         {/* The grid of closet items OR saved outfits */}
-        <div className="pt-36 w-full flex justify-center">
+        <div className=" w-[70%] flex items-center justify-center">
           {loading ? (
             <p className="text-center text-lg mt-10">Loading closet...</p>
           ) : showOutfits ? (
-            <div className="flex flex-col items-center w-full">
-              <div className="grid grid-cols-2 gap-6">
+            <div className="flex flex-col items-center w-auto">
+              <div className="flex flex-row flex-wrap justify-center gap-6">
                 {outfits.map((fit) => (
-                  <div key={fit._id} className="relative bg-themeGray p-4 rounded-lg border border-black w-80">
+                  <div key={fit._id} className="relative bg-themeGray p-4 rounded-2xl w-80">
                     <h3 className="text-lg font-bold mb-2">{fit.Name}</h3>
                     <p className="text-sm mb-2">Weather: {fit.WeatherCategory}</p>
 
@@ -427,7 +348,7 @@ const handleDeleteOutfit = async (id: string) => {
                         return (
                           <div
                             key={label}
-                            className={`w-24 h-28 flex flex-col items-center justify-center overflow-hidden ${
+                            className={`w-28 h-28 flex flex-col items-center rounded-md justify-center overflow-hidden ${
                               imageUrl ? 'bg-transparent' : 'bg-white'
                             }`}
                           >
@@ -477,30 +398,30 @@ const handleDeleteOutfit = async (id: string) => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-8">
+            <div className="pt-24 flex flex-wrap flex-col lg:flex-row gap-8 items-center justify-center">
               {clothingItems.map((item, idx) => (
                 <div
                   key={item.id}
                   ref={idx === clothingItems.length - 1 ? lastItemRef : null}
-                  className="relative bg-themeLightBeige"
+                  className="relative"
                 >
                   {/* Plant decoration */}
                   <img src={plant} alt="plant" className="absolute -top-24 w-full" />
 
-                  <div className="relative w-72 mt-6 bg-themeGray rounded-lg flex flex-col items-center border border-black gap-2 pb-4 overflow-hidden shadow-md">
+                  <div className="relative mb-8 w-[full] mt-6 bg-themeGray rounded-2xl flex flex-col items-center gap-2 p-4 overflow-hidden shadow-2xl">
                     {/* Item image */}
                     <img
                       src={item.image}
                       alt={item.name}
                       loading="lazy"
-                      className="h-40 w-full object-contain p-2 rounded"
+                      className="h-40 object-contain m-1 rounded-lg shadow-md"
                       onError={(e) => (e.currentTarget.src = shoe)}
                     />
 
                     {/* Info and buttons */}
-                    <div className="flex flex-col rounded-lg bg-themeLightBeige py-2 w-64 px-4">
+                    <div className="flex flex-col rounded-lg shadow-md bg-themeLightBeige py-2 h-full w-64 px-4">
                       <div className="flex flex-row justify-between items-center mb-1">
-                        <p className="text-lg font-semibold">{item.name}</p>
+                        <p className="text-md sm:text-lg font-semibold">{item.name}</p>
                         <button onClick={() => toggleFavorite(item.id)}>
                           <img
                             src={redheart}
@@ -517,7 +438,7 @@ const handleDeleteOutfit = async (id: string) => {
                         <p className="text-sm">Color: {item.color}</p>
                         <button
                           title="Edit Item"
-                          className="text-lg px-1 text-black hover:text-themeGreen transition-transform duration-200"
+                          className="text-sm sm:text-lg px-1 text-black hover:text-themeGreen transition-transform duration-200"
                           onClick={() => {
                             setItemName(item.name);
                             setItemColor(item.color);
@@ -546,20 +467,6 @@ const handleDeleteOutfit = async (id: string) => {
 
       </div>
 
-      {/* Create outfit and add item buttons */}
-      <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg"
-        onClick={() => setShowAddItemForm(true)}
-        >
-          Add Item
-        </button>
-        <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg"
-        onClick={() => setShowCreateOutfitForm(true)}
-        >
-          Create Outfit
-        </button>
-      </div>
-      
       {(showAddItemForm || editingItem) && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
@@ -581,7 +488,7 @@ const handleDeleteOutfit = async (id: string) => {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const formData = new FormData();
-                  const userId = localStorage.getItem("userId");
+                  const userId = 1;
                   formData.append("userId", userId || "");
                   formData.append("name", itemName);
                   formData.append("color", itemColor);
@@ -704,7 +611,7 @@ const handleDeleteOutfit = async (id: string) => {
                     return;
                   }
 
-                  const userId = localStorage.getItem("userId");
+                  const userId = 1;
 
                   const outfit = {
                     userId,
@@ -818,4 +725,152 @@ const handleDeleteOutfit = async (id: string) => {
 
     </div>
   );
+
+  function Sidebar(){
+    const [isOpen, setIsOpen] = useState(false);
+  
+
+    return (
+      <>
+        {/* Half-Oval Menu Toggle Button for Smaller Screens */}
+        {!isOpen && (
+          <button 
+            className="lg:hidden fixed top-1/2 left-0 transform -translate-y-1/2 bg-themeGreen text-white px-3 py-4 rounded-r-full shadow-md z-20 flex items-center"
+            onClick={() => setIsOpen(true)}
+          >
+            <ChevronRight size={24} />
+          </button>
+        )}
+
+          {/* Sidebar Full-Screen Overlay for Small Screens */}
+          {isOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-70 z-40 flex items-center justify-center">
+              <div className="w-[250px] h-auto bg-themeGray rounded-lg py-6 shadow-lg flex flex-col items-center gap-4 relative">
+                {/* Close Button (X icon) */}
+                <button className="relative left-24 text-white" onClick={() => setIsOpen(false)}>
+                  <X size={28} />
+                </button>
+                <SidebarMenu />
+              </div>
+            </div>
+          )}
+
+        {/* Sidebar for Larger Screens */}
+        <div className="hidden lg:flex flex-col w-[215px] h-auto gap-4 justify-center items-center bg-themeGray rounded-r-2xl py-6 shadow-md fixed top-52">
+          <SidebarMenu />
+        </div>
+
+      </>
+    );
+  }
+
+  function SidebarMenu(){
+    return (
+      <>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={async () => {
+            setShowOutfits(true);
+            try {
+              const response = await fetch("http://localhost:5001/api/getOutfits", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              });
+              if (response.ok) {
+                const data = await response.json();
+                setOutfits(data);
+              } else {
+                toast.error("Failed to fetch outfits");
+              }
+            } catch (err) {
+              console.error("Outfit fetch error:", err);
+            }
+          }}
+        >
+          Saved Fits
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={() => {
+            setActiveCategory("Shirts");
+            setClothingItems([]);
+            setPage(1);
+            setHasMore(true);
+          }}
+        >
+          Shirts
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={() => {
+            setActiveCategory("Long Sleeves");
+            setClothingItems([]);
+            setPage(1);
+            setHasMore(true);
+          }}
+        >
+          Long Sleeves
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={() => {
+            setActiveCategory("Pants");
+            setClothingItems([]);
+            setPage(1);
+            setHasMore(true);
+          }}
+        >
+          Pants
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={() => {
+            setActiveCategory("Shorts");
+            setClothingItems([]);
+            setPage(1);
+            setHasMore(true);
+          }}
+        >
+          Shorts
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={() => {
+            setActiveCategory("Shoes");
+            setClothingItems([]);
+            setPage(1);
+            setHasMore(true);
+          }}
+        >
+          Shoes
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg flex items-center justify-center gap-2 shadow-md" 
+          onClick={() => {
+            setFavoriteOnly(true);        // 🔒 Lock to favorites
+            setActiveCategory('');        // Clear category filter if needed
+            setSearchTerm('');            // Optional: clear search
+            setClothingItems([]);         // Reset list
+            setPage(1);                   // Restart pagination
+            setHasMore(true);             // Allow loading more
+          }}
+        >
+          Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
+        </button>
+        <button
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          onClick={() => {
+            setFavoriteOnly(false);      // 👈 Reset
+            setActiveCategory('');
+            setSearchTerm('');
+            setClothingItems([]);
+            setPage(1);
+            setHasMore(true);
+          }}
+        >
+          Clear Filters
+        </button>
+      </>
+    );
+  }
 }

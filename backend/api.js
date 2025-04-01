@@ -17,8 +17,16 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = function (app) {
 
-  const cors = require('cors');
-app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173'] }));
+const cors = require('cors');
+app.use(cors({ 
+  origin: ['https://dressmeupproject.com', 'http://localhost:5173'],
+ }));
+
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
@@ -396,7 +404,7 @@ app.post("/api/resetPassword", async (req, res) => {
       console.log("Database query result:", JSON.stringify(user, null, 2));
   
       if(!user){
-        return res.status(401).json({ error: "Incorrect email and password!" });
+        return res.status(401).json({ error: "Insrect email and password!" });
       }
       if(!user.verified){
         return res.status(403).json({ error: "Please verify your email before signing in!", verified: false });
