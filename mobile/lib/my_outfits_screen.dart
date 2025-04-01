@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import "edit_outfits_screen.dart" as EditOutfitScreen;
-import "add_outfit_screen.dart" as AddOutfitScreen; // Ensure this file exists
+import "add_outfit_screen.dart" as AddOutfitScreen;
 
 class MyOutfitsScreen extends StatefulWidget {
   final String jwtToken;
@@ -116,38 +116,43 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
     });
   }
 
-Widget _buildClothingRow(String label, dynamic item) {
-  if (item == null) return Text('$label: N/A');
+  Widget _buildClothingRow(String label, dynamic item) {
+    debugPrint("[$label] Type: ${item.runtimeType}");
+    try {
+      debugPrint("[$label] Content: ${jsonEncode(item)}");
+    } catch (_) {
+      debugPrint("[$label] Couldn't stringify item.");
+    }
 
-  if (item is String) {
-    return Text('$label: (unresolved ID)');
-  }
+    if (item == null) return Text('$label: N/A');
 
-  if (item is Map<String, dynamic>) {
-    final name = item['Name'];
-    final imageData = item['file'];
+    if (item is String) {
+      return Text('$label: (unresolved ID)');
+    }
 
-    return Row(
-      children: [
-        if (imageData is String)
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Image.memory(
-              base64Decode(imageData),
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
+    if (item is Map<String, dynamic>) {
+      final name = item['Name'];
+      final imageData = item['file'];
+
+      return Row(
+        children: [
+          if (imageData is String)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Image.memory(
+                base64Decode(imageData),
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        Text('$label: ${name ?? "N/A"}'),
-      ],
-    );
+          Text('$label: ${name ?? "N/A"}'),
+        ],
+      );
+    }
+
+    return Text('$label: (invalid data)');
   }
-
-  return Text('$label: (invalid data)');
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -200,6 +205,8 @@ Widget _buildClothingRow(String label, dynamic item) {
                       itemCount: _outfits.length,
                       itemBuilder: (context, index) {
                         final outfit = _outfits[index];
+                        debugPrint("Rendering Outfit: ${jsonEncode(outfit)}");
+
                         return Card(
                           color: themeLightBeige,
                           elevation: 4,

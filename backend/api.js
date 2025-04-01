@@ -1,8 +1,7 @@
-// api.js
 const User = require('./models/user');
 const Card = require('./models/card');
 const Weather = require('./models/weather');
-const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
+const token = require('./createJWT');
 const ClothingItem = require('./models/clothingItem');
 const Outfit = require('./models/outfit');
 const multer = require('multer');
@@ -11,6 +10,7 @@ const axios = require('axios');
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
 const sendEmailVerification = require('./sendEmailVerification');
+const compression = require('compression'); // ✅ Added compression
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -18,8 +18,10 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 module.exports = function (app) {
 
   const cors = require('cors');
-app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173', 'http://localhost:5001'] }));
+  app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173', 'http://localhost:5001'] }));
+  app.use(compression()); // ✅ Enable response compression
 
+  
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
 
