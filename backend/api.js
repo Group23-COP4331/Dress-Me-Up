@@ -21,7 +21,7 @@ module.exports = function (app) {
   app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173', 'http://localhost:5001'] }));
   app.use(compression()); // ✅ Enable response compression
 
-  
+
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
 
@@ -258,7 +258,8 @@ app.post("/api/resetPassword", async (req, res) => {
     const skip = (page - 1) * limit;
   
     try {
-      const query = { UserId: userId };
+      const query = { UserId: userId.toString() };
+
   
       if (category) {
         query.Category = category;
