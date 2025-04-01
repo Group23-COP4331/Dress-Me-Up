@@ -67,6 +67,7 @@ export default function MyCloset() {
   const [searchTerm, setSearchTerm] = useState('');
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [triggerReload, setTriggerReload] = useState(false);
+  const [triggerOutfitReload, setTriggerOutfitReload] = useState(false);
 
   //fields for creating an item
   const [itemName, setItemName] = useState('');
@@ -136,8 +137,9 @@ export default function MyCloset() {
   
     const fetchClothingItems = async () => {
       const userId = 1;
+  
       if (!userId) {
-        console.warn("No userId found in localStorage");
+        console.warn("No userId found");
         return;
       }
   
@@ -147,16 +149,15 @@ export default function MyCloset() {
         const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
   
         const response = await fetch(
-          `http://localhost:5001/api/getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`,{
-            method: "GET",
-          }
+          `http://localhost:5001/api/getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`
         );
-
-        console.log("Response Status:", response.status);
-        console.log("Response Headers:", response.headers);
-        console.log("Raw Response:", response);
   
         const data = await response.json();
+  
+        if (!data || !Array.isArray(data.results)) {
+          console.warn("Unexpected data:", data);
+          return;
+        }
   
         const itemsWithImages = data.results.map((item: any) => {
           const blob = new Blob([new Uint8Array(item.file.data)], {
@@ -177,7 +178,6 @@ export default function MyCloset() {
         if (!ignore) {
           if (itemsWithImages.length === 0) setHasMore(false);
           setClothingItems((prev) => [...prev, ...itemsWithImages]);
-          console.log("Items loaded");
         }
       } catch (err) {
         console.error("Fetch failed:", err);
@@ -191,7 +191,8 @@ export default function MyCloset() {
     return () => {
       ignore = true;
     };
-  }, [page, activeCategory, searchTerm, favoriteOnly]);  
+  }, [page, activeCategory, searchTerm, favoriteOnly, triggerReload]);
+    
   
   const lastItemRef = useCallback(
     (node: HTMLDivElement) => {
@@ -208,6 +209,31 @@ export default function MyCloset() {
     },
     [loading, hasMore]
   );
+
+  useEffect(() => {
+    const fetchOutfits = async () => {
+      try {
+        const response = await fetch("http://localhost:5001/api/getOutfits", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          setOutfits(data);
+        } else {
+          toast.error("Failed to fetch outfits");
+        }
+      } catch (err) {
+        console.error("Outfit fetch error:", err);
+      }
+    };
+  
+    if (showOutfits) {
+      fetchOutfits();
+    }
+  }, [showOutfits, triggerOutfitReload]); // 👈 Listen to trigger
+  
   
   const tops = clothingItems.filter(
     item => item.category === 'Shirts' || item.category === 'LongSleeves'
@@ -310,9 +336,9 @@ const handleDeleteOutfit = async (id: string) => {
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center overflow-y-auto px-10 pt-24 pb-32">
+      <div className="flex-1 flex items-center justify-center  px-10 pt-24 pb-32">
         {/* The grid of closet items OR saved outfits */}
-        <div className=" w-[70%] flex items-center justify-center">
+        <div className=" w-[70%] flex items-center justify-center ">
           {loading ? (
             <p className="text-center text-lg mt-10">Loading closet...</p>
           ) : showOutfits ? (
@@ -398,7 +424,7 @@ const handleDeleteOutfit = async (id: string) => {
               </div>
             </div>
           ) : (
-            <div className="pt-24 flex flex-wrap flex-col lg:flex-row gap-8 items-center justify-center">
+            <div className="pt-24 flex flex-wrap flex-col lg:flex-row gap-8 items-center justify-center overflow-y-scroll">
               {clothingItems.map((item, idx) => (
                 <div
                   key={item.id}
@@ -592,11 +618,10 @@ const handleDeleteOutfit = async (id: string) => {
             <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
               <button
                 className="absolute top-2 right-2 text-xl font-bold"
-                onClick={() => 
-                {
+                onClick={() => {
                   resetOutfitForm();
                   setShowCreateOutfitForm(false);
-                }}
+                }}                
               >
                 &times;
               </button>
@@ -769,23 +794,10 @@ const handleDeleteOutfit = async (id: string) => {
       <>
         <button
           className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
-          onClick={async () => {
+          onClick={() => {
             setShowOutfits(true);
-            try {
-              const response = await fetch("http://localhost:5001/api/getOutfits", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-              });
-              if (response.ok) {
-                const data = await response.json();
-                setOutfits(data);
-              } else {
-                toast.error("Failed to fetch outfits");
-              }
-            } catch (err) {
-              console.error("Outfit fetch error:", err);
-            }
-          }}
+            setTriggerOutfitReload((prev) => !prev);
+          }}          
         >
           Saved Fits
         </button>
