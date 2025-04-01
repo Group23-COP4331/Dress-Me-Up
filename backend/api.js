@@ -452,9 +452,9 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       const newOutfit = new Outfit({
         UserId: userId,
         Name: name,
-        Top: mongoose.Types.ObjectId(top),
-        Bottom: mongoose.Types.ObjectId(bottom),
-        Shoes: mongoose.Types.ObjectId(shoes),
+        Top: new ObjectId(top),
+        Bottom: new ObjectId(bottom),
+        Shoes: new ObjectId(shoes),
         WeatherCategory: weatherCategory,
       });
 

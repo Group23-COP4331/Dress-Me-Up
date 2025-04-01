@@ -33,39 +33,52 @@ class _AddOutfitScreenState extends State<AddOutfitScreen> {
   static const themeLightBeige = Color(0xFFF6E6CB);
 
   Future<void> _addOutfit() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final response = await http.post(
-      Uri.parse('http://dressmeupproject.com:5001/api/addOutfit'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${widget.jwtToken}',
-      },
-      body: jsonEncode({
-        'userId': widget.userId,
-        'name': _nameController.text,
-        'top': _selectedTop?['_id'] ?? '',
-        'bottom': _selectedBottom?['_id'] ?? '',
-        'shoes': _selectedShoes?['_id'] ?? '',
-        'weatherCategory': _selectedWeather,
-      }),
+  if (_selectedTop == null || _selectedBottom == null || _selectedShoes == null || _nameController.text.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please fill out all fields.')),
     );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
-      final newOutfit = jsonDecode(response.body);
-      Navigator.pop(context, newOutfit);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to add outfit')),
-      );
-    }
+    return;
   }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  final payload = {
+    'userId': widget.userId,
+    'name': _nameController.text.trim(),
+    'top': _selectedTop?['_id'],
+    'bottom': _selectedBottom?['_id'],
+    'shoes': _selectedShoes?['_id'],
+    'weatherCategory': _selectedWeather,
+  };
+
+  print("🚀 Sending payload: ${jsonEncode(payload)}");
+
+  final response = await http.post(
+    Uri.parse('http://dressmeupproject.com:5001/api/addOutfit'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${widget.jwtToken}',
+    },
+    body: jsonEncode(payload),
+  );
+
+  setState(() {
+    _isLoading = false;
+  });
+
+  if (response.statusCode == 200) {
+    final newOutfit = jsonDecode(response.body);
+    Navigator.pop(context, newOutfit);
+  } else {
+    print("❌ Add outfit failed: ${response.statusCode} ${response.body}");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Failed to add outfit')),
+    );
+  }
+}
+
 
   Widget _clothingItemButton({
     required String label,
