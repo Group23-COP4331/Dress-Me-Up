@@ -13,11 +13,11 @@ class AddClothingItemScreen extends StatefulWidget {
   final String userId;
 
   const AddClothingItemScreen({
-    Key? key,
+    super.key,
     required this.imageFile,
     required this.jwtToken,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   _AddClothingItemScreenState createState() => _AddClothingItemScreenState();

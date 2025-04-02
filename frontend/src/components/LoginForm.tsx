@@ -90,7 +90,7 @@ export default function LoginForm({setMessage} : LoginFormProps){
         <button className = "text-2xl text-white w-full md:w-[500px] h-12 bg-themeGreen rounded-lg hover:scale-105"type="submit">Submit</button>
         <Link 
           to={process.env.NODE_ENV === 'production' 
-            ? 'http://dressmeupproject.com:5001/send-email-reset' 
+            ? 'http://dressmeupproject.com/send-email-reset' 
             : 'http://localhost:5173/send-email-reset'}
             className="text-white hover:text-blue-700 py-1 px-1 rounded"
           >

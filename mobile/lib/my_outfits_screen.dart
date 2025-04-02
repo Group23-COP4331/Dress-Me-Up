@@ -9,10 +9,10 @@ class MyOutfitsScreen extends StatefulWidget {
   final String userId;
 
   const MyOutfitsScreen({
-    Key? key,
+    super.key,
     required this.jwtToken,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   _MyOutfitsScreenState createState() => _MyOutfitsScreenState();
@@ -45,36 +45,33 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
         },
       );
 
-      
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         debugPrint("Outfits JSON: ${jsonEncode(data)}");
 
         if (mounted) {
-        setState(() {
-          _outfits = data['results'] ?? [];
-          if (_outfits.isEmpty) {
-            _message = 'No outfits yet.';
-          }
-        });
-      }
-
+          setState(() {
+            _outfits = data['results'] ?? [];
+            if (_outfits.isEmpty) {
+              _message = 'No outfits yet.';
+            } else {
+              _message = '';
+            }
+          });
+        }
       } else {
         if (mounted) {
-  setState(() {
-    _message = 'Failed to load outfits. (Status: ${response.statusCode})';
-  });
-}
-
+          setState(() {
+            _message = 'Failed to load outfits. (Status: ${response.statusCode})';
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
-  setState(() {
-    _message = 'Error: $e';
-  });
-}
-
+        setState(() {
+          _message = 'Error: $e';
+        });
+      }
     }
   }
 
@@ -131,7 +128,6 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
     if (item is String) return Text('$label: (unresolved ID)');
     if (item == null || item is! Map) return Text('$label: (unresolved)');
 
-
     final name = item['Name'];
     final imageData = item['file'];
 
@@ -167,24 +163,18 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
             ElevatedButton.icon(
               onPressed: () async {
                 final newOutfit = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddOutfitScreen.AddOutfitScreen(
-                        jwtToken: widget.jwtToken,
-                        userId: widget.userId,
-                      ),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddOutfitScreen.AddOutfitScreen(
+                      jwtToken: widget.jwtToken,
+                      userId: widget.userId,
                     ),
-                  );
+                  ),
+                );
 
-                  if (newOutfit != null) {
-                    await _fetchOutfits(); // re-fetch with populated fields
-                  }
-
+                // Only re-fetch outfits if a new outfit was added
                 if (newOutfit != null) {
-                  setState(() {
-                    _outfits.add(newOutfit);
-                    _message = '';
-                  });
+                  await _fetchOutfits();
                 }
               },
               icon: const Icon(Icons.add),

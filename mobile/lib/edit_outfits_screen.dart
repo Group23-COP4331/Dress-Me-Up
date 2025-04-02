@@ -9,11 +9,11 @@ class EditOutfitsScreen extends StatefulWidget {
   final Map<String, dynamic> existingOutfit;
 
   const EditOutfitsScreen({
-    Key? key,
+    super.key,
     required this.jwtToken,
     required this.userId,
     required this.existingOutfit,
-  }) : super(key: key);
+  });
 
   @override
   _EditOutfitsScreenState createState() => _EditOutfitsScreenState();
@@ -147,8 +147,8 @@ _selectedShoes = outfit['Shoes'] is Map ? outfit['Shoes'] : null;
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _isSaving ? null : _updateOutfit,
-              child: _isSaving ? const CircularProgressIndicator() : const Text('Save Changes'),
               style: ElevatedButton.styleFrom(backgroundColor: themeGreen),
+              child: _isSaving ? const CircularProgressIndicator() : const Text('Save Changes'),
             )
           ],
         ),

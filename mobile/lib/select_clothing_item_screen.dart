@@ -8,11 +8,11 @@ class SelectClothingItemScreen extends StatefulWidget {
   final List<String> allowedCategories;
 
   const SelectClothingItemScreen({
-    Key? key,
+    super.key,
     required this.jwtToken,
     required this.userId,
     required this.allowedCategories,
-  }) : super(key: key);
+  });
 
   @override
   _SelectClothingItemScreenState createState() => _SelectClothingItemScreenState();

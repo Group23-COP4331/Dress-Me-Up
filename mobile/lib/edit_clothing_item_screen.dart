@@ -11,11 +11,11 @@ class EditClothingItemScreen extends StatefulWidget {
   final String userId;
 
   const EditClothingItemScreen({
-    Key? key,
+    super.key,
     required this.clothingItem,
     required this.jwtToken,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   _EditClothingItemScreenState createState() => _EditClothingItemScreenState();
