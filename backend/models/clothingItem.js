@@ -12,4 +12,6 @@ const ClothingItemSchema = new Schema({
     isFavorite: { type: Boolean, default: false }
 }, {timestamps: true});
 
+ClothingItemSchema.index({ UserId: 1 });
+
 module.exports = mongoose.model('ClothingItem', ClothingItemSchema);

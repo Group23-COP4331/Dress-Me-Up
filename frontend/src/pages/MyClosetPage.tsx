@@ -576,6 +576,7 @@ const handleDeleteOutfit = async (id: string) => {
                       });
                       if (response.ok) {
                         toast.success("Item added!");
+                        observer.current?.disconnect();
                         resetItemForm();
                         setShowAddItemForm(false);
                         setClothingItems([]); // re-fetch
@@ -839,7 +840,7 @@ const handleDeleteOutfit = async (id: string) => {
         <button
           className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
           onClick={() => {
-            setActiveCategory("Long Sleeves");
+            setActiveCategory("LongSleeves");
             setClothingItems([]);
             setPage(1);
             setHasMore(true);
