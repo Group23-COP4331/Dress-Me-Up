@@ -124,13 +124,11 @@ export default function MyCloset() {
   };  
 
   const getImageUrlFromItem = (item: any) => {
-    if (!item?.file?.data || !item?.fileType) return null;
+    if (!item?.file || !item?.fileType) return null;
   
-    const rawData = item.file.data.data || item.file.data; // defensive for nested buffers
-    const uint8Array = new Uint8Array(rawData);
-    const blob = new Blob([uint8Array], { type: item.fileType });
-    return URL.createObjectURL(blob);
+    return `data:${item.fileType};base64,${item.file}`;
   };
+  
 
   useEffect(() => {
     let ignore = false;
@@ -159,21 +157,16 @@ export default function MyCloset() {
           return;
         }
   
-        const itemsWithImages = data.results.map((item: any) => {
-          const blob = new Blob([new Uint8Array(item.file.data)], {
-            type: item.fileType,
-          });
-          const objectUrl = URL.createObjectURL(blob);
-          return {
-            id: item._id,
-            name: item.Name,
-            color: item.Color,
-            size: item.Size,
-            category: item.Category,
-            isFavorite: item.isFavorite || false,
-            image: objectUrl,
-          };
-        });
+        const itemsWithImages = data.results.map((item: any) => ({
+          id: item._id,
+          name: item.Name,
+          color: item.Color,
+          size: item.Size,
+          category: item.Category,
+          isFavorite: item.isFavorite || false,
+          image: `data:${item.fileType};base64,${item.file}`, // ✅ use base64 directly
+        }));
+        
   
         if (!ignore) {
           if (itemsWithImages.length === 0) setHasMore(false);
@@ -213,19 +206,15 @@ export default function MyCloset() {
   useEffect(() => {
     const fetchOutfits = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/getOutfits", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch("http://localhost:5001/api/getOutfits?userId=1", {
+          method: "GET", // ✅ also correct HTTP method now
         });
-  
-        if (response.ok) {
-          const data = await response.json();
-          setOutfits(data);
-        } else {
-          toast.error("Failed to fetch outfits");
-        }
+    
+        const data = await response.json();
+        setOutfits(data.results); // ✅ fix here
       } catch (err) {
-        console.error("Outfit fetch error:", err);
+        toast.error("Error fetching outfits");
+        console.error("Fetch outfits error:", err);
       }
     };
   
@@ -356,15 +345,17 @@ const handleDeleteOutfit = async (id: string) => {
                       {fit.Shoes ? <p>Shoes: {fit.Shoes.Name}</p> : <p>Shoes: (none)</p>}
                     </div>
 
-                    <div className="flex gap-2 justify-center">
+                    <div className="flex gap-4 justify-center">
                       {[fit.Top, fit.Bottom, fit.Shoes].map((piece, idx) => {
                         const label = ['Top', 'Bottom', 'Shoes'][idx];
 
+                        const baseBox =
+                          "w-28 h-28 flex items-center justify-center border border-black rounded-md overflow-hidden";
+
                         if (!piece) {
                           return (
-                            <div key={label} className="w-20 h-20 bg-white flex flex-col items-center justify-center border border-black">
-                              <p className="text-xs">Missing</p>
-                              <p className="text-[10px] mt-1">{label}</p>
+                            <div key={label} className={baseBox}>
+                              <p className="text-xs text-center">{label}\nMissing</p>
                             </div>
                           );
                         }
@@ -372,25 +363,12 @@ const handleDeleteOutfit = async (id: string) => {
                         const imageUrl = getImageUrlFromItem(piece);
 
                         return (
-                          <div
-                            key={label}
-                            className={`w-28 h-28 flex flex-col items-center rounded-md justify-center overflow-hidden ${
-                              imageUrl ? 'bg-transparent' : 'bg-white'
-                            }`}
-                          >
-                            {imageUrl ? (
-                              <>
-                                <img src={imageUrl} alt={piece.Name} className="h-full object-contain" />
-                                <p className="text-[10px] mt-1 text-center truncate max-w-[4.5rem]">
-                                  {piece.Name}
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <p className="text-xs">Missing</p>
-                                <p className="text-[10px] mt-1">{label}</p>
-                              </>
-                            )}
+                          <div key={label} className={baseBox}>
+                            <img
+                              src={imageUrl}
+                              alt={label}
+                              className="max-h-full max-w-full object-contain"
+                            />
                           </div>
                         );
                       })}

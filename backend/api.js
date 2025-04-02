@@ -285,6 +285,11 @@ app.post("/api/resetPassword", async (req, res) => {
         query.Name = { $regex: search, $options: 'i' };
       }
 
+      // ✅ Add this block:
+      if (req.query.favorite === 'true') {
+        query.isFavorite = true;
+      }
+
       console.log("🧩 MongoDB query:", query);
 
       const items = await ClothingItem.find(query)
