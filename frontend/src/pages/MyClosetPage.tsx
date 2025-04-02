@@ -393,6 +393,9 @@ const handleDeleteOutfit = async (id: string) => {
                     setClothingItems([]);
                     setPage(1);
                     setHasMore(true);
+                    setFavoriteOnly(false);      // 👈 Reset
+                    setActiveCategory('');
+                    setSearchTerm('');
                     setTriggerReload((prev) => !prev); // ✅ force re-run useEffect
                   }}
                   className="text-red-600 text-lg font-bold underline hover:text-red-800"
