@@ -1,4 +1,4 @@
-import React from 'react';
+//import React from 'react';
 import ProfilePic from '../assets/About-Images/profile-icon.jpg';
 
 export default function profileCard({name = "John Doe", role = "Developer", pic = ProfilePic}){    

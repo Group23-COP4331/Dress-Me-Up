@@ -1,4 +1,4 @@
-import React from 'react';
+//import React from 'react';
 import Calendar from '../components/Calendar.tsx';
 import shrub from "../assets/shrub.png";
 import Navbar from '../components/Navbar.tsx';

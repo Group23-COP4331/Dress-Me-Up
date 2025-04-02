@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useEffect} from 'react';
-import logo from "../assets/GreenLogo.png";
+//import logo from "../assets/GreenLogo.png";
 import { X, ChevronRight } from "lucide-react"; // Import icons
 import redheart from "../assets/MyClosetImages/redheart.png";
 import plant from "../assets/shrub.png";
@@ -60,7 +60,7 @@ export default function MyCloset() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+  //const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const [showAddItemForm, setShowAddItemForm] = useState(false);
   const [showCreateOutfitForm, setShowCreateOutfitForm] = useState(false);
@@ -409,10 +409,10 @@ const handleDeleteOutfit = async (id: string) => {
                         return (
                           <div key={label} className={baseBox}>
                             <img
-                              src={imageUrl}
+                              src={imageUrl || undefined} alt="Closet" />
                               alt={label}
                               className="max-h-full max-w-full object-contain"
-                            />
+                            
                           </div>
                         );
                       })}

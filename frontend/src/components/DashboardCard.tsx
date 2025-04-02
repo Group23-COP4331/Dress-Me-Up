@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from 'react';
+import { Link, To } from 'react-router-dom';
 
-export default function DashboardCard(props){
+export default function DashboardCard(props: { route: To; pic: any; title: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; desc: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }){
     return (
         <Link to={props.route} className="bg-no-repeat bg-cover w-[350px] h-[400px] sm:w-[550px] sm:h-[600px] lg:w-[650px] lg:h-[700px] rounded-3xl z-[0] shadow-xl hover:brightness-125 hover:scale-[1.03] ease-in duration-200"
         style={{ backgroundImage: `url(${props.pic})` }}>

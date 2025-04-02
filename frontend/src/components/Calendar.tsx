@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+//import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, getDay, subDays, addDays, addWeeks } from 'date-fns';
 import axios from 'axios';
 import { setDay } from 'date-fns';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 interface Holiday {
   date: Date;
@@ -22,7 +24,7 @@ export default function Calendar() {
   const [showSidePanel, setShowSidePanel] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [showEventModal, setShowEventModal] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  //const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
 
