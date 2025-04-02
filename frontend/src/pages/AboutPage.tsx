@@ -5,7 +5,10 @@ import Logo from '../assets/GreenLogo.png';
 import Tree from '../assets/tree.png';
 import Kevin from '../assets/About-Images/kevinpfp.JPG'; 
 import Daniel from '../assets/About-Images/Daniel.JPG'; 
-import Ethan from "../assets/About-Images/ethan.jpg";
+import Ethan from '../assets/About-Images/ethan.jpg';
+import Jesiel from '../assets/About-Images/Jesiel.JPG';
+import Sadie from '../assets/About-Images/Sadie_PFP.jpeg';
+import Ernesto from '../assets/About-Images/ErnestoPFP.jpg';
 
 
 export default function AboutPage(){
@@ -21,9 +24,9 @@ export default function AboutPage(){
             pic: Kevin
         },
         { 
-            // IMPORT PROFILE PHOTO
             name: "Jesiel Reyes",
             role: "Front End",
+            pic: Jesiel
         },
         { 
             name: "Ethan McKissic",
@@ -38,12 +41,12 @@ export default function AboutPage(){
         { 
             name: "Sadie Burns",
             role: "API",
-            // IMPORT PROFILE PHOTO
+            pic: Sadie
         },
         { 
             name: "Ernesto Perez",
             role: "Front End, API",
-            // IMPORT PROFILE PHOTO
+            pic: Ernesto
         }
     ];
     // Removes default padding and width opon rendering
