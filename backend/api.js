@@ -6,6 +6,7 @@ const Weather = require('./models/weather');
 const token = require('./createJWT');
 const ClothingItem = require('./models/clothingItem');
 const Outfit = require('./models/outfit');
+const OutfitPlan = require('./models/outfitPlan');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 const axios = require('axios');
@@ -400,8 +401,105 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     }
   })
 
+  app.post('/api/outfitPlan', async (req, res, next) => {
+    const {userId, name, date, outfitId} = req.body;
+    try{
+      const newPlan = new OutfitPlan({
+        UserId: userId,
+        Name: name,
+        Date: new Date(date), // YYYY-MM-DD
+        OutfitId: outfitId
+      })
+      await newPlan.save();
+      res.status(200).json({message: 'Outfit Planned', error: ''});
+    } catch (error) {
+      console.log(OutfitPlan);
+      res.status(500).json({error: 'Error in outfitPlan api',
+      details: error.message
+    });
+    }
+  })
+  ///query: /api/getPlans?userId=...
+  app.get('/api/getPlans', async (req, res, next) => {
+    const {userId} = req.query;
+    try{
+      const plans = await OutfitPlan.find({UserId: userId});
+      res.status(200).json(plans);
+    }catch (e) {
+      res.status(500).json({error: e.message});
+    }
+  })
 
+  app.post('/api/updatePlan', async (req, res, next) => {
+    const {userId, planId, name, outfitId} = req.body;
+    try{
+      const updatePlan = await OutfitPlan.findById(planId);
+      if (!updatePlan) {
+        return res.status(404).json({error: 'Plan not found'});
+      }
+      if (name) {
+        updatePlan.Name = name;
+      }
+      if (outfitId) {
+        updatePlan.OutfitId = outfitId;
+      }
+      await updatePlan.save();
+      res.status(200).json({updatePlan});
+    }
+    catch (e){
+      console.log('Error in updatePlan:', e);
+      res.status(500).json({error: e.message});
+    }
+  })
 
+  app.post('/api/deletePlan', async (req, res, next) => {
+    const{userId, planId} = req.body;
+    try{
+      const deleted = await OutfitPlan.findByIdAndDelete(planId);
+      if (!deleted) {
+        return res.status(400).json({error: 'Plan not found'});
+      }
+      res.status(200).json({message: 'Plan deleted', error: ''});
+    }
+    catch (e){
+      console.log('Error in deletePlan:', e);
+      res.status(500).json({error: e.message});
+    }
+  })
+
+  app.post('/api/randomOutfit', async (req, res, next) => {
+    const {userId} = req.body;
+
+    try{
+      const tops = await ClothingItem.find({UserId: userId, 
+        Category: {$in: ['Shirts', 'Longsleeves']}});
+      console.log('tops:', tops.length);
+      const bottoms = await ClothingItem.find({UserId: userId, 
+        Category: {$in: ['Pants', 'Shorts']}});
+      console.log('bottoms:', bottoms.length);
+      const shoes = await ClothingItem.find({UserId: userId.toString(), Category: 'Shoes'});
+      console.log('shoes:', shoes.length);
+      if(tops.length === 0 || bottoms.length === 0 || shoes.length === 0){
+        return res.status(500).json({error: 'Not Enough Clothing Items to Create Outfit'});
+      }
+      const randomTop = tops[Math.floor(Math.random() * tops.length)]._id;
+      const randomBottom = bottoms[Math.floor(Math.random() * bottoms.length)]._id;
+      const randomShoes = shoes[Math.floor(Math.random() * shoes.length)]._id;
+      const randomOutfit = new Outfit({
+        UserId: userId,
+        Name: 'Random Outfit',
+        Top: randomTop,
+        Bottom: randomBottom,
+        Shoes: randomShoes,
+        WeatherCategory: 'Normal'
+      })
+      await randomOutfit.save();
+      res.status(200).json( {outfit: randomOutfit, error: ''});
+    }
+    catch (e) {
+      console.log('Error in randomOutfit:', e);
+      res.status(500).json({error: e.message});
+    }});
 
   app.post('/api/searchcards', async (req, res, next) => {
     const { userId, search, jwtToken } = req.body;
