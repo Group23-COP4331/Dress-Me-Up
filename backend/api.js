@@ -672,16 +672,21 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
 
   app.get('/api/weather', async (req, res) => {
     try {
-      const { city, country } = req.query;
+      const { userId} = req.query;
+      const Person = await User.findById(userId);
+      if (!Person) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      city = Person.City;
+      country = Person.Country;
       const API_KEY = process.env.WEATHER_API_KEY;
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`;
 
       const response = await axios.get(url);
       const { name, sys, main, weather } = response.data;
-
       const weatherData = new Weather({
        city: city,
-       country: sys.country,
+       country: country,
        temperature: main.temp,
        description: weather[0].description,
        icon: `https://openweathermap.org/img/wn/${weather[0].icon}.png`
