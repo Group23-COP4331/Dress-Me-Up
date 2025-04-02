@@ -367,7 +367,7 @@ app.post("/api/resetPassword", async (req, res) => {
       const newPlan = new OutfitPlan({
         UserId: userId,
         Name: name,
-        Date: new Date(date),
+        Date: new Date(date), // YYYY-MM-DD
         OutfitId: outfitId
       })
       await newPlan.save();
@@ -389,6 +389,77 @@ app.post("/api/resetPassword", async (req, res) => {
       res.status(500).json({error: e.message});
     }
   })
+
+  app.post('/api/updatePlan', async (req, res, next) => {
+    const {userId, planId, name, outfitId} = req.body;
+    try{
+      const updatePlan = await OutfitPlan.findById(planId);
+      if (!updatePlan) {
+        return res.status(404).json({error: 'Plan not found'});
+      }
+      if (name) {
+        updatePlan.Name = name;
+      }
+      if (outfitId) {
+        updatePlan.OutfitId = outfitId;
+      }
+      await updatePlan.save();
+      res.status(200).json({updatePlan});
+    }
+    catch (e){
+      console.log('Error in updatePlan:', e);
+      res.status(500).json({error: e.message});
+    }
+  })
+
+  app.post('/api/deletePlan', async (req, res, next) => {
+    const{userId, planId} = req.body;
+    try{
+      const deleted = await OutfitPlan.findByIdAndDelete(planId);
+      if (!deleted) {
+        return res.status(400).json({error: 'Plan not found'});
+      }
+      res.status(200).json({message: 'Plan deleted', error: ''});
+    }
+    catch (e){
+      console.log('Error in deletePlan:', e);
+      res.status(500).json({error: e.message});
+    }
+  })
+
+  app.post('/api/randomOutfit', async (req, res, next) => {
+    const {userId} = req.body;
+
+    try{
+      const tops = await ClothingItem.find({UserId: userId, 
+        Category: {$in: ['Shirts', 'Longsleeves']}});
+      console.log('tops:', tops.length);
+      const bottoms = await ClothingItem.find({UserId: userId, 
+        Category: {$in: ['Pants', 'Shorts']}});
+      console.log('bottoms:', bottoms.length);
+      const shoes = await ClothingItem.find({UserId: userId.toString(), Category: 'Shoes'});
+      console.log('shoes:', shoes.length);
+      if(tops.length === 0 || bottoms.length === 0 || shoes.length === 0){
+        return res.status(500).json({error: 'Not Enough Clothing Items to Create Outfit'});
+      }
+      const randomTop = tops[Math.floor(Math.random() * tops.length)]._id;
+      const randomBottom = bottoms[Math.floor(Math.random() * bottoms.length)]._id;
+      const randomShoes = shoes[Math.floor(Math.random() * shoes.length)]._id;
+      const randomOutfit = new Outfit({
+        UserId: userId,
+        Name: 'Random Outfit',
+        Top: randomTop,
+        Bottom: randomBottom,
+        Shoes: randomShoes,
+        WeatherCategory: 'Normal'
+      })
+      await randomOutfit.save();
+      res.status(200).json( {outfit: randomOutfit, error: ''});
+    }
+    catch (e) {
+      console.log('Error in randomOutfit:', e);
+      res.status(500).json({error: e.message});
+    }});
 
   app.post('/api/searchcards', async (req, res, next) => {
     const { userId, search, jwtToken } = req.body;
