@@ -21,7 +21,7 @@ export default function LoginForm({setMessage} : LoginFormProps){
   async function doLogin(event: any): Promise<void> {
     event.preventDefault();
 
-    const obj = { Login: emailName, Password: loginPassword }; //make an obj to send to api that stores the login credentials and password of user
+    const obj = { Login: emailName, Password: loginPassword }; //make an obj to send to api that stores the login credentials and password of use
     const js = JSON.stringify(obj); //stringify said object to send to api as pakcage
 
     console.log('Login:', emailName);

@@ -92,7 +92,8 @@ export default function MyCloset() {
 
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
 
-  const userId = localStorage.getItem("userId");
+  const storedUser = localStorage.getItem("user_data");
+  const userId = storedUser ? JSON.parse(storedUser).id : null;
 
   const toggleFavorite = async (itemId: string) => {
     // Get the current item
