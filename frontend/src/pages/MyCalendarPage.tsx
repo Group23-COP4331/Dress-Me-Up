@@ -2,12 +2,24 @@ import React from 'react';
 import Calendar from '../components/Calendar.tsx';
 import shrub from "../assets/shrub.png";
 import Navbar from '../components/Navbar.tsx';
+import { useEffect } from 'react';
 
 export default function MyCalendar() {
+
+// Removes default padding and width opon rendering
+  useEffect(() => {
+      document.getElementById("root")?.classList.add("dashboard");
+  
+      return () => {
+          document.getElementById("root")?.classList.remove("dashboard");
+      };
+  }, []);
+
+
   return (
-    <div className="min-h-screen w-full p-0 m-0 relative">
+    <div className="min-h-screen w-full p-0 m-0 relative overflow-hidden">
       {/* Navbar fixed at the top with high z-index */}
-      <Navbar className="fixed top-0 left-0 w-full z-30" />
+      <Navbar/>
       
       <div className="relative min-h-screen w-screen m-0 p-0 overflow-x-hidden">
         {/* Logo (absolute position outside the flow) */}

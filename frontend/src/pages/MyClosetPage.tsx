@@ -352,13 +352,13 @@ const handleDeleteOutfit = async (id: string) => {
         </div>
 
         {/* Create outfit and add item buttons */}
-        <div className="md:fixed md:right-8 md:top-1/2 md:-translate-y-1/2 flex flex-row md:flex-col gap-4">
-          <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md"
+        <div className="md:fixed md:right-8 md:top-1/2 md:-translate-y-1/2 flex flex-row md:flex-col gap-4 ">
+          <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => setShowAddItemForm(true)}
           >
             Add Item
           </button>
-          <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md"
+          <button className="text-black text-lg bg-themeGreen px-6 py-3 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => setShowCreateOutfitForm(true)}
           >
             Create Outfit
@@ -519,10 +519,10 @@ const handleDeleteOutfit = async (id: string) => {
       </div>
 
       {(showAddItemForm || editingItem) && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div ref={itemModalRef} className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 shadow-lg">
+            <div ref={itemModalRef} className="bg-themeGray p-6 rounded-lg w-96 relative">
               <button
-                className="absolute top-2 right-2 text-xl font-bold"
+                className="absolute top-2 right-2 text-xl font-bold text-white"
                 onClick={() => {
                   resetItemForm();
                   setShowAddItemForm(false);
@@ -531,7 +531,7 @@ const handleDeleteOutfit = async (id: string) => {
               >
                 &times;
               </button>
-              <h2 className="text-xl font-semibold mb-4">
+              <h2 className="text-xl font-semibold mb-4 text-white">
                 {editingItem ? "Edit Item" : "Add New Item"}
               </h2>
               <form
@@ -595,26 +595,26 @@ const handleDeleteOutfit = async (id: string) => {
                   placeholder="Item Name"
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
-                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                  className="bg-white border shadow-md p-2 rounded text-black placeholder-black"
                 />
                 <input
                   type="text"
                   placeholder="Color"
                   value={itemColor}
                   onChange={(e) => setItemColor(e.target.value)}
-                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                  className="bg-white border shadow-md p-2 rounded text-black placeholder-black"
                 />
                 <input
                   type="text"
                   placeholder="Item Size"
                   value={itemSize}
                   onChange={(e) => setItemSize(e.target.value)}
-                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                  className="bg-white border p-2 shadow-md rounded text-black placeholder-black"
                 />
                 <select
                   value={itemCategory}
                   onChange={(e) => setItemCategory(e.target.value)}
-                  className="bg-themeGray border border-black p-2 rounded text-black"
+                  className="bg-white border shadow-md p-2 rounded text-black"
                 >
                   <option value="">-- Select Category --</option>
                   <option value="Shirts">Shirts</option>
@@ -628,9 +628,9 @@ const handleDeleteOutfit = async (id: string) => {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setItemImage(e.target.files?.[0] || null)}
-                  className="file:bg-themeGreen file:text-white file:font-medium file:border-none file:px-4 file:py-2 file:rounded file:cursor-pointer bg-themeGray border border-black p-2 rounded"
+                  className="file:bg-themeGreen file:text-black file:font-medium file:border-none file:px-4 file:py-2 file:rounded file:cursor-pointer bg-themeGray border border-lightBeige p-2 rounded shadow-md"
                 />
-                <button type="submit" className="bg-themeGreen text-white p-2 rounded">
+                <button type="submit" className="bg-themeGreen text-white p-2 rounded shadow-md">
                   {editingItem ? "Update Item" : "Save"}
                 </button>
               </form>
@@ -641,9 +641,9 @@ const handleDeleteOutfit = async (id: string) => {
 
         {showCreateOutfitForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div ref={outfitModalRef} className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
+            <div ref={outfitModalRef} className="bg-themeGray p-6 rounded-lg w-96 relative shadow-lg">
               <button
-                className="absolute top-2 right-2 text-xl font-bold"
+                className="absolute top-2 right-2 text-xl font-bold shadow-md text-white"
                 onClick={() => {
                   resetOutfitForm();
                   setShowCreateOutfitForm(false);
@@ -651,7 +651,7 @@ const handleDeleteOutfit = async (id: string) => {
               >
                 &times;
               </button>
-              <h2 className="text-xl font-semibold mb-4">Create A New Outfit</h2>
+              <h2 className="text-xl text-white font-semibold mb-4">Create A New Outfit</h2>
               <form
                 className="flex flex-col gap-4"
                 onSubmit={async (e) => {
@@ -692,12 +692,12 @@ const handleDeleteOutfit = async (id: string) => {
                   }
                 }}
               >
-                <label className="text-black font-medium">Select a Top</label>
+                <label className="text-white font-medium">Select a Top</label>
                 <select
                   onChange={(e) =>
                     setSelectedTop(tops.find((item) => item.id === e.target.value) || null)
                   }
-                  className="bg-themeGray border border-black p-2 rounded text-black"
+                  className="bg-white shadow-md border-black p-2 rounded text-black"
                 >
                   <option value="">-- Select Top --</option>
                   {tops.map((item) => (
@@ -707,12 +707,12 @@ const handleDeleteOutfit = async (id: string) => {
                   ))}
                 </select>
 
-                <label className="text-black font-medium">Select a Bottom</label>
+                <label className="text-white font-medium">Select a Bottom</label>
                 <select
                   onChange={(e) =>
                     setSelectedBottom(bottoms.find((item) => item.id === e.target.value) || null)
                   }
-                  className="bg-themeGray border border-black p-2 rounded text-black"
+                  className="bg-white shadow-md  border-black p-2 rounded text-black"
                 >
                   <option value="">-- Select Bottom --</option>
                   {bottoms.map((item) => (
@@ -722,12 +722,12 @@ const handleDeleteOutfit = async (id: string) => {
                   ))}
                 </select>
 
-                <label className="text-black font-medium">Select Shoes</label>
+                <label className="text-white font-medium">Select Shoes</label>
                 <select
                   onChange={(e) =>
                     setSelectedShoes(shoes.find((item) => item.id === e.target.value) || null)
                   }
-                  className="bg-themeGray border border-black p-2 rounded text-black"
+                  className="bg-white shadow-md border-black p-2 rounded text-black"
                 >
                   <option value="">-- Select Shoes --</option>
                   {shoes.map((item) => (
@@ -738,11 +738,11 @@ const handleDeleteOutfit = async (id: string) => {
                 </select>
 
                 {/* ✅ NEW FIELD: Weather Category */}
-                <label className="text-black font-medium">Weather Category</label>
+                <label className="text-white font-medium">Weather Category</label>
                 <select
                   value={weatherCategory}
                   onChange={(e) => setWeatherCategory(e.target.value)}
-                  className="bg-themeGray border border-black p-2 rounded text-black"
+                  className="bg-white shadow-md border-black p-2 rounded text-black"
                 >
                   <option value="">-- Select Weather --</option>
                   <option value="Hot">Hot</option>
@@ -753,16 +753,16 @@ const handleDeleteOutfit = async (id: string) => {
                   <option value="Cloudy">Cloudy</option>
                 </select>
 
-                <label className="text-black font-medium">Give Your Outfit A Name!</label>
+                <label className="text-white font-medium">Give Your Outfit A Name!</label>
                 <input
                   type="text"
                   placeholder="Outfit Name"
                   value={outfitName}
                   onChange={(e) => setOutfitName(e.target.value)}
-                  className="bg-themeGray border border-black p-2 rounded text-black placeholder-black"
+                  className="bg-white shadow-md p-2 rounded text-black placeholder-black"
                 />
 
-                <button type="submit" className="bg-themeGreen text-white p-2 rounded mt-4">
+                <button type="submit" className="bg-themeGreen text-white p-2 rounded mt-4 shadow-md">
                   Save Outfit
                 </button>
               </form>
@@ -817,7 +817,7 @@ const handleDeleteOutfit = async (id: string) => {
     return (
       <>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setShowOutfits(true);
             setTriggerOutfitReload((prev) => !prev);
@@ -826,7 +826,7 @@ const handleDeleteOutfit = async (id: string) => {
           Saved Fits
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setActiveCategory("Shirts");
             setClothingItems([]);
@@ -837,7 +837,7 @@ const handleDeleteOutfit = async (id: string) => {
           Shirts
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setActiveCategory("Long Sleeves");
             setClothingItems([]);
@@ -848,7 +848,7 @@ const handleDeleteOutfit = async (id: string) => {
           Long Sleeves
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setActiveCategory("Pants");
             setClothingItems([]);
@@ -859,7 +859,7 @@ const handleDeleteOutfit = async (id: string) => {
           Pants
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setActiveCategory("Shorts");
             setClothingItems([]);
@@ -870,7 +870,7 @@ const handleDeleteOutfit = async (id: string) => {
           Shorts
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setActiveCategory("Shoes");
             setClothingItems([]);
@@ -881,7 +881,7 @@ const handleDeleteOutfit = async (id: string) => {
           Shoes
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg flex items-center justify-center gap-2 shadow-md" 
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg flex items-center justify-center gap-2 shadow-md hover:brightness-75 ease-in duration-100" 
           onClick={() => {
             setFavoriteOnly(true);        // 🔒 Lock to favorites
             setActiveCategory('');        // Clear category filter if needed
@@ -894,7 +894,7 @@ const handleDeleteOutfit = async (id: string) => {
           Favorites <img src={redheart} alt="heart" className="w-6 h-6" />
         </button>
         <button
-          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md"
+          className="text-white text-lg bg-themeGreen w-5/6 py-2 rounded-lg shadow-md hover:brightness-75 ease-in duration-100"
           onClick={() => {
             setFavoriteOnly(false);      // 👈 Reset
             setActiveCategory('');

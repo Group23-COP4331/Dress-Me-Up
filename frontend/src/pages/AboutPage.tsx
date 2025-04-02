@@ -7,15 +7,15 @@ import Kevin from '../assets/About-Images/kevinpfp.JPG';
 import Daniel from '../assets/About-Images/Daniel.JPG'; 
 import Ethan from '../assets/About-Images/ethan.jpg';
 import Jesiel from '../assets/About-Images/Jesiel.JPG';
-import Sadie from '../assets/About-Images/Sadie_PFP.jpeg';
+import Sadie from '../assets/About-Images/sadie.png';
 import Ernesto from '../assets/About-Images/ErnestoPFP.jpg';
-
+import Kenneth from '../assets/About-Images/kenneth.JPG';
 
 export default function AboutPage(){
     const devs = [
         { 
             name: "Daniel Perera",
-            role: "Project Manager, Database",
+            role: "Database, Mobile",
             pic: Daniel          
         },
         { 
@@ -36,7 +36,8 @@ export default function AboutPage(){
         { 
             name: "Kenneth Arias",
             role: "API",
-            // IMPORT PROFILE PHOTO
+            pic: Kenneth,
+            
         },
         { 
             name: "Sadie Burns",
@@ -60,7 +61,7 @@ export default function AboutPage(){
     
 
     return (
-        <div className = "min-h-screen min-w-screen overflow-auto">
+        <div className = "h-screen min-w-screen overflow-auto lg:overflow-hidden">
             <Link to="/" className="hover:scale-105 absolute z-[2] top-7 left-4 sm:left-8 ">
                 <img src={Logo} alt="DressMeUp Logo" className = "w-12 h-12 sm:w-20 sm:h-20 rounded-lg shadow-xl object-cover" />
             </Link>

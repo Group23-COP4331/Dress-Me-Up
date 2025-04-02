@@ -17,23 +17,25 @@ export default function LandingPage(){
     text-white 
     text-3xl 
     bg-themeGray 
-    border-4 
+    border-2 
     border-themeDarkBeige
     w-36 h-12
     lg:w-44 lg:h-16 rounded-lg
     cursor-pointer
     hover:scale-105
+    shadow-md
+    ease-in duration-100
   `;
 
   return (
 
     <div className = "relative flex flex-col justify-start items-center h-screen gap-4 md:flex-row md:items-start lg:pt-24 lg:gap-20 lg:flex-row lg:-translate-x-36 lg:items-start"> {/* Outer div takes up whole screen so the inner div can be centered on screen */}
 
-          <div className = "order-2 relative flex flex-col items-center justify-center bg-themeGray rounded-lg flex-shrink-0 w-80 h-80 gap-4 md:order-1 md:w-3/6 md:h-3/6 lg:gap-10 lg:w-4/6 lg:h-5/6 lg:pt-0 lg:order-1"> {/*This div is the gray card containing the closet picture and buttons under it */}
+          <div className = "order-2 relative flex flex-col items-center justify-center bg-themeGray rounded-lg flex-shrink-0 w-80 h-80 gap-4 md:order-1 md:w-3/6 md:h-3/6 lg:gap-10 lg:w-4/6 lg:h-5/6 lg:pt-0 lg:order-1 shadow-lg"> {/*This div is the gray card containing the closet picture and buttons under it */}
     
-            <img src = {closetImage} alt = "Minimalist closet pic" className = "select-none pointer-events-none w-64 h-56 rounded-lg md:-translate-y-10 md:w-5/6 md:h-3/6 lg:w-5/6 lg:h-4/6"></img> 
+            <img src = {closetImage} alt = "Minimalist closet pic" className = "select-none pointer-events-none w-64 h-56 rounded-lg md:-translate-y-10 md:w-5/6 md:h-3/6 lg:w-5/6 lg:h-4/6 shadow-md"></img> 
 
-            <div className = "flex flex-row justify-center items-center self-start ml-8 w-fit gap-2 lg:ml-16"> {/*This div keeps all buttons in a flex row within the flex col that stacks the image and button above each other */}
+            <div className = "flex flex-row justify-center items-center self-start ml-8 w-fit gap-2 lg:ml-16 "> {/*This div keeps all buttons in a flex row within the flex col that stacks the image and button above each other */}
               <img src = {blackheart} alt = "heart symbol" className = "select-none pointer-events-none w-9 h-9 lg:w-14 lg:h-14"></img>
               <img src = {chatbubble} alt = "chat bubble symbol" className = "select-none pointer-events-none  w-9 h-9 lg:w-14 lg:h-14"></img>
               <img src = {sendbutton} alt = "send button symbol" className = "select-none pointer-events-none  w-9 h-9 lg:w-14 lg:h-14"></img>
@@ -44,7 +46,7 @@ export default function LandingPage(){
 
           <div className="flex flex-col flex-shrink-0 gap-9 relative md:order-2 lg:order-2 lg:gap-16"> {/*Div for dressmeup logo and slogan that will go under the logo*/}
 
-            <img src = {logo} alt = "DressMeUp Logo" className = "select-none pointer-events-none w-36 h-36 lg:w-44 lg:h-44 rounded-lg" />
+            <img src = {logo} alt = "DressMeUp Logo" className = "select-none pointer-events-none w-36 h-36 lg:w-44 lg:h-44 rounded-lg shadow-md" />
 
             <div className = "hidden items-start justify-center gap-4 md:flex md:flex-col lg:hidden"> {/*Flex col so that login and about us are stacked on top of each other */}
 

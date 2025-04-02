@@ -691,6 +691,13 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       console.error('Error in /api/weather: ', error);
       res.status(500).json({ error: error.message });
     }
-  })
+  });
+
+    
+  app.post('/api/logout', (req, res) => {
+    res.clearCookie('jwtToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.status(200).json({ message: 'Logged out successfully' });
+  });
+
 
 };

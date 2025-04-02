@@ -65,41 +65,41 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
       <div className ="flex flex-col justify-center items-center gap-6"> {/*Keep al form items in a flex col so that they are above one another */}
 
       <div className = "flex flex-col items-start gap-2"> {/*Wrap labels and inputs in another flex col so lable lines up left with input box */}
-        <label htmlFor="firstname"> First Name</label>
+        <label className = "text-lg" htmlFor="firstname"> First Name</label>
         {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
-        <input onChange = {(e) => {setFirstName(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4" type="text" required id="firstname" name="firstname" placeholder='First Name' />
+        <input onChange = {(e) => {setFirstName(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4 shadow-md" type="text" required id="firstname" name="firstname" placeholder='First Name' />
       </div>
 
       <div className = "flex flex-col items-start gap-2">
-        <label htmlFor="lastname"> Last Name </label>
+        <label className = "text-lg" htmlFor="lastname"> Last Name </label>
         {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
-        <input onChange = {(e) => {setLastName(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4" type="text" required id="lastname" name="lastname" placeholder='Last Name'/>
+        <input onChange = {(e) => {setLastName(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4 shadow-md" type="text" required id="lastname" name="lastname" placeholder='Last Name'/>
       </div>
 
       <div className = "flex flex-col gap-4 w-full md:flex-row md:w[500px]"> {/*Flex row div so i can put countryy and city input boxes side by side */}
         <div className = "flex flex-col items-start gap-2 md:w-1/2"> {/*Make it so that the input for country is half the size of the 500px parent container so country and city are side by side */}
-          <label htmlFor="country">Country</label>
-          <input onChange={(e) => setCountry(e.target.value)} className="w-full h-12 rounded-lg pl-4" type="text" required id="country" name="country" placeholder="Country"/>
+          <label className = "text-lg" htmlFor="country">Country</label>
+          <input onChange={(e) => setCountry(e.target.value)} className="w-full h-12 rounded-lg pl-4 shadow-md" type="text" required id="country" name="country" placeholder="Country"/>
 
         </div>
 
         <div className = "flex flex-col items-start gap-2 md:w-1/2">
-          <label htmlFor="city">City</label>
-          <input onChange={(e) => setCity(e.target.value)} className="w-full h-12 rounded-lg pl-4" type="text" required id="city" name="city" placeholder="City"/>
+          <label className = "text-lg" htmlFor="city">City</label>
+          <input onChange={(e) => setCity(e.target.value)} className="w-full h-12 rounded-lg pl-4 shadow-md" type="text" required id="city" name="city" placeholder="City"/>
         </div>
   
       </div>
 
       <div className = "flex flex-col items-start gap-2">
-        <label htmlFor="email"> Email </label>
+        <label className = "text-lg" htmlFor="email"> Email </label>
         {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
-        <input onChange = {(e) => {setEmail(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4" type="email" required id="email" name="email" placeholder='Email@example.com'/>
+        <input onChange = {(e) => {setEmail(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4 shadow-md" type="email" required id="email" name="email" placeholder='Email@example.com'/>
       </div>
       
       <div className = "flex flex-col items-start gap-2 relative">
-        <label htmlFor="password"> Password </label>
+        <label className = "text-lg" htmlFor="password"> Password </label>
         {/*Make sure on input change we grab the event and call the callback funciton that sets the email state to whatever users key stroke was dyanmaic updating */}
-        <input onChange = {(e) => {setPassword(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4" required pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+        <input onChange = {(e) => {setPassword(e.target.value)}} className = "w-full md:w-[500px] h-12 rounded-lg pl-4 shadow-md" required pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
   title="Password must be at least 8 characters long, contain one letter, one number, and one symbol." type = {showPassword? 'text': 'password'} id="password" name="password" placeholder='Password'/>
 
         <button type = "button" className = {`absolute bottom-2 right-4 ${password ? '': 'opacity-50 cursor-not-allowed'}`} disabled={!password} onClick = {() => setVisibility((prev)=> !prev)}> {/*On click of this button we toggle the bool of our showPassword so that state changes and everything using show password re-renders. Also have disabled so that when password is not empty so !password it returns true which enables button to have onclick functionality */}
@@ -107,7 +107,7 @@ export default function RegisterForm({setMessage} : RegisterFormComponent){
         </button>
       </div>
 
-      <button className = "text-2xl text-white w-full md:w-[500px] h-12 bg-themeGreen rounded-lg hover:scale-105"type="submit">Submit</button>
+      <button className = "text-2xl text-white w-full md:w-[500px] h-12 bg-themeGreen rounded-lg hover:brightness-75 hover:scale-[1.03] ease-in duration-100 shadow-md"type="submit">Submit</button>
 
       </div>
     </form>
