@@ -6,6 +6,7 @@ import redheart from "../assets/MyClosetImages/redheart.png";
 import plant from "../assets/shrub.png";
 import { toast } from 'react-toastify';
 import { useRef, useCallback } from "react";
+import {buildPath} from "../components/BuildApiPath";
 
 
 //shoe is a placeholder import we will change this with the images users upload
@@ -109,7 +110,7 @@ export default function MyCloset() {
   
     // 2. Send request to server
     try {
-      const res = await fetch("http://localhost:5001/api/toggleFavorite", {
+      const res = await fetch(buildPath("toggleFavorite"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ _id: itemId }),
@@ -187,7 +188,7 @@ export default function MyCloset() {
         const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
   
         const response = await fetch(
-          `http://localhost:5001/api/getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`
+          buildPath(`getClothingItems?userId=${userId}&page=${page}&limit=9${categoryParam}${searchParam}${favoriteParam}`)
         );
   
         const data = await response.json();
@@ -246,7 +247,7 @@ export default function MyCloset() {
   useEffect(() => {
     const fetchOutfits = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/getOutfits?userId=${userId}`, {
+        const response = await fetch(buildPath(`getOutfits?userId=${userId}`), {
           method: "GET", // ✅ also correct HTTP method now
         });
     
@@ -279,7 +280,7 @@ export default function MyCloset() {
     if (!confirmDelete) return;
   
     try {
-      const response = await fetch("http://localhost:5001/api/deleteClothingItem", {
+      const response = await fetch(buildPath("deleteClothingItem"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -304,7 +305,7 @@ const handleDeleteOutfit = async (id: string) => {
   if (!confirm) return;
 
   try {
-    const res = await fetch("http://localhost:5001/api/deleteOutfit", {
+    const res = await fetch(buildPath("deleteOutfit"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ _id: id }),
@@ -410,9 +411,9 @@ const handleDeleteOutfit = async (id: string) => {
                         return (
                           <div key={label} className={baseBox}>
                             <img
-                              src={imageUrl || undefined} alt="Closet" />
-                              alt={label}
-                              className="max-h-full max-w-full object-contain"
+                              src={imageUrl || undefined} alt={label}
+                              className="max-h-full max-w-full object-contain" />
+                              
                             
                           </div>
                         );
@@ -551,7 +552,7 @@ const handleDeleteOutfit = async (id: string) => {
                   if (editingItem) {
                     formData.append("_id", editingItem.id);
                     try {
-                      const response = await fetch("http://localhost:5001/api/updateClothingItem", {
+                      const response = await fetch(buildPath("updateClothingItem"), {
                         method: "POST",
                         body: formData,
                       });
@@ -571,7 +572,7 @@ const handleDeleteOutfit = async (id: string) => {
                   } else {
                     // else, normal add flow
                     try {
-                      const response = await fetch("http://localhost:5001/api/addClothingItem", {
+                      const response = await fetch(buildPath("addClothingItem"), {
                         method: "POST",
                         body: formData,
                       });
@@ -674,7 +675,7 @@ const handleDeleteOutfit = async (id: string) => {
                   };
 
                   try {
-                    const response = await fetch("http://localhost:5001/api/addOutfit", {
+                    const response = await fetch(buildPath("addOutfit"), {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
