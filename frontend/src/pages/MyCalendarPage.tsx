@@ -36,7 +36,7 @@ export default function MyCalendar() {
         />
         
         {/* Calendar component with forced left alignment */}
-        <div className="relative z-20 w-full max-w-7xl mx-auto pt-32 -translate-y-60 -translate-x-20">
+        <div className="relative z-20 w-full max-w-7xl mx-auto pt-32 -translate-y-60 flex flex-col items-center">
           <Calendar />
         </div>
       </div>
