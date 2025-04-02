@@ -1,6 +1,6 @@
 // src/pages/VerifyEmailPage.tsx
-import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+//import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from "../assets/GreenLogo.png";
 import { Link } from 'react-router-dom';
@@ -32,7 +32,7 @@ export default function EnterEmailPassPage() {
         setMessage('Reset password link has been sent to your email!');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send reset link.');
+      setError((err as any).response?.data?.message || 'Failed to send reset link.');
     } finally {
       setIsLoading(false);
     }

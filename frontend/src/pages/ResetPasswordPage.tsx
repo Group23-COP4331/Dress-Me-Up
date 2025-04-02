@@ -48,7 +48,7 @@ export default function ResetPasswordPage() {
 
       }
     } catch (err) {
-      setError(err.response?.data?.message  || 'Server error in resetPassword API');
+      setError((err as any).response?.data?.message || 'Server error in resetPassword API');
     } finally {
       setIsLoading(false);
     }
