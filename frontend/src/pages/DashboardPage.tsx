@@ -7,7 +7,7 @@ import calendarImage from "../assets/Dashboard/calendar.jpeg";
 export default function DashboardPage(){
     const previews = [
         {title: 'My Closet', desc: 'Your wardrobe, reimagined. Organize, favorite, and style your outfits effortlessly.', pic: closetImage, route: '/mycloset'},
-        {title: 'Outfit of the Day', desc:'Stay ahead of the forecast and seamlessly plan outfits for every occasion.', pic: calendarImage, route: '/mycloset'}
+        {title: 'Outfit of the Day', desc:'Stay ahead of the forecast and seamlessly plan outfits for every occasion.', pic: calendarImage, route: '/mycalendar'}
     ];
 
     // Removes default padding and width opon rendering
