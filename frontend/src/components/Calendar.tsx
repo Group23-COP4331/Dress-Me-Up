@@ -374,14 +374,8 @@ export default function Calendar() {
                   </button>
                 </div>
                 
-                <div className="flex-grow overflow-y-auto pr-2">
+                <div className="flex-grow overflow-y-auto pr-2 pt-5">
                   <div className="space-y-2">
-                    <button 
-                      className="w-full bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors shadow-md"
-                      onClick={() => console.log('Assign Outfit button clicked')}
-                    >
-                      Assign Outfit to Calendar
-                    </button>
                     
                     <button 
                       className="w-full bg-[#9cb4d4] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#8aa3c2] transition-colors mb-4 shadow-md"
@@ -429,12 +423,6 @@ export default function Calendar() {
                   </div>
                 </div>
                 
-                <button 
-                  className="mt-auto bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors shadow-md"
-                  onClick={() => console.log('Randomize Outfit button clicked')}
-                >
-                  Randomize Outfit
-                </button>
               </>
             )}
           </div>
