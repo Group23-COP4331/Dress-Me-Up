@@ -6,6 +6,7 @@ import AboutPage from './pages/AboutPage';
 import MyClosetPage from './pages/MyClosetPage';
 import MyCalendarPage from './pages/MyCalendarPage';
 import { ToastContainer } from 'react-toastify';
+import WeatherBox from './components/WeatherBox';
 import 'react-toastify/dist/ReactToastify.css';
 import VerificationPage from './pages/VerificationPage';
 import EnterEmail from './pages/EnterEmailPassPage';

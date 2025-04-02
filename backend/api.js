@@ -669,13 +669,13 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     }
   });
   
-
+///query: /api/getPlans?userId=..&city=..&country=...
   app.get('/api/weather', async (req, res) => {
     try {
-      const { userId} = req.query;
-      const Person = await User.findById(userId);
+      const { userId } = req.query;
+      const Person = await User.findOne({ UserId: userId });
       if (!Person) {
-        return res.status(404).json({ error: 'User not found' });
+          return res.status(404).json({ error: 'User not found' });
       }
       city = Person.City;
       country = Person.Country;

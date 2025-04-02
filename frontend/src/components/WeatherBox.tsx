@@ -1,4 +1,6 @@
+
 import { useState, useEffect } from 'react';
+
 
 function capitalizeWords(description: string): string {
     return description
@@ -11,10 +13,19 @@ export default function WeatherBox() {
     const [weatherData, setWeatherData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const storedUser = localStorage.getItem("user_data");
+    const userId = storedUser ? JSON.parse(storedUser).id : null;
+
+    console.log("Stored user data:", userId);
+
+    if (!userId) {
+        console.error("User ID is missing or undefined.");
+    }
+
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const response = await fetch('http://localhost:5001/api/weather?userId=67eb0d6b16530df2cf3fa74c'); // Replace `1` with the actual userId
+                const response = await fetch(`http://dressmeupproject.com/api/weather?userId=${userId}`); // Replace `1` with the actual userId
                 if (!response.ok) {
                     throw new Error('Failed to fetch weather data');
                 }
@@ -37,8 +48,8 @@ export default function WeatherBox() {
     }
 
     return (
-        <div className="bg-[#b6c7a9] flex flex-col justify-center text-center p-5 border border-gray-300 rounded-lg max-w-sm aspect-square mx-auto ">
-            <p className="w-full flex flex-start text-2xl">{weatherData.temperature}°C</p>
+        <div className="bg-[#b6c7a9] shadow-sm flex flex-col justify-center text-center p-5 border border-gray-300 rounded-xl max-w-sm aspect-square mx-auto ">
+            <p className="w-full flex flex-start text-2xl font-medium">{weatherData.temperature}°C</p>
             <div className="w-full h-full flex flex-col justify-center items-center">
             <img 
         src={weatherData.icon} 

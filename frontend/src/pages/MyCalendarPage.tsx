@@ -2,6 +2,7 @@
 import Calendar from '../components/Calendar.tsx';
 import shrub from "../assets/shrub.png";
 import Navbar from '../components/Navbar.tsx';
+import WeatherBox from '../components/WeatherBox.tsx';
 import { useEffect } from 'react';
 
 export default function MyCalendar() {
@@ -25,21 +26,20 @@ export default function MyCalendar() {
         {/* Logo (absolute position outside the flow) */}
         
         {/* Shrub overlay - properly centered */}
-        <img 
-          src={shrub} 
-          alt="Decorative shrub" 
-          className="fixed top-0 left-1/2 w-2/4 max-w-[1250px] -translate-x-1/2 z-10 pointer-events-none"
-          style={{
-            transform: 'translateY(-5%) translateX(-50%)',
-            mixBlendMode: 'multiply'
-          }}
-        />
         
         {/* Calendar component with forced left alignment */}
-        <div className="relative z-20 w-full max-w-7xl mx-auto pt-32 -translate-y-60 flex flex-col items-center">
-          <Calendar />
+        <div className="relative z-20 w-full max-w-7xl mx-auto pt-32 -translate-y-60 flex items-start gap-8">
+    {/* Calendar on the left */}
+    <div className="w-2/3">
+      <Calendar />
+    </div>
+
+    {/* WeatherBox on the right */}
+    <div className="w-1/3 translate-y-36 scale-[0.75] translate-x-20">
+      <WeatherBox />
+    </div>
+  </div>
         </div>
       </div>
-    </div>
   );
 }

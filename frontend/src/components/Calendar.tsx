@@ -314,7 +314,7 @@ export default function Calendar() {
     <div className="flex flex-col items-end justify-end min-h-screen w-9/12 p-4 relative">
       <div className="w-full relative z-20">
         {/* Main container with overflow hidden */}
-        <div className="relative overflow-hidden shadow-lg rounded-lg">
+        <div className="relative overflow-hidden shadow-lg rounded-lg w-[900px]">
           {/* Calendar content that shifts left */}
           <div className={`transition-all duration-300 ease-in-out ${showSidePanel ? '-ml-[50%]' : ''}`}>
             {/* Month and Year Header */}
