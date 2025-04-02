@@ -19,14 +19,14 @@ export default function Navbar() {
       if (response.ok) {
         // Clear local storage or authentication state if needed
         localStorage.removeItem("token"); 
-        navigate("/"); // Redirect user to login page
+        window.location.href = '/'; 
       } else {
         console.error("Logout failed");
-        navigate("/"); // Redirect user to login page
+        window.location.href = '/'; 
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      navigate("/"); // Redirect user to login page
+      window.location.href = '/'; // Redirect user to login page
     }
   };
 
