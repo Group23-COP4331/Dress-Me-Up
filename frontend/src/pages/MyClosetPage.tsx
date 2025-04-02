@@ -51,6 +51,10 @@ export default function MyCloset() {
     size: string;
   };
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const outfitModalRef = useRef<HTMLDivElement>(null);
+  const itemModalRef = useRef<HTMLDivElement>(null);
+
   const [loading, setLoading] = useState(true); // ✅ for loading spinner
 
   const [page, setPage] = useState(1);
@@ -129,6 +133,40 @@ export default function MyCloset() {
     return `data:${item.fileType};base64,${item.file}`;
   };
   
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+  
+      const clickedOutsideOutfit =
+        showCreateOutfitForm &&
+        outfitModalRef.current &&
+        !outfitModalRef.current.contains(target);
+  
+      const clickedOutsideItem =
+        (showAddItemForm || editingItem) &&
+        itemModalRef.current &&
+        !itemModalRef.current.contains(target);
+  
+      if (clickedOutsideOutfit) {
+        resetOutfitForm();
+        setShowCreateOutfitForm(false);
+      }
+  
+      if (clickedOutsideItem) {
+        resetItemForm();
+        setShowAddItemForm(false);
+        setEditingItem(null);
+      }
+    }
+  
+    if (showCreateOutfitForm || showAddItemForm || editingItem) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showCreateOutfitForm, showAddItemForm, editingItem]);    
 
   useEffect(() => {
     let ignore = false;
@@ -294,17 +332,22 @@ const handleDeleteOutfit = async (id: string) => {
         {/* Search Bar*/}
         <div className="mt-4 top-16 py-4 w-[75%]">
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search ..."
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setClothingItems([]); // reset results
-              setPage(1);            // reset pagination
-              setHasMore(true);      // allow more fetches
+            onChange={(e) => setSearchTerm(e.target.value)} // 🔁 Live update
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setClothingItems([]);            // Reset current results
+                setPage(1);                      // Restart pagination
+                setHasMore(true);                // Allow more items
+                setTriggerReload(prev => !prev); // Force re-fetch
+                searchInputRef.current?.blur();  // ✅ Deselect input
+              }
             }}
             className="w-full max-w-xl mx-auto px-4 py-2 bg-white rounded-full text-black placeholder-black shadow-lg z-10"
-        />
+          />
         </div>
 
         {/* Create outfit and add item buttons */}
@@ -476,7 +519,7 @@ const handleDeleteOutfit = async (id: string) => {
 
       {(showAddItemForm || editingItem) && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
+            <div ref={itemModalRef} className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
               <button
                 className="absolute top-2 right-2 text-xl font-bold"
                 onClick={() => {
@@ -596,7 +639,7 @@ const handleDeleteOutfit = async (id: string) => {
 
         {showCreateOutfitForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
+            <div ref={outfitModalRef} className="bg-themeDarkBeige p-6 rounded-lg w-96 relative">
               <button
                 className="absolute top-2 right-2 text-xl font-bold"
                 onClick={() => {
