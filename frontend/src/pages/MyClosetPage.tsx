@@ -92,6 +92,8 @@ export default function MyCloset() {
 
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
 
+  const userId = localStorage.getItem("userId");
+
   const toggleFavorite = async (itemId: string) => {
     // Get the current item
     const original = clothingItems.find((item) => item.id === itemId);
@@ -172,7 +174,6 @@ export default function MyCloset() {
     let ignore = false;
   
     const fetchClothingItems = async () => {
-      const userId = 1;
   
       if (!userId) {
         console.warn("No userId found");
@@ -244,7 +245,7 @@ export default function MyCloset() {
   useEffect(() => {
     const fetchOutfits = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/getOutfits?userId=1", {
+        const response = await fetch(`http://localhost:5001/api/getOutfits?userId=${userId}`, {
           method: "GET", // ✅ also correct HTTP method now
         });
     
@@ -538,7 +539,6 @@ const handleDeleteOutfit = async (id: string) => {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const formData = new FormData();
-                  const userId = 1;
                   formData.append("userId", userId || "");
                   formData.append("name", itemName);
                   formData.append("color", itemColor);
@@ -560,6 +560,7 @@ const handleDeleteOutfit = async (id: string) => {
                         setEditingItem(null);
                         setClothingItems([]); // re-fetch
                         setPage(1); // reset to start
+                        setTriggerReload(prev => !prev);
                       } else {
                         toast.error("Update failed!");
                       }
@@ -579,6 +580,7 @@ const handleDeleteOutfit = async (id: string) => {
                         setShowAddItemForm(false);
                         setClothingItems([]); // re-fetch
                         setPage(1); // reset
+                        setTriggerReload(prev => !prev);
                       } else {
                         toast.error("Add failed!");
                       }
@@ -659,8 +661,6 @@ const handleDeleteOutfit = async (id: string) => {
                     alert("Please complete all fields including weather!");
                     return;
                   }
-
-                  const userId = 1;
 
                   const outfit = {
                     userId,
