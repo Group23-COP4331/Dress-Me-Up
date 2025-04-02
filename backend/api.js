@@ -137,9 +137,9 @@ app.post("/api/requestResetPassword", async (req, res) => {
     let requestLink;
 
     if (process.env.NODE_ENV === 'production') {
-      requestLink = 'http://dressmeupproject.com/api/resetPassword?token=${resetToken}';
+      requestLink = `http://dressmeupproject.com/api/reset-password?token=${resetToken}`;
     } else {
-      requestLink = 'http://localhost:5001/api/resetPassword?token=${resetToken}';
+      requestLink = `http://localhost:5001/api/reset-password?token=${resetToken}`;
     }
 
     const msg = {
@@ -175,6 +175,7 @@ app.post("/api/resetPassword", async (req, res) => {
     return res.status(500).json({ message: "Server error in resetPassword API", error });
   }
 });
+
 
   app.post('/api/addcard', async (req, res, next) => {
     const { userId, card, jwtToken } = req.body;
@@ -691,6 +692,13 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       console.error('Error in /api/weather: ', error);
       res.status(500).json({ error: error.message });
     }
-  })
+  });
+
+    
+  app.post('/api/logout', (req, res) => {
+    res.clearCookie('jwtToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.status(200).json({ message: 'Logged out successfully' });
+  });
+
 
 };

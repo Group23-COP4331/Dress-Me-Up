@@ -20,7 +20,7 @@ export default function DashboardPage(){
     }, []);
 
     return (
-        <main>
+        <main className="overflow-hidden lg:overflow-hidden">
             <Navbar />
             <section 
             className="

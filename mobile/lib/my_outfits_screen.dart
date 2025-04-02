@@ -51,21 +51,30 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
         final data = jsonDecode(response.body);
         debugPrint("Outfits JSON: ${jsonEncode(data)}");
 
+        if (mounted) {
         setState(() {
           _outfits = data['results'] ?? [];
           if (_outfits.isEmpty) {
             _message = 'No outfits yet.';
           }
         });
+      }
+
       } else {
-        setState(() {
-          _message = 'Failed to load outfits. (Status: ${response.statusCode})';
-        });
+        if (mounted) {
+  setState(() {
+    _message = 'Failed to load outfits. (Status: ${response.statusCode})';
+  });
+}
+
       }
     } catch (e) {
-      setState(() {
-        _message = 'Error: $e';
-      });
+      if (mounted) {
+  setState(() {
+    _message = 'Error: $e';
+  });
+}
+
     }
   }
 
@@ -158,14 +167,18 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
             ElevatedButton.icon(
               onPressed: () async {
                 final newOutfit = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddOutfitScreen.AddOutfitScreen(
-                      jwtToken: widget.jwtToken,
-                      userId: widget.userId,
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddOutfitScreen.AddOutfitScreen(
+                        jwtToken: widget.jwtToken,
+                        userId: widget.userId,
+                      ),
                     ),
-                  ),
-                );
+                  );
+
+                  if (newOutfit != null) {
+                    await _fetchOutfits(); // re-fetch with populated fields
+                  }
 
                 if (newOutfit != null) {
                   setState(() {
@@ -196,7 +209,7 @@ class _MyOutfitsScreenState extends State<MyOutfitsScreen> {
                         final outfit = _outfits[index];
 
                         return Card(
-                          color: themeLightBeige,
+                          color: const Color(0xFFF6E6CB),
                           elevation: 4,
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(

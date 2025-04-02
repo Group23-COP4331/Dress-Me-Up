@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 class AddClothingItemScreen extends StatefulWidget {
   final File imageFile;
@@ -27,14 +30,32 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
   final _sizeController = TextEditingController();
   String _message = '';
 
-  Future<void> _submit() async {
-    final name = _nameController.text.trim();
-    final color = _colorController.text.trim();
-    final category = _categoryController.text.trim();
-    final size = _sizeController.text.trim();
+Future<void> _submit() async {
+  final name = _nameController.text.trim();
+  final color = _colorController.text.trim();
+  final category = _categoryController.text.trim();
+  final size = _sizeController.text.trim();
 
-    if (name.isEmpty || color.isEmpty || category.isEmpty || size.isEmpty) {
-      setState(() => _message = 'Please fill out all fields.');
+  if (name.isEmpty || color.isEmpty || category.isEmpty || size.isEmpty) {
+    setState(() => _message = 'Please fill out all fields.');
+    return;
+  }
+
+  setState(() => _message = '');
+
+  try {
+    // Compress the image
+    final dir = await getTemporaryDirectory();
+    final targetPath = path.join(dir.path, '${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      widget.imageFile.absolute.path,
+      targetPath,
+      quality: 70, // You can tune this between 0-100
+    );
+
+    if (compressedFile == null) {
+      setState(() => _message = 'Image compression failed.');
       return;
     }
 
@@ -43,7 +64,6 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
       Uri.parse('http://dressmeupproject.com:5001/api/addClothingItem'),
     );
 
-    // Add form fields
     request.fields['userId'] = widget.userId;
     request.fields['name'] = name;
     request.fields['color'] = color;
@@ -51,36 +71,29 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
     request.fields['size'] = size;
     request.fields['jwtToken'] = widget.jwtToken;
 
-    // Add image file with explicitly set content type
     request.files.add(
       await http.MultipartFile.fromPath(
         'image',
-        widget.imageFile.path,
+        compressedFile.path,
         contentType: MediaType('image', 'jpeg'),
       ),
     );
 
-    // Debug prints
-    print("Fields: ${request.fields}");
-    print("Number of files: ${request.files.length}");
+    var response = await request.send();
+    var body = await response.stream.bytesToString();
+    final data = jsonDecode(body);
 
-    try {
-      var response = await request.send();
-      var body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-
-      if (response.statusCode == 201) {
-        // On success, pop this screen and return the new item
-        Navigator.pop(context, data['newItem']);
-      } else {
-        setState(() => _message = data['error'] ?? 'Unknown error');
-      }
-    } catch (e) {
-      setState(() => _message = 'Error: $e');
+    if (response.statusCode == 201) {
+      Navigator.pop(context, data['newItem']);
+    } else {
+      setState(() => _message = data['error'] ?? 'Unknown error');
     }
+  } catch (e) {
+    setState(() => _message = 'Error: $e');
   }
+}
 
-  @override
+ @override
   void dispose() {
     _nameController.dispose();
     _colorController.dispose();

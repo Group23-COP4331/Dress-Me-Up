@@ -6,7 +6,7 @@ interface SliderButtonProps{ //defining an interface to give the types of the pr
 export default function SliderButton({isLoginForm, toggleForm}: SliderButtonProps){
 
   return(
-    <div className = "flex flex-row justify-center items-center bg-themeDarkBeige w-56 h-16 rounded-3xl mt-10 relative"> {/*Div that shows the dark beige box that contians the login and register message on center of login box */}
+    <div className = "flex flex-row justify-center items-center bg-themeDarkBeige w-56 h-16 rounded-3xl mt-10 relative shadow-md"> {/*Div that shows the dark beige box that contians the login and register message on center of login box */}
       
       <button className = "flex flex-row w-full justify-between px-7 z-10" onClick = {toggleForm}> {/*Only need to make one button since login and register prompt are within  same oval. Whenever button gets clicked wse call toggleForm which changes the boolean state of our isLoginForm variable */}
         <span className = "text-lg">Login</span>

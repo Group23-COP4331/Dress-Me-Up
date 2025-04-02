@@ -309,10 +309,10 @@ export default function Calendar() {
   });
 
   return (
-    <div className="flex flex-col items-end justify-end min-h-screen w-9/12 p-4 overflow-hidden relative">
+    <div className="flex flex-col items-end justify-end min-h-screen w-9/12 p-4 relative">
       <div className="w-full relative z-20">
         {/* Main container with overflow hidden */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden shadow-lg rounded-lg">
           {/* Calendar content that shifts left */}
           <div className={`transition-all duration-300 ease-in-out ${showSidePanel ? '-ml-[50%]' : ''}`}>
             {/* Month and Year Header */}
@@ -375,21 +375,21 @@ export default function Calendar() {
                 <div className="flex-grow overflow-y-auto pr-2">
                   <div className="space-y-2">
                     <button 
-                      className="w-full bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors"
+                      className="w-full bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors shadow-md"
                       onClick={() => console.log('Assign Outfit button clicked')}
                     >
                       Assign Outfit to Calendar
                     </button>
                     
                     <button 
-                      className="w-full bg-[#9cb4d4] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#8aa3c2] transition-colors mb-4"
+                      className="w-full bg-[#9cb4d4] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#8aa3c2] transition-colors mb-4 shadow-md"
                       onClick={handleAddEventClick}
                     >
                       Add Event
                     </button>
                     
                     {getHoliday(selectedDate) && (
-                      <div className="p-2 bg-white text-amber-800 rounded">
+                      <div className="p-2 bg-white text-amber-800 rounded shadow-md">
                         Holiday: {getHoliday(selectedDate)?.name}
                       </div>
                     )}
@@ -408,7 +408,7 @@ export default function Calendar() {
                               e.stopPropagation();
                               handleEditEvent(event);
                             }}
-                            className="px-2 py-1 bg-blue-200 text-blue-800 rounded hover:bg-blue-300"
+                            className="px-2 py-1 bg-blue-200 text-blue-800 rounded hover:bg-blue-300 shadow-md" 
                           >
                             Edit
                           </button>
@@ -417,7 +417,7 @@ export default function Calendar() {
                               e.stopPropagation();
                               handleDeleteClick(event);
                             }}
-                            className="px-2 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300"
+                            className="px-2 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300 shadow-md"
                           >
                             Delete
                           </button>
@@ -428,7 +428,7 @@ export default function Calendar() {
                 </div>
                 
                 <button 
-                  className="mt-auto bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors"
+                  className="mt-auto bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors shadow-md"
                   onClick={() => console.log('Randomize Outfit button clicked')}
                 >
                   Randomize Outfit
@@ -498,13 +498,13 @@ export default function Calendar() {
       
       <div className="flex justify-end space-x-2">
         <button
-          className="px-4 py-2 bg-gray-300 rounded"
+          className="px-4 py-2 bg-gray-300 rounded shadow-md"
           onClick={closeEventModal}  // Updated to use close function
         >
           Cancel
         </button>
         <button
-          className="px-4 py-2 bg-[#a8947c] text-white rounded"
+          className="px-4 py-2 bg-[#a8947c] text-white rounded shadow-md"
           onClick={() => {
             if (modalEvent.originalEvent) {
               handleUpdateEvent();
@@ -531,13 +531,13 @@ export default function Calendar() {
       {eventToDelete.frequency !== 'none' ? (
         <div className="mb-4 space-y-2">
           <button
-            className="w-full px-4 py-2 bg-red-100 text-red-800 rounded hover:bg-red-200"
+            className="w-full px-4 py-2 bg-red-100 text-red-800 rounded hover:bg-red-200 shadow-md"
             onClick={() => handleDeleteEvent(false)}
           >
             Delete only this occurrence
           </button>
           <button
-            className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 shadow-md"
             onClick={() => handleDeleteEvent(true)}
           >
             Delete all {eventToDelete.frequency} occurrences
@@ -545,7 +545,7 @@ export default function Calendar() {
         </div>
       ) : (
         <button
-          className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 shadow-md"
           onClick={() => handleDeleteEvent(false)}
         >
           Delete Event
@@ -553,7 +553,7 @@ export default function Calendar() {
       )}
       
       <button
-        className="w-full mt-2 px-4 py-2 bg-gray-300 rounded"
+        className="w-full mt-2 px-4 py-2 bg-gray-300 rounded shadow-md"
         onClick={() => setShowDeleteModal(false)}
       >
         Cancel
