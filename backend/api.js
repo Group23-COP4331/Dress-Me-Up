@@ -1,25 +1,35 @@
-// api.js
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const User = require('./models/user');
 const Card = require('./models/card');
 const Weather = require('./models/weather');
-const token = require('./createJWT'); // Assuming you have your JWT helper in createJWT.js
+const token = require('./createJWT');
 const ClothingItem = require('./models/clothingItem');
 const Outfit = require('./models/outfit');
 const OutfitPlan = require('./models/outfitPlan');
 const multer = require('multer');
-const upload = multer({storage: multer.memoryStorage()});
+const upload = multer({ storage: multer.memoryStorage() });
 const axios = require('axios');
 const express = require('express');
 const jsonWebToken = require('jsonwebtoken');
 const sendEmailVerification = require('./sendEmailVerification');
+const compression = require('compression');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = function (app) {
 
-  const cors = require('cors');
-app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173'] }));
+const cors = require('cors');
+app.use(cors({ 
+  origin: ['https://dressmeupproject.com', 'http://localhost:5173'],
+ }));
+
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
@@ -252,39 +262,63 @@ app.post("/api/resetPassword", async (req, res) => {
   //Need to add jwtToken to this
   // GET route: /api/getClothingItems?userId=...&page=1&limit=12
   app.get('/api/getClothingItems', async (req, res) => {
+    console.log("🛠️ Received getClothingItems request");
+
     const { userId, page = 1, limit = 12, category, search } = req.query;
+    console.log("🔍 Incoming query params:", req.query);
+
     const skip = (page - 1) * limit;
-  
+
     try {
-      const query = { UserId: userId };
-  
-      // Optional: filter by category
+      const query = { UserId: userId.toString() };
+
       if (category) {
-        query.Category = category;
-      }
-  
-      // Optional: search term (case-insensitive match on Name or Color)
-      if (search) {
-        const regex = new RegExp(search, 'i');
-        query.$or = [
-          { Name: regex },
-          { Color: regex }
-        ];
+        const categories = Array.isArray(category)
+          ? category
+          : category.split(',');
+
+        query.Category = {
+          $in: categories.map(c => new RegExp(`^${c}$`, 'i')) // case-insensitive match
+        };
       }
 
+      if (search) {
+        query.Name = { $regex: search, $options: 'i' };
+      }
+
+      // ✅ Add this block:
       if (req.query.favorite === 'true') {
         query.isFavorite = true;
       }
-  
+
+      console.log("🧩 MongoDB query:", query);
+
       const items = await ClothingItem.find(query)
         .skip(parseInt(skip))
         .limit(parseInt(limit));
-  
-      res.json({ results: items });
+
+      console.log("📦 Items fetched from DB:", items.length);
+
+      const result = items.map(item => {
+        const itemObj = item.toObject();
+        if (itemObj.file && itemObj.file.data) {
+          itemObj.file = Buffer.from(itemObj.file.data).toString('base64');
+        } else if (Buffer.isBuffer(itemObj.file)) {
+          itemObj.file = itemObj.file.toString('base64');
+        }
+        return itemObj;
+      });
+
+      res.json({ results: result });
     } catch (err) {
+      console.error("❌ Error in getClothingItems:", err);
       res.status(500).json({ error: 'Failed to fetch items' });
     }
   });
+
+  
+
+
 
   app.post('/api/toggleFavorite', async (req, res) => {
     const { _id } = req.body;
@@ -339,7 +373,13 @@ app.post("/api/resetPassword", async (req, res) => {
         item.fileType = req.file.mimetype;
       }
       await item.save();
-      res.status(200).json({item, message: 'Item Updated', error: ''});
+      const updatedItem = item.toObject();
+if (updatedItem.file && Buffer.isBuffer(updatedItem.file)) {
+  updatedItem.file = updatedItem.file.toString('base64');
+}
+console.log('Sending item:', typeof updatedItem.file); // Should log "string"
+
+res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     } catch(e) {
       res.status(500).json({error: e.message});
     }
@@ -499,7 +539,7 @@ app.post("/api/resetPassword", async (req, res) => {
       console.log("Database query result:", JSON.stringify(user, null, 2));
   
       if(!user){
-        return res.status(401).json({ error: "Incorrect email and password!" });
+        return res.status(401).json({ error: "Insrect email and password!" });
       }
       if(!user.verified){
         return res.status(403).json({ error: "Please verify your email before signing in!", verified: false });
@@ -531,56 +571,103 @@ app.post("/api/resetPassword", async (req, res) => {
 
   app.post('/api/addOutfit', async (req, res) => {
     try {
-      const {userId, name, top, bottom, shoes, weatherCategory} = req.body;
-      
+      const { userId, name, top, bottom, shoes, weatherCategory } = req.body;
+
       if (!userId || !name || !top || !bottom || !shoes) {
         return res.status(400).json({ error: 'Fields are wrong!' });
       }
 
       const newOutfit = new Outfit({
-        UserId: userId, 
+        UserId: userId,
         Name: name,
-        Top: top,
-        Bottom: bottom,
-        Shoes: shoes,
-        WeatherCategory: weatherCategory
+        Top: new ObjectId(top),
+        Bottom: new ObjectId(bottom),
+        Shoes: new ObjectId(shoes),
+        WeatherCategory: weatherCategory,
       });
 
       await newOutfit.save();
       res.status(200).json(newOutfit);
     } catch (error) {
-        res.status(500).json({error: 'Error in addOutfit api',
-        details: error.message
-      });
+      res.status(500).json({ error: 'Error in addOutfit api', details: error.message });
     }
   });
 
-  app.post('/api/deleteOutfit', async (req, res, next) =>{
-    const _id = req.body; 
-    const id = _id;
-
+  app.post('/api/deleteOutfit', async (req, res) => {
+    const { _id } = req.body; // ✅ Destructure _id properly
+  
     try {
-      const deleted = await Outfit.findByIdAndDelete(id);
-
+      const deleted = await Outfit.findByIdAndDelete(_id);
+  
       if (!deleted) {
-        return res.status(404).json({error: 'Outfit id not found'});
+        return res.status(404).json({ error: 'Outfit id not found' });
       }
-
-      res.status(200).json({id, message: 'Outfit Deleted', error: ''});
-      }
-    catch(e) {
-      res.status(500).json({error: e.message});
+  
+      res.status(200).json({ _id, message: 'Outfit Deleted', error: '' });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
     }
   });
+  
 
-  app.post('/api/getOutfits', async (req, res) => {
+  app.get('/api/getOutfits', async (req, res) => {
+    const { userId } = req.query;
     try {
-      const allOutfits = await Outfit.find();
-      res.status(200).json(allOutfits);
-    } catch (error) {
-      res.status(500).json({error: 'Error in /api/getOutfits'});
+      const outfits = await Outfit.find({ UserId: userId })
+        .populate('Top')
+        .populate('Bottom')
+        .populate('Shoes')
+        .lean(); // Convert to plain objects
+
+      const toBase64 = (file) => {
+        if (!file) return null;
+        if (file.data) return Buffer.from(file.data).toString('base64');
+        if (Buffer.isBuffer(file)) return file.toString('base64');
+        return file;
+      };
+
+      const results = outfits.map((outfit) => {
+        if (outfit.Top?.file) {
+          outfit.Top.file = toBase64(outfit.Top.file);
+        }
+        if (outfit.Bottom?.file) {
+          outfit.Bottom.file = toBase64(outfit.Bottom.file);
+        }
+        if (outfit.Shoes?.file) {
+          outfit.Shoes.file = toBase64(outfit.Shoes.file);
+        }
+        return outfit;
+      });
+
+      console.log("✅ Final outfit payload:", JSON.stringify(results[0], null, 2));
+
+      res.json({ results });
+    } catch (err) {
+      console.error("Error in getOutfits:", err);
+      res.status(500).json({ error: 'Failed to fetch outfits' });
     }
   });
+
+  app.post('/api/updateOutfit', async (req, res) => {
+    const { _id, name, top, bottom, shoes, weatherCategory } = req.body;
+    try {
+      const outfit = await Outfit.findById(_id);
+      if (!outfit) {
+        return res.status(404).json({ error: 'Outfit not found' });
+      }
+      if (name) outfit.Name = name;
+      if (top) outfit.Top = mongoose.Types.ObjectId(top);
+      if (bottom) outfit.Bottom = mongoose.Types.ObjectId(bottom);
+      if (shoes) outfit.Shoes = mongoose.Types.ObjectId(shoes);
+      if (weatherCategory !== undefined) outfit.WeatherCategory = weatherCategory;
+
+      await outfit.save();
+      res.status(200).json({ updatedOutfit: outfit });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
 
   app.get('/api/weather', async (req, res) => {
     try {

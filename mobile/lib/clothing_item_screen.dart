@@ -119,7 +119,7 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: 'Name',
+                labelText: 'Name (Ex: Graphic T-Shirt)',
                 border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: themeGray),
@@ -131,7 +131,7 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
             TextField(
               controller: _colorController,
               decoration: InputDecoration(
-                labelText: 'Color',
+                labelText: 'Color (Ex: Pink, Yellow)',
                 border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: themeGray),
@@ -143,7 +143,7 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
             TextField(
               controller: _categoryController,
               decoration: InputDecoration(
-                labelText: 'Category',
+                labelText: 'Category (Ex: Shirts, Pants, Longsleeves)',
                 border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: themeGray),
@@ -155,7 +155,7 @@ class _AddClothingItemScreenState extends State<AddClothingItemScreen> {
             TextField(
               controller: _sizeController,
               decoration: InputDecoration(
-                labelText: 'Size',
+                labelText: 'Size (Ex: S for Small, M for Medium)',
                 border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: themeGray),
