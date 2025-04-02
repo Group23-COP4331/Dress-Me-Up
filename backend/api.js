@@ -18,9 +18,17 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = function (app) {
-  const cors = require('cors');
-  app.use(cors({ origin: ['https://dressmeupproject.com', 'http://localhost:5173', 'http://localhost:5001'] }));
-  app.use(compression());
+
+const cors = require('cors');
+app.use(cors({ 
+  origin: ['https://dressmeupproject.com', 'http://localhost:5173'],
+ }));
+
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 
 app.post('/api/register', async (req, res) => {
   const { FirstName, LastName, Login, Password, Country, City } = req.body;
@@ -428,7 +436,7 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       console.log("Database query result:", JSON.stringify(user, null, 2));
   
       if(!user){
-        return res.status(401).json({ error: "Incorrect email and password!" });
+        return res.status(401).json({ error: "Insrect email and password!" });
       }
       if(!user.verified){
         return res.status(403).json({ error: "Please verify your email before signing in!", verified: false });
@@ -482,23 +490,22 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
     }
   });
 
-  app.post('/api/deleteOutfit', async (req, res, next) =>{
-    const _id = req.body; 
-    const id = _id;
-
+  app.post('/api/deleteOutfit', async (req, res) => {
+    const { _id } = req.body; // ✅ Destructure _id properly
+  
     try {
-      const deleted = await Outfit.findByIdAndDelete(id);
-
+      const deleted = await Outfit.findByIdAndDelete(_id);
+  
       if (!deleted) {
-        return res.status(404).json({error: 'Outfit id not found'});
+        return res.status(404).json({ error: 'Outfit id not found' });
       }
-
-      res.status(200).json({id, message: 'Outfit Deleted', error: ''});
-      }
-    catch(e) {
-      res.status(500).json({error: e.message});
+  
+      res.status(200).json({ _id, message: 'Outfit Deleted', error: '' });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
     }
   });
+  
 
   app.get('/api/getOutfits', async (req, res) => {
     const { userId } = req.query;
