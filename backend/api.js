@@ -137,9 +137,9 @@ app.post("/api/requestResetPassword", async (req, res) => {
     let requestLink;
 
     if (process.env.NODE_ENV === 'production') {
-      requestLink = `http://dressmeupproject.com/api/reset-password?token=${resetToken}`;
+      requestLink = `http://dressmeupproject.com/reset-password?token=${resetToken}`;
     } else {
-      requestLink = `http://localhost:5001/api/reset-password?token=${resetToken}`;
+      requestLink = `http://localhost:5173/reset-password?token=${resetToken}`;
     }
 
     const msg = {
@@ -540,7 +540,7 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       console.log("Database query result:", JSON.stringify(user, null, 2));
   
       if(!user){
-        return res.status(401).json({ error: "Insrect email and password!" });
+        return res.status(401).json({ error: "Incorrect email and password!" });
       }
       if(!user.verified){
         return res.status(403).json({ error: "Please verify your email before signing in!", verified: false });
