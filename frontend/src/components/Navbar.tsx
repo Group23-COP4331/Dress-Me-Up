@@ -26,7 +26,7 @@ export default function Navbar() {
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      window.location.href = '/'; // Redirect user to login page
+      window.location.href = '/'; // Redirect user to login pages
     }
   };
 
