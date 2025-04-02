@@ -22,9 +22,11 @@ export default function Navbar() {
         navigate("/"); // Redirect user to login page
       } else {
         console.error("Logout failed");
+        navigate("/"); // Redirect user to login page
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      navigate("/"); // Redirect user to login page
     }
   };
 
