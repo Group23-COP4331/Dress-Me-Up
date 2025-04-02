@@ -24,15 +24,15 @@ export default function Calendar() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
+  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
 
-const [modalEvent, setModalEvent] = useState({
-  name: '',
-  frequency: 'none' as 'daily' | 'weekly' | 'none',
-  weekday: 0 as number,
-  originalEvent: null as CalendarEvent | null,
-  isEditMode: false // Add this flag
-});
+  const [modalEvent, setModalEvent] = useState({
+    name: '',
+    frequency: 'none' as 'daily' | 'weekly' | 'none',
+    weekday: 0 as number,
+    originalEvent: null as CalendarEvent | null,
+    isEditMode: false
+  });
 
   useEffect(() => {
     const fetchHolidays = async () => {
@@ -308,143 +308,135 @@ const [modalEvent, setModalEvent] = useState({
     );
   });
 
-  // Update your side panel to show events
-  const sidePanelContent = showSidePanel && selectedDate && (
-    <div className="absolute top-0 right-0 w-1/2 h-full bg-[#a8947c] p-4 flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-white text-2xl font-['Piazzolla']">
-          {format(selectedDate, 'EEEE, MMMM d')}
-        </h2>
-        <button 
-          onClick={() => setShowSidePanel(false)}
-          className="text-white text-2xl hover:text-[#d3c0a9]"
-        >
-          ✕
-        </button>
-      </div>
-      
-      {/* Scrollable content area */}
-      <div className="flex-grow overflow-y-auto pr-2"> {/* Added padding for scrollbar */}
-        <div className="space-y-2">
-          <button 
-            className="w-full bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors"
-            onClick={() => console.log('Assign Outfit button clicked')}
-          >
-            Assign Outfit to Calendar
-          </button>
-          
-          <button 
-            className="w-full bg-[#9cb4d4] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#8aa3c2] transition-colors mb-4"
-            onClick={handleAddEventClick}
-          >
-            Add Event
-          </button>
-          
-          {getHoliday(selectedDate) && (
-            <div className="p-2 bg-white text-amber-800 rounded">
-              Holiday: {getHoliday(selectedDate)?.name}
-            </div>
-          )}
-          
-          {getEventsForDate(selectedDate).map(event => (
-  <div key={event.id} className="p-2 bg-blue-100 text-blue-800 rounded flex justify-between items-center">
-    <div>
-      Event: {event.name}
-      {event.frequency !== 'none' && (
-        <span className="text-xs ml-2">({event.frequency})</span>
-      )}
-    </div>
-    <div className="flex space-x-2">
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          handleEditEvent(event);
-        }}
-        className="px-2 py-1 bg-blue-200 text-blue-800 rounded hover:bg-blue-300"
-      >
-        Edit
-      </button>
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          handleDeleteClick(event);
-        }}
-        className="px-2 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300"
-      >
-        Delete
-      </button>
-    </div>
-  </div>
-))}
-        </div>
-      </div>
-      
-      {/* Fixed bottom button */}
-      <button 
-        className="mt-auto bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors"
-        onClick={() => console.log('Randomize Outfit button clicked')}
-      >
-        Randomize Outfit
-      </button>
-    </div>
-  );
-
-
-  // Add the modal at the bottom of your return statement
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-9/12 p-4 overflow-hidden relative">
-      
-      {/* Shrub image that will appear behind the calendar */}
-    <img 
-      src="/shrub.png" // Update this path to your actual image
-      alt="Decorative shrub"
-      className="absolute bottom-20 left-0 w-full max-w-2xl z-10" // Adjust positioning as needed
-      style={{
-        transform: 'translateY(50%)', // Adjust this to position the shrub correctly
-        pointerEvents: 'none' // Allows clicks to pass through to the calendar
-      }}
-    />
-
-      <div className="flex w-full max-w-6xl relative z-20">
-        {/* Calendar container */}
-        <div className={`transition-all duration-500 ${showSidePanel ? 'translate-x-[-50%]' : ''} w-full`}>
-          {/* Month and Year Header */}
-          <div className="bg-[#a8947c] text-white font-['Piazzolla'] p-2.5 text-center flex justify-between items-center w-full">
-            <button 
-              onClick={handlePrevMonth} 
-              className="bg-none border-none text-white text-[30px] cursor-pointer hover:text-[#d3c0a9] p-2.5"
-            >
-              &lt;
-            </button>
-            <div className="text-xl md:text-2xl lg:text-3xl">
-              {format(currentMonth, 'MMMM yyyy')}
-            </div>
-            <button 
-              onClick={handleNextMonth} 
-              className="bg-none border-none text-white text-[30px] cursor-pointer hover:text-[#d3c0a9] p-2.5"
-            >
-              &gt;
-            </button>
-          </div>
-
-          {/* Weekday Header */}
-          <div className="grid grid-cols-7 w-full text-xl">
-            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
-              <div 
-                key={day} 
-                className="bg-white text-[#666666] font-['Montserrat'] p-5 text-center"
+    <div className="flex flex-col items-end justify-end min-h-screen w-9/12 p-4 overflow-hidden relative">
+      <div className="w-full relative z-20">
+        {/* Main container with overflow hidden */}
+        <div className="relative overflow-hidden">
+          {/* Calendar content that shifts left */}
+          <div className={`transition-all duration-300 ease-in-out ${showSidePanel ? '-ml-[50%]' : ''}`}>
+            {/* Month and Year Header */}
+            <div className="bg-[#a8947c] text-white font-['Piazzolla'] p-2.5 text-center flex justify-between items-center w-full">
+              <button 
+                onClick={handlePrevMonth} 
+                className="bg-none border-none text-white text-[30px] cursor-pointer hover:text-[#d3c0a9] p-2.5"
               >
-                {day}
+                &lt;
+              </button>
+              <div className="text-xl md:text-2xl lg:text-3xl">
+                {format(currentMonth, 'MMMM yyyy')}
               </div>
-            ))}
+              <button 
+                onClick={handleNextMonth} 
+                className="bg-none border-none text-white text-[30px] cursor-pointer hover:text-[#d3c0a9] p-2.5"
+              >
+                &gt;
+              </button>
+            </div>
+
+            {/* Weekday Header */}
+            <div className="grid grid-cols-7 w-full text-xl">
+              {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+                <div 
+                  key={day} 
+                  className="bg-white text-[#666666] font-['Montserrat'] p-5 text-center"
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Days */}
+            <div className="grid grid-cols-7 w-full">
+              {calendarDaysRender}
+            </div>
           </div>
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 w-full">
-  {calendarDaysRender}
-</div>
+          {/* Side Panel that slides out from within the calendar */}
+          <div 
+            className={`absolute top-0 right-0 w-1/2 h-full bg-[#a8947c] p-4 flex flex-col 
+              transition-transform duration-300 ease-in-out
+              ${showSidePanel ? 'translate-x-0' : 'translate-x-full'}`}
+          >
+            {selectedDate && (
+              <>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-white text-2xl font-['Piazzolla']">
+                    {format(selectedDate, 'EEEE, MMMM d')}
+                  </h2>
+                  <button 
+                    onClick={() => setShowSidePanel(false)}
+                    className="text-white text-2xl hover:text-[#d3c0a9]"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div className="flex-grow overflow-y-auto pr-2">
+                  <div className="space-y-2">
+                    <button 
+                      className="w-full bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors"
+                      onClick={() => console.log('Assign Outfit button clicked')}
+                    >
+                      Assign Outfit to Calendar
+                    </button>
+                    
+                    <button 
+                      className="w-full bg-[#9cb4d4] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#8aa3c2] transition-colors mb-4"
+                      onClick={handleAddEventClick}
+                    >
+                      Add Event
+                    </button>
+                    
+                    {getHoliday(selectedDate) && (
+                      <div className="p-2 bg-white text-amber-800 rounded">
+                        Holiday: {getHoliday(selectedDate)?.name}
+                      </div>
+                    )}
+                    
+                    {getEventsForDate(selectedDate).map(event => (
+                      <div key={event.id} className="p-2 bg-blue-100 text-blue-800 rounded flex justify-between items-center">
+                        <div>
+                          Event: {event.name}
+                          {event.frequency !== 'none' && (
+                            <span className="text-xs ml-2">({event.frequency})</span>
+                          )}
+                        </div>
+                        <div className="flex space-x-2">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditEvent(event);
+                            }}
+                            className="px-2 py-1 bg-blue-200 text-blue-800 rounded hover:bg-blue-300"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(event);
+                            }}
+                            className="px-2 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <button 
+                  className="mt-auto bg-[#b6c7a9] text-black text-2xl font-['Piazzolla'] py-2 px-4 rounded-xl hover:bg-[#aabb9f] transition-colors"
+                  onClick={() => console.log('Randomize Outfit button clicked')}
+                >
+                  Randomize Outfit
+                </button>
+              </>
+            )}
+          </div>
         </div>
-        {sidePanelContent}
       </div>
 
       {/* Event Modal */}
