@@ -25,7 +25,7 @@ export default function WeatherBox() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const response = await fetch(`http://dressmeupproject.com/api/weather?userId=${userId}`); // Replace `1` with the actual userId
+                const response = await fetch(`http://localhost:5001/api/weather?userId=${userId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch weather data');
                 }
@@ -48,8 +48,8 @@ export default function WeatherBox() {
     }
 
     return (
-        <div className="bg-[#b6c7a9] shadow-sm flex flex-col justify-center text-center p-5 border border-gray-300 rounded-xl max-w-sm aspect-square mx-auto ">
-            <p className="w-full flex flex-start text-2xl font-medium">{weatherData.temperature}°C</p>
+        <div className="bg-[#a8947c] shadow-md flex flex-col justify-center text-center p-5 rounded-xl max-w-sm aspect-square mx-auto text-white">
+            <p className="w-full flex flex-start text-2xl font-medium">{weatherData.temperature}°F</p>
             <div className="w-full h-full flex flex-col justify-center items-center">
             <img 
         src={weatherData.icon} 

@@ -22,7 +22,7 @@ module.exports = function (app) {
 
 const cors = require('cors');
 app.use(cors({ 
-  origin: ['https://dressmeupproject.com', 'http://localhost:5173'],
+  origin: ['https://dressmeupproject.com', 'http://localhost:5173'], //include https://dressmeupproject.com header for server
  }));
 
 app.use((req, res, next) => {
@@ -66,13 +66,13 @@ app.post('/api/register', async (req, res) => {
       verificationLink = `http://dressmeupproject.com/verify-email?token=${verifyToken}`;
     } else { //otherwise jsut do local host
       verificationLink = `http://localhost:5173/verify-email?token=${verifyToken}`;
-    }
+    } 
 
     // wait for the email to send
-    await sendEmailVerification(newUser.Login.trim(), verificationLink);
+    //await sendEmailVerification(newUser.Login.trim(), verificationLink);
 
     // 3. (Optional) Auto-login the user by returning a JWT
-    // const jwtToken = token.createToken(newUser.FirstName, newUser.LastName, newUser.UserId);
+     const jwtToken = token.createToken(newUser.FirstName, newUser.LastName, newUser.UserId);
 
     // 4. Return success
     res.status(200).json({
@@ -83,7 +83,7 @@ app.post('/api/register', async (req, res) => {
       userId: newUser.UserId,
       Country: newUser.Country,
       City: newUser.City,
-      message: 'You have successfully registered! Please check email to verify account and finish registration.'
+      message: 'You have successfully registered!'
     });
   } catch (e) {
     console.error('Error in /api/register:', e);
@@ -94,6 +94,7 @@ app.post('/api/register', async (req, res) => {
 app.get('/auth/verify-email', async (req, res) => {
 
   console.log("Hitting verify-email");
+
 
   // get token
   const { token } = req.query;
@@ -195,8 +196,6 @@ app.post("/api/resetPassword", async (req, res) => {
       res.status(500).json({ error: e.message, jwtToken: '' });
     }
   });
-
-
 
 
   //Need to add jwtToken to this
@@ -542,9 +541,10 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
       if(!user){
         return res.status(401).json({ error: "Incorrect email and password!" });
       }
-      if(!user.verified){
+
+      /*if(!user.verified){
         return res.status(403).json({ error: "Please verify your email before signing in!", verified: false });
-      }
+      } */
   
       // >>> Create the JWT token here <<<
       const jwtToken = token.createToken(user.FirstName, user.LastName, user.UserId);
@@ -671,33 +671,43 @@ res.status(200).json({ item: updatedItem, message: 'Item Updated', error: '' });
   
 ///query: /api/getPlans?userId=..&city=..&country=...
   app.get('/api/weather', async (req, res) => {
-    try {
-      const { userId } = req.query;
-      const Person = await User.findOne({ UserId: userId });
-      if (!Person) {
-          return res.status(404).json({ error: 'User not found' });
-      }
-      city = Person.City;
-      country = Person.Country;
-      const API_KEY = process.env.WEATHER_API_KEY;
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`;
+  try {
+    const { userId } = req.query;
+    const person = await User.findOne({ UserId: userId });
+    if (!person) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-      const response = await axios.get(url);
-      const { name, sys, main, weather } = response.data;
-      const weatherData = new Weather({
-       city: city,
-       country: country,
-       temperature: main.temp,
-       description: weather[0].description,
-       icon: `https://openweathermap.org/img/wn/${weather[0].icon}.png`
-      });
+    const { City: city, Country: country } = person;
+    const API_KEY = process.env.WEATHER_API_KEY;
 
-      res.json(weatherData);
+    if (!API_KEY) {
+      return res.status(500).json({ error: 'Weather API key not configured' });
+    }
+
+    if (!city || !country) {
+      return res.status(400).json({ error: 'City or country missing for this user' });
+    }
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=imperial`;
+
+    const response = await axios.get(url);
+    const { main, weather } = response.data;
+
+    res.json({
+      city,
+      country,
+      temperature: main.temp,
+      description: weather[0].description,
+      icon: `https://openweathermap.org/img/wn/${weather[0].icon}.png`
+    });
+
     } catch (error) {
-      console.error('Error in /api/weather: ', error);
+      console.error('Error in /api/weather:', error.response?.data || error.message);
       res.status(500).json({ error: error.message });
     }
   });
+
 
     
   app.post('/api/logout', (req, res) => {

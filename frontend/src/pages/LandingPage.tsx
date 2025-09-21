@@ -14,13 +14,13 @@ export default function LandingPage(){
 
   //making a button class varibale that holds a multiline string denoted by backticks to just populate className for buttons with a variable since its getting pretty long
   const buttonClass = `
-    text-white 
+    text-white  
     text-3xl 
     bg-themeGray 
     border-2 
     border-themeDarkBeige
     w-36 h-12
-    lg:w-44 lg:h-16 rounded-lg
+    lg:w-44 lg:h-16 rounded-lg 
     cursor-pointer
     hover:scale-105
     shadow-md
@@ -31,7 +31,7 @@ export default function LandingPage(){
 
     <div className = "relative flex flex-col justify-start items-center h-screen gap-4 md:flex-row md:items-start lg:pt-24 lg:gap-20 lg:flex-row lg:-translate-x-36 lg:items-start"> {/* Outer div takes up whole screen so the inner div can be centered on screen */}
 
-          <div className = "order-2 relative flex flex-col items-center justify-center bg-themeGray rounded-lg flex-shrink-0 w-80 h-80 gap-4 md:order-1 md:w-3/6 md:h-3/6 lg:gap-10 lg:w-4/6 lg:h-5/6 lg:pt-0 lg:order-1 shadow-lg"> {/*This div is the gray card containing the closet picture and buttons under it */}
+          <div className = "order-2 relative flex flex-col items-center justify-center bg-themeGray rounded-lg flex-shrink-0 w-80 h-80 gap-2 md:order-1 md:w-3/6 md:h-3/6 lg:gap-4 lg:w-4/6 lg:h-5/6 lg:pt-0 lg:order-1 shadow-lg"> {/*This div is the gray card containing the closet picture and buttons under it */}
     
             <img src = {closetImage} alt = "Minimalist closet pic" className = "select-none pointer-events-none w-64 h-56 rounded-lg md:-translate-y-10 md:w-5/6 md:h-3/6 lg:w-5/6 lg:h-4/6 shadow-md"></img> 
 

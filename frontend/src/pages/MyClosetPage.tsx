@@ -56,7 +56,7 @@ export default function MyCloset() {
   const outfitModalRef = useRef<HTMLDivElement>(null);
   const itemModalRef = useRef<HTMLDivElement>(null);
 
-  const [loading, setLoading] = useState(true); // ✅ for loading spinner
+  const [loading, setLoading] = useState(true); // 
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -412,7 +412,7 @@ const handleDeleteOutfit = async (id: string) => {
                           <div key={label} className={baseBox}>
                             <img
                               src={imageUrl || undefined} alt={label}
-                              className="max-h-full max-w-full object-contain" />
+                              className="max-h-full max-w-full object-cover" />
                               
                             
                           </div>

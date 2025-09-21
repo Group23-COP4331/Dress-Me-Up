@@ -23,11 +23,11 @@ const sendEmailVerification = async (userEmail, verificationLink) => {
     // look out for any errors
     try {
         await sgMail.send(msg);
-        console.log('Email sent');
+        console.log('Email sent'); 
     } catch (error) {
         console.error(error);
     }
 }
 
-// export the function
+// export the function 
 module.exports = sendEmailVerification;

@@ -19,7 +19,7 @@ function Login() {
 
 
     return (
-        <div className = "flex flex-col justify-start items-center bg-themeGray w-full max-w-xl mx-4 lg:w-[600px] pb-8 rounded-2xl gap-4 shadow-lg ">
+        <div className = "flex flex-col justify-start items-center bg-themeGray w-full max-w-xl mx-4 lg:w-[600px] pb-8 rounded-3xl gap-4 shadow-lg ">
 
             <SliderButton isLoginForm = {isLoginForm} toggleForm = {toggleForm}/> {/*Call slider button to display login / register button at top of div container. Passing it bool isLoginForm so we can keep track of state */}
             

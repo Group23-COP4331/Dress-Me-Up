@@ -63,7 +63,7 @@ export default function AboutPage(){
     return (
         <div className = "h-screen min-w-screen overflow-auto lg:overflow-hidden">
             <Link to="/" className="hover:scale-105 absolute z-[2] top-7 left-4 sm:left-8 ">
-                <img src={Logo} alt="DressMeUp Logo" className = "w-12 h-12 sm:w-20 sm:h-20 rounded-lg shadow-xl object-cover" />
+                <img src={Logo} alt="DressMeUp Logo" className = "w-12 h-12 sm:w-20 sm:h-20 rounded-lg shadow-lg object-cover" />
             </Link>
             <header className="flex flex-row items-center justify-center min-w-screen relative top-8 mb-24 lg:mb-0">
                 <h1 className='text-4xl md:text-6xl'>Meet the developers</h1>
